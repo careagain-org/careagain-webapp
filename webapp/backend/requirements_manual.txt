@@ -1,0 +1,27 @@
+# api
+fastapi
+
+# web serverz
+uvicorn[standard]
+
+# data model
+pydantic
+typing
+
+# database
+sqlalchemy
+pymysql
+mysql-connector-python
+mysqlclient
+
+# databse migrations
+alembic
+psycopg2-binary
+
+# password hashing
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
+
+#geolocation
+geopy
