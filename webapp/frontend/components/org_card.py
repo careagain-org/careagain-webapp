@@ -1,6 +1,6 @@
 import reflex as rx
 import httpx
-from ..states.project_state import ProjectState
+from ..states.org_state import OrgState
 from ..constants import urls
 from dotenv import load_dotenv,find_dotenv
 import os
@@ -10,53 +10,44 @@ s3_bucket = os.environ.get("SUPABASE_S3_BUCKET")
 s3_prfolder = "/projects/project_id"
 s3_imfolder = "/images/"
 
-def project_card_vertical(image: str, 
-                          project_title: str, 
-                          project_description: str, 
-                          project_id: str,
-                          group_logo:str)-> rx.Component:
-
+def org_card_vertical(org)-> rx.Component:
     return rx.box(
         rx.card(
-            rx.link(
             rx.hstack(
-                rx.image(src=image,
-                        width="120px",
-                        height="120px"),
+                rx.avatar(src=f"{org["logo"]}",
+                        width="50px",
+                        height="50px"),
                 rx.vstack(
-                    # rx.image(src=group_logo,
-                    #     height="40px",
-                    #     align="right"),
-                    rx.heading(project_title),
-                    rx.text(project_description),
-                    spacing="5"
+                    rx.heading(org["name"],size="3"),
+                    rx.text(org["type"]),
+                    rx.text(org["adress"]),
+                    spacing="1",
                 ),
-            ),
+                rx.cond(org["org_id"] == OrgState.org_id,
+                        rx.button("Select",disabled=True,type="button"),
+                        rx.button("Select",disabled=False,
+                            on_click = lambda: OrgState.select_org(org["org_id"]),
+                            type="button"),
+                        )
             ),
             width = "100%",
             size="3",
-            # align="center",
-            on_click=ProjectState.select_project(project_id),
+            _hover={"color": "teal"}
         ),
         height = 'auto',
         #width = '100vw',
         align='start',
-        width = "90%",
+        width = "100%",
 
     )
 
-def project_grid_vertical()-> rx.Component:
+def org_grid_vertical(orgs)-> rx.Component:
 
     return rx.vstack(
         rx.cond(
-            ProjectState.projects != [],
-            rx.foreach(ProjectState.projects, lambda value, i: 
-                        project_card_vertical(
-                            image = value["image"],
-                            project_title = value["project_name"],
-                            project_description = value["description"],
-                            project_id = value["project_id"],
-                            group_logo = "logo1.png")),
+            orgs != [],
+            rx.foreach(orgs, lambda org, i: 
+                        org_card_vertical(org),),
             rx.spinner(),#rx.text("No projects available")
         ),   
         spacing_y="4",

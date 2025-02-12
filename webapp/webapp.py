@@ -21,7 +21,7 @@ from webapp.backend.routes.project_routes import project_route
 from webapp.backend.routes.video_routes import video_route
 from webapp.backend.routes.organizations_routes import organization_route
 from webapp.backend.routes.question_routes import question_route
-from webapp.backend.routes.supa_routes import auth_route
+from webapp.backend.routes.auth_routes import auth_route
 
 # import model and db
 from webapp.backend.models import model
@@ -73,7 +73,7 @@ origins = ['http://localhost:3000',
 
 app.api.add_middleware(
     CORSMiddleware,
-    allow_origins=[origins],  # Change this in production
+    allow_origins=origins,  # Change this in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

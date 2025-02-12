@@ -1,6 +1,7 @@
 import reflex as rx
 from ..constants import urls
 from ..states.auth_state import AuthState
+from ..states.user_state import UserState
 
 def list_icons() ->rx.Component:
     return rx.fragment(
@@ -118,7 +119,8 @@ def login_multiple_thirdparty() -> rx.Component:
                 spacing="2",
                 width="100%",
             ),
-            rx.button("Log in", size="3", width="100%", on_click=AuthState.handle_login),
+            rx.button("Log in", size="3", width="100%", on_click=[AuthState.handle_login,
+                                                                  UserState.get_my_details]),
             #list_icons(),
             spacing="6",
             width="100%",

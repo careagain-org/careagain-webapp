@@ -5,6 +5,7 @@ from ..components.project_card import project_grid_horizontal
 from ..components.question_card import question_grid_horizontal
 from ..states.project_state import ProjectState
 from ..states.question_state import QuestionState
+from ..states.org_state import OrgState
 
 def section_title(section_icon:str,section_title:str, section_link:str) -> rx.Component(): # type: ignore
     return rx.hstack(
@@ -22,7 +23,8 @@ def platform_home() -> rx.Component:
                 section_title("square-library",'Projects', urls.PROJECTS_URL),
                 project_grid_horizontal(),
                 # section_title("square-play",'Videos', urls.VIDEOS_URL),
-                section_title("store",'Market', urls.PLATFORM_URL),
+                # section_title("store",'Market', urls.PLATFORM_URL),
+                section_title("users",'Community', urls.PLATFORM_URL),
                 question_grid_horizontal(),
                 section_title('file-question',"Questions", urls.QUESTIONS_URL),
                 question_grid_horizontal(),

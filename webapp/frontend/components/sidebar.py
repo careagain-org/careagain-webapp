@@ -1,5 +1,6 @@
 import reflex as rx
 from ..constants import urls
+from ..states.user_state import UserState
 
 def sidebar_item(
     text: str, icon: str, href: str
@@ -34,9 +35,9 @@ def sidebar_items() -> rx.Component:
         sidebar_item("Community", "users", urls.COMMUNITY_PLATFORM),
         # sidebar_item("Videos", "square-play", urls.VIDEOS_URL),
         # sidebar_item("How-To's", "book", urls.PLATFORM_URL),
-        sidebar_item("Market", "store", urls.PLATFORM_URL),
-        #sidebar_item("Dashboard", "layout-dashboard", urls.PLATFORM_URL),
-        sidebar_item("Analytics", "bar-chart-4", urls.PLATFORM_URL),
+        # sidebar_item("Market", "store", urls.PLATFORM_URL),
+        # sidebar_item("Dashboard", "layout-dashboard", urls.PLATFORM_URL),
+        # sidebar_item("Analytics", "bar-chart-4", urls.PLATFORM_URL),
         sidebar_item("Questions", "file-question", urls.QUESTIONS_URL),
         sidebar_item("Chat", "message-square-code", urls.DISCORD_URL),
         sidebar_item("Videos", "square-play", urls.YOUTUBE_URL),
@@ -48,11 +49,13 @@ def profile_button() -> rx.Component:
     return rx.container(
             rx.link(
                 rx.hstack(
-                    rx.icon_button(
-                        rx.icon("user"),
-                        size="3",
-                        radius="full",
-                    ),
+                    rx.cond(UserState.my_details["profile_image"]=="",
+                        rx.icon_button(rx.icon("user"),
+                                       size="3",
+                                       radius="full",),
+                        rx.avatar(src=UserState.my_details["profile_image"],
+                                  size="3",
+                                  radius="full",)),
                     rx.vstack(
                     rx.box(
                         rx.text(
@@ -61,7 +64,7 @@ def profile_button() -> rx.Component:
                             weight="bold",
                         ),
                         rx.text(
-                            "user@reflex.dev",
+                            f"@{UserState.my_details["username"]}",
                             size="2",
                             weight="medium",
                         ),
@@ -77,25 +80,27 @@ def profile_button() -> rx.Component:
                 justify="start",
                 width="100%",
             ),
-            href=urls.PROFILE_URL
+            href=urls.PROFILE_URL,
         )
     )
 
 def brand_header() ->rx.Component:
     return rx.hstack(
                 rx.image(
-                src="/logo1.png",
+                src="/logo0.png",
                 width="2.25em",
                 height="auto",
-                border_radius="25%",
+                border_radius="10%",
             ),
             rx.heading(
                 "CareAgain", size="7", weight="bold"
             ),
+            rx.badge("DEV",variant="solid",size="1"),
             align="center",
             justify="start",
             padding_x="0.5rem",
             width="100%",
+            spacing="2",
         ),
 
 
@@ -124,7 +129,7 @@ def sidebar() -> rx.Component:
                 bg=rx.color("accent", 3),
                 align="start",
                 height="100vh",
-                width="16em",
+                width="17em",
             ),
         ),
         rx.mobile_and_tablet(

@@ -5,38 +5,65 @@ from ..constants import urls
 from typing import Optional,Dict
 import threading
 from urllib.parse import urlparse, parse_qs
+import json
+import asyncio
+# from ..states.user_state import UserState
 
 class AuthState(rx.State):
     email: str = ""
     password: str = ""
     auth_response: str = ""
-    token: Optional[str] = rx.LocalStorage()
+    token: Optional[str] = ""
     is_authenticated: bool = False
     error_message: str = ""
+    auth_data: Dict[str,str]
 
     def set_email(self, value: str):
         self.email = value
 
     def set_password(self, value: str):
         self.password = value
+
+    @rx.var(cache=True)
+    def get_token(self) -> str:
+        return self.token
+
+    @rx.background
+    async def check_auth(self):
+        """Check if the token is not None every 60 sec"""
+        while self.is_authenticated:
+            token=self.get_token()
+            if token:
+                self.is_authenticated = True
+                return self.token
+            else:
+                self.is_authenticated = False
+            
+            await asyncio.sleep(60)
     
+    @rx.event
     async def handle_login(self):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
-                    f"{urls.API_URL}api/auth/sign_in",
-                    json={
-                        "email": self.email,
+                    f"{urls.API_URL}api/auth/token",
+                    data={
+                        "username": self.email,
                         "password": self.password,
-                    })
-                print(response)
-            
+                    },
+                    headers={"Content-Type": "application/x-www-form-urlencoded"},
+                )
+                print(response.json()["access_token"])
             if response.status_code == 200:
-                response_data = response.json()
-                self.is_authenticated = True
-                return [rx.redirect(urls.PLATFORM_URL),rx.toast.success('Successfully sign in!')]
+                access_token = response.json()["access_token"]
+                if access_token:
+                    self.token=access_token
+                    self.is_authenticated = True
+                    # After calculation is done, chain to StoreEventsState
+                    # lambda: UserState.get_token(self.token)
+                    return [rx.redirect(urls.PLATFORM_URL),rx.toast.success('Successfully sign in!')]
             else:
-                response_detail = response.json()["details"]
+                response_detail = response.json()["detail"]
                 self.is_authenticated = False
                 return rx.toast.error(f"{response_detail}")
         
@@ -57,16 +84,16 @@ class AuthState(rx.State):
                 )
             
             if response.status_code == 200:
-                response_details = response.json()["details"]
-                return [rx.redirect(urls.LOGIN_URL),rx.toast.success(f"{response_details}")]
+                response_detail = response.json()["detail"]
+                return [rx.redirect(urls.LOGIN_URL),rx.toast.success(f"{response_detail}")]
 
             else:
-                response_details = response.json()["details"]
+                response_details = response.json()["detail"]
                 return rx.toast.error(f"{response_details}")
         
         except Exception as err:
-            response_details = response.json()["detail"]
-            return rx.toast.error(f"{response_details}")
+            response_detail = response.json()["detail"]
+            return rx.toast.error(f"{response_detail}")
         
     async def handle_logout(self):
         async with httpx.AsyncClient() as client:
@@ -131,7 +158,7 @@ class AuthState(rx.State):
        
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{urls.API_URL}api/auth/login_without_password",
+                f"{urls.API_URL}api/auth/token",
                     json={
                             "email": self.email,
                             "password": "",

@@ -1,5 +1,6 @@
 import reflex as rx
 from ..components.notification_popover import notification_popover
+from ..components.navbar_profile import navbar_profile
 from ..constants import urls
 from ..states import nav_state, auth_state
 
@@ -24,17 +25,7 @@ def navbar_platform() -> rx.Component:
                 rx.menu.separator(),
                 rx.color_mode.button(color="teal"),
                 notification_popover(),
-                rx.menu.root(
-                    rx.menu.trigger(
-                        rx.icon_button("user", size="3",radius="full")
-                    ),
-                    rx.menu.content(
-                        rx.menu.item("My profile", on_click=nav_state.NavState.to_profile),
-                        rx.menu.separator(),
-                        rx.menu.item("Log out",  on_click=auth_state.AuthState.handle_logout),
-                    ),
-                    justify="end",
-                ),
+                navbar_profile(),
                 spacing="5",
                 justify="end",
                 align_items="center"
@@ -61,5 +52,5 @@ def navbar_platform() -> rx.Component:
         # position="fixed",
         # top="0px",
         # z_index="5",
-        width="100%",
+        width="95%",
     )

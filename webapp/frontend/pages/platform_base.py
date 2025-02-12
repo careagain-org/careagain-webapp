@@ -23,18 +23,17 @@ def platform_base(child: rx.Component ,*args,**kwargs) -> rx.Component:
             rx.hstack(
                 sidebar(),
                 rx.desktop_only(
-                    rx.box(width="16em",),
+                    rx.box(width="17em",),
                 ),
                 rx.vstack(
                     navbar_platform(),
                     rx.box(
                         child,
-                        text_align="center", 
+                        # text_align="center", 
                         id="box-content-area",
-                        width="100%"
+                        width="83em"
                     ),
                     low_footer(),
-                    width="90%"
                 )
             ),
             render_menu(),

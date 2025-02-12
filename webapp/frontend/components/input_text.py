@@ -6,6 +6,8 @@ class EditableText(rx.ComponentState):
     text: str = "Click to edit"
     original_text: str
     editing: bool = False
+    key: str = None
+
 
     def start_editing(self, original_text: str):
         self.original_text = original_text
@@ -22,12 +24,7 @@ class EditableText(rx.ComponentState):
         value = props.pop("value", cls.text)
         on_change = props.pop("on_change", cls.set_text)
         cursor = props.pop("cursor", "pointer")
-
-        # Set the initial value of the State var.
-        initial_value = props.pop("initial_value", cls.text)
-        # if initial_value is not None:
-        # # Update the pydantic model to use the initial value as default.
-        #     cls.__fields__["text"].default = initial_value
+        key = props.pop("key", cls.key)
 
         # Form elements for editing, saving and reverting the text.
         edit_controls = rx.hstack(
@@ -46,20 +43,25 @@ class EditableText(rx.ComponentState):
                 color_scheme="red",
             ),
             rx.icon_button(rx.icon("check"),
-                           on_click=[
-                            on_change(cls.text),
-                            cls.stop_editing,
-                ],),
+                on_click=[
+                    on_change(cls.text),
+                    cls.stop_editing,
+                    ],
+                type="submit",
+                ),
             align="center",
             width="100%",
-        )
+        ),
+        
 
         # Return the text or the form based on the editing Var.
         return rx.cond(
             cls.editing,
             rx.form(
                 edit_controls,
-                on_submit=lambda _: cls.stop_editing(),
+                on_submit=lambda _: [on_change(cls.text),
+                                     cls.stop_editing(),
+                                     UserState.update_user(key,cls.text)]
             ),
             rx.hstack(
                 rx.text(
@@ -105,3 +107,43 @@ class SimpleTextInput(rx.ComponentState):
     @classmethod
     def set_input_value(cls, value: str):
         cls.input_value = value
+
+# class InputState(rx.State):
+#     editing: bool = False
+#     text: str ="str"
+
+#     def set_text(self, value: str):
+#         self.text = value
+    
+#     def start_editing(self):
+#         self.editing = True
+
+#     def stop_editing(self):
+#         self.editing = False
+        
+
+# def non_edit_mode(text = InputState.text) -> rx.Component:
+#     return rx.hstack(
+#         rx.text(text),
+#         rx.icon_button("pencil",
+#                     variant="soft",
+#                     on_click=InputState.start_editing,
+#                 )
+#     )
+
+# def edit_mode(text = InputState.text) -> rx.Component:
+#     return rx.hstack(
+#         rx.input(placeholder = text,
+#             on_change=InputState.set_text),
+#         rx.icon_button(rx.icon("check"),
+#              on_click=[InputState.stop_editing,
+#                        UserState.update_user("first_name",InputState.text)]),
+#     )
+
+# def my_input_text() -> rx.Component:
+#     return rx.fragment(
+#         rx.cond(
+#             InputState.editing,
+#             edit_mode(text = UserState.my_details['first_name']),
+#             non_edit_mode(text = UserState.my_details['first_name']),
+        # ))

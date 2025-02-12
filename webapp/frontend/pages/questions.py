@@ -11,7 +11,7 @@ def platform_questions() -> rx.Component:
     my_child = rx.vstack(
         rx.hstack(
             rx.heading('Questions', size="9"),
-            add_new_popover("project"),
+            add_new_popover("question"),
             align="end",
             spacing="5"
         ),

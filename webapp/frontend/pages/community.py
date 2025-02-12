@@ -44,7 +44,7 @@ def community_page() -> rx.Component:
                             value="tab-map",
                         ),
                         rx.tabs.content(
-                            table_pagination(),
+                            table_pagination(OrgState.orgs),
                             value="tab-list",
                         ),
                         default_value="tab-map",
@@ -53,6 +53,6 @@ def community_page() -> rx.Component:
                     ),
                     align="start",
                     id='community_page',
-                    on_mount=OrgState.get_location
+                    on_mount=[OrgState.get_location,OrgState.get_orgs]
                 )
     return platform_base(my_child)

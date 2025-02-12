@@ -1,12 +1,25 @@
 import reflex as rx
 
 from ..constants import urls
-from ..states import nav_state
+from ..states import nav_state,auth_state
+from .navbar_profile import navbar_profile
 
 def navbar_link(text: str, url: str) -> rx.Component:
     return rx.link(
         rx.text(text, size="4", weight="medium",color="teal"), href=url
     )
+
+def sign_in_buttons() ->rx.Component:
+    return rx.hstack(
+            rx.button(
+                "Sign Up",
+                size="3",
+                variant="outline",
+                color="teal",
+                on_click=nav_state.NavState.to_signup()
+            ),
+            rx.button("Log In", size="3", on_click=nav_state.NavState.to_login()),
+        ),
 
 
 def navbar() -> rx.Component:
@@ -35,14 +48,22 @@ def navbar() -> rx.Component:
                 ),
                 rx.hstack(
                     rx.color_mode.button(color="teal"),
-                    rx.button(
-                        "Sign Up",
-                        size="3",
-                        variant="outline",
-                        color="teal",
-                        on_click=nav_state.NavState.to_signup()
-                    ),
-                    rx.button("Log In", size="3", on_click=nav_state.NavState.to_login()),
+                    rx.hstack(
+                            rx.button("Sign Up",size="3",
+                                variant="outline",
+                                color="teal",on_click=nav_state.NavState.to_signup()
+                            ),
+                            rx.button("Log In", size="3", on_click=nav_state.NavState.to_login()),
+                        ),
+                    # rx.cond(auth_state.AuthState.is_authenticated,
+                    #     navbar_profile(),
+                    #     rx.hstack(
+                    #         rx.button("Sign Up",size="3",
+                    #             variant="outline",
+                    #             color="teal",on_click=nav_state.NavState.to_signup()
+                    #         ),
+                    #         rx.button("Log In", size="3", on_click=nav_state.NavState.to_login()),
+                    #     ),),
                     spacing="4",
                     justify="end",
                     color_scheme="teal",
