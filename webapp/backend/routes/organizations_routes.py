@@ -49,6 +49,7 @@ async def create_org(input:org_schema.CreateOrganization,
                                  name = input.name,
                                  type = input.type,
                                  address = input.address,
+                                 description= input.description,
                                  latitude = input.latitude,
                                  longitude = input.longitude,
                                  logo = input.logo,
@@ -69,10 +70,12 @@ async def create_org(input:org_schema.CreateOrganization,
 
     return {"detail": "New organization uploaded","org_details":org_obj}
 
+
 @organization_route.get("/organizations",tags = ['organizations'])
 async def show_organizations(db:Session=Depends(get_db)):
     orgs = db.query(model.Organization).all()
     return orgs 
+
 
 @organization_route.delete("/delete_org",tags = ['organizations'])
 async def delete_organization(org_id:str,
@@ -122,6 +125,32 @@ async def join_organization(org_id:str,
     else:
         raise HTTPException(status_code=422, detail="Organization already attached to this user")
 
+
+@organization_route.get("/members",tags = ['organizations'])
+async def join_organization(org_id:str,
+                            db:Session=Depends(get_db)):
+    members = db.query(model.User).join(
+            model.User_Organization,
+            model.User_Organization.user_id == model.User.user_id
+        ).filter(model.User_Organization.org_id == org_id).all()
+    my_roles = (db.query(model.User_Organization)
+        .filter(model.User_Organization.org_id == org_id)).all()
+
+    # Create a dictionary of users by user_id for fast lookups
+    user_dict = {user.user_id: user for user in members}
+
+    # Now merge by matching user_id in both lists and merge all fields
+    merged_list = []
+    for role in my_roles:
+        org = user_dict.get(role.user_id)  # Look up the corresponding organization
+        if org:
+            # Merge all fields from both the organization and the role
+            merged_dict = {**org.__dict__, **role.__dict__}  # Combine all fields
+            merged_dict.pop('_sa_instance_state', None)  # Remove SQLAlchemy internal state attribute
+            merged_list.append(merged_dict)
+        
+    return merged_list
+    
 @organization_route.get("/locations",tags = ['organizations'])
 async def show_organizations(db:Session=Depends(get_db)):
     orgs = db.query(model.Organization).filter(model.Organization.latitude.isnot(None)).filter(model.Organization.visible==True).all()
@@ -169,4 +198,29 @@ async def show_organizations(
 
     # Return the list of organizations
     return merged_list
+
+@organization_route.put("/update_org", tags=['organizations'])
+async def update_org(key: str, 
+                      value: str, 
+                      org_id: str,
+                      db: Session = Depends(get_db)):
+    
+    org= (db.query(model.Organization).filter(model.Organization.org_id == org_id)).first()
+
+    if org is None:
+        raise HTTPException(status_code=404, detail="Organization not found")
+
+    # Check if the attribute exists on the user model
+    if not hasattr(org, key):
+        raise HTTPException(status_code=400, detail=f"Field '{key}' does not exist on organization")
+
+    # Set the attribute dynamically
+    setattr(org, key, value)
+
+    # Commit the changes to the database
+    db.add(org)
+    db.commit()
+    db.refresh(org)
+
+    return org
 

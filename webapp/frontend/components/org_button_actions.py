@@ -1,5 +1,18 @@
 import reflex as rx
 from ..states.org_state import OrgState
+from ..constants import urls
+
+def button_view(org_id):
+    return rx.icon_button("eye",
+                          variant="soft",
+                          tooltip="view",
+                          on_click=lambda: [OrgState.to_org_view(org_id),OrgState.find_members_org(org_id)])
+
+def button_edit(org_id):
+    return rx.icon_button("pencil",
+                          variant="soft",
+                          tooltip="view",
+                          on_click=lambda: [OrgState.to_org_edit(org_id),OrgState.find_members_org(org_id)])
 
 def dialog_remove(org_id):
 

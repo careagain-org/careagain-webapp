@@ -1,7 +1,7 @@
 import reflex as rx
 import uuid
 from typing import List,Dict
-from .input_text import SimpleTextInput
+from .user_input_text import SimpleTextInput
 from .upload import upload_logo_org
 from ..states.project_state import ProjectState
 from ..states.org_state import OrgState
@@ -30,70 +30,80 @@ def form_org() -> rx.Component:
                 ),
             rx.form(
                     rx.flex(
-                rx.heading("Name *",size="3"),
-                rx.input(placeholder="Enter organization name",
-                            name="name",
-                            required=True),
-                rx.heading("Type of organization *",size="3"),
-                rx.select(all_organization, 
-                        placeholder="Select Organization Type",
-                        name="type",
-                        required=True),
-                rx.heading("Organization Description",size="3"),
-                rx.text_area(
-                    placeholder="Type here...",
-                    name="description",),
-                rx.heading("Website url (if aplicable)",size="3"),
-                rx.input(placeholder="Enter url link",
-                            name= "web_link"),
-                
-                rx.hstack(
-                        upload_logo_org(title="Logo",my_image=rx.get_upload_url(OrgState.logo)),
-                        rx.vstack(
-                            rx.hstack(rx.heading("Locate in the map",color="grey",size="3"),
-                                      rx.text(value=OrgState.longitude,name="location")),
-                            interactive_map(),
-                            rx.text("** one click to add a new pin, double-click to remove it",size="1"),
-                            rx.flex(
-                                rx.text("Visibility in the community map"),
-                                rx.switch(id="visibility",on_change=OrgState.update_location),
-                                spacing="5",
-                                )
+                        rx.hstack(
+                            rx.vstack(
+                                rx.heading("Name *",size="3"),
+                                rx.input(placeholder="Enter organization name",
+                                name="name",
+                                required=True,
+                                width="100%"),
+                                width="100%"
                             ),
+                            rx.vstack(
+                                rx.heading("Type of organization *",size="3"),
+                                rx.select(all_organization, 
+                                        placeholder="Select Organization Type",
+                                        name="type",
+                                        required=True,
+                                        width="100%"),
+                                width="100%"
+                            ),
+                            width="100%",
                         ),
-                
-                rx.heading("Address",size="3"),
-                    rx.input(placeholder="Enter organization address",
-                        name="address",),
-                    rx.heading("E-mail",size="3"),
-                    rx.input(placeholder="Enter organization email",
-                        name="email",),
-                rx.flex(
-                    rx.dialog.close(
-                        rx.button(
-                            "Cancel",
-                            color_scheme="gray",
-                            variant="soft",
-                            justify="start",
-                        ),
-                    ),
-                    rx.dialog.close(
-                        rx.button("Save",
-                            type ="submit",
+                        rx.heading("Organization Description",size="3"),
+                        rx.text_area(
+                            placeholder="Type here...",
+                            name="description",),
+                        rx.heading("Website url (if aplicable)",size="3"),
+                        rx.input(placeholder="Enter url link",
+                                    name= "web_link"),
+                        rx.hstack(
+                                upload_logo_org(title="Logo",my_image=rx.get_upload_url(OrgState.logo)),
+                                rx.vstack(
+                                    rx.hstack(rx.heading("Locate in the map",color="grey",size="3"),
+                                            rx.text(value=OrgState.longitude,name="location")),
+                                    interactive_map(),
+                                    rx.text("** one click to add a new pin, double-click to remove it",size="1"),
+                                    rx.flex(
+                                        rx.text("Visibility in the community map"),
+                                        rx.switch(id="visibility",on_change=OrgState.update_location),
+                                        spacing="5",
+                                        ),
+                                    ),
+                                ),
+                        rx.heading("Address",size="3"),
+                            rx.input(placeholder="Enter organization address",
+                                name="address",),
+                            rx.heading("E-mail",size="3"),
+                            rx.input(placeholder="Enter organization email",
+                                name="email",),
+                        rx.flex(
+                            rx.dialog.close(
+                                rx.button(
+                                    "Cancel",
+                                    color_scheme="gray",
+                                    variant="soft",
+                                    justify="start",),
+                            ),
+                            rx.dialog.close(
+                                rx.button("Save",
+                                    type ="submit",
+                                    justify="end",
+                                    color_scheme="teal",),
+                            ),
+                            spacing="3",
+                            margin_top="16px",
                             justify="end",
-                            color_scheme="teal",),
+                            width="100%",
+                        ),
+                        spacing = "3",
+                        direction = "column",
+                        width="100%",
                     ),
-                    spacing="3",
-                    margin_top="16px",
-                    justify="end",
-                    width="100%",
-                ),
-                spacing = "3",
-                direction = "column"),
-            on_submit=OrgState.create_new_org,
-            reset_on_submit=True,
-            )
-        )
+                    on_submit=OrgState.create_new_org,
+                    reset_on_submit=True,
+                    )
+                )
 
 
 
@@ -103,11 +113,13 @@ def search_org() -> rx.Component:
         rx.dialog.title(f"Search existing organization"),
         rx.form(
             rx.flex(
-            rx.input(placeholder="Enter organization name",
+            rx.input(rx.icon("search"),
+                        placeholder="Enter organization name",
                         default_value="",
                         name="name",
                         required=True,
                         width="100%",
+                        align="start",
                         on_change=lambda value:OrgState.filter_org(value)),
             org_grid_vertical(OrgState.filtered_orgs),
             rx.flex(

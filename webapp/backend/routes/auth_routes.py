@@ -28,6 +28,7 @@ class AuthCredentialsToken(BaseModel):
     email: str
     password: str
     token:str
+    refresh_token:str
 
 @auth_route.post("/sign_up",tags = ['auth'])
 async def sign_up(input:AuthCredentials,db:Session=Depends(get_db)):
@@ -136,10 +137,7 @@ def reset_password(input:AuthCredentials):
 @auth_route.put("/update_password",tags = ['auth'])
 def update_password(input:AuthCredentialsToken):
     try:
-        response = supa.auth.get_user(input.token)
-        user = response.json()
-        print('Successful')
-        print(user.user)
+        supa.auth.set_session(access_token=input.token, refresh_token=input.refresh_token)
         response = supa.auth.update_user({  
                     "password": input.password
                     })
@@ -176,5 +174,16 @@ def current_user(session = Depends(oauth2schema)):
         data = response.json() 
         parsed_data = json.loads(data)
         return parsed_data
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f": {str(e)}")
+    
+
+@auth_route.get("/refresh_session",tags = ['auth'])
+def refresh_session(session = Depends(oauth2schema)):
+    try:
+        response = supa.auth.refresh_session()
+        data = response.json() 
+        parsed_data = json.loads(data)
+        return parsed_data["session"]
     except Exception as e:
         raise HTTPException(status_code=400, detail=f": {str(e)}")

@@ -2,7 +2,7 @@
 
 # frontend imports
 import reflex as rx
-from webapp.frontend.pages import (webpage,login, projects, signup,
+from webapp.frontend.pages import (ind_org_view, ind_org_edit, webpage,login, projects, signup,
                                    platform, projects, profile,
                                    videos,community, questions,
                                    individual_project,reset_password) #contact,community,
@@ -51,6 +51,7 @@ app = rx.App(
         accent_color="teal"
     )
 )
+# app.add_page(view_organization, route="/org_view=[org_id]")
 
 ## ---------------- ADD BACKEND --------------------------- ##
 

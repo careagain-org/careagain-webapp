@@ -4,9 +4,9 @@ from ..constants import urls
 from ..states.project_state import ProjectState
 from ..states.auth_state import AuthState
 from typing import Dict
+urls.INDIVIDUAL_PROJECT_URL
 
-
-@rx.page(route=f"/[ProjectState.selected_id]")
+@rx.page(route=f"/[urls.INDIVIDUAL_PROJECT_URL][ProjectState.selected_id]")
 def individual_project() -> rx.Component:
     my_child = rx.vstack(
         rx.link(rx.icon('arrow_left'),href=urls.PROJECTS_URL),

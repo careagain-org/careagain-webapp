@@ -49,10 +49,10 @@ class ProjectState(AuthState):
     #     if response.status_code == 200:
     #         self.projects = response.json()
     
-    def select_project(self,selected_id:str):
-        self.selected_id = selected_id
-        self.selected_project = [d for d in self.projects if d['project_id']==int(selected_id)][0]
-        return rx.redirect(f"/{urls.INDIVIDUAL_PROJECT_URL}{selected_id}")
+    def select_project(self,project_id:str):
+        self.project_id = project_id
+        self.selected_project = [d for d in self.projects if d['project_id']==(project_id)][0]
+        return rx.redirect(f"/{urls.INDIVIDUAL_PROJECT_URL}{project_id}")
     
     async def upload_image(self,file: rx.UploadFile):
         try:

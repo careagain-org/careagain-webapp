@@ -38,9 +38,9 @@ def sidebar_items() -> rx.Component:
         # sidebar_item("Market", "store", urls.PLATFORM_URL),
         # sidebar_item("Dashboard", "layout-dashboard", urls.PLATFORM_URL),
         # sidebar_item("Analytics", "bar-chart-4", urls.PLATFORM_URL),
-        sidebar_item("Questions", "file-question", urls.QUESTIONS_URL),
-        sidebar_item("Chat", "message-square-code", urls.DISCORD_URL),
-        sidebar_item("Videos", "square-play", urls.YOUTUBE_URL),
+        # sidebar_item("Questions", "file-question", urls.QUESTIONS_URL),
+        sidebar_item("Chat & FAQs", "message-square-code", urls.DISCORD_URL),
+        # sidebar_item("Videos", "square-play", urls.YOUTUBE_URL),
         spacing="1",
         width="100%",
     )

@@ -31,37 +31,17 @@ def platform_base(child: rx.Component ,*args,**kwargs) -> rx.Component:
                         child,
                         # text_align="center", 
                         id="box-content-area",
-                        width="83em"
+                        width="83vw"
                     ),
                     low_footer(),
                 )
             ),
             render_menu(),
+            width="100%",
+            # on_mount= AuthState.refresh_login
         )
     return  rx.cond(
         AuthState.is_authenticated,
         platform,
-        login_page() #rx.text(AuthState.is_authenticated)
-        # rx.spinner(on_mount =rx.redirect('/')),
+        login_page() 
     )
-
-    # rx.cond(
-    #     AuthState.is_authenticated,
-    #     platform,
-    #     login_page() #rx.text(AuthState.is_authenticated)
-    #     # rx.spinner(on_mount =rx.redirect('/')),
-    # )
-
-# rx.fragment(
-#             rx.cond(
-#                 AuthState.is_authenticated,
-#                 platform,
-#                 rx.text(AuthState.is_authenticated),
-#             ),
-#         on_mount=AuthState.process_authentication)
-            
-# rx.cond(
-#         AuthState.is_authenticated,
-#         platform,
-#         login_page()
-#     )

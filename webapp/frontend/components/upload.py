@@ -83,6 +83,9 @@ def upload_logo_org(title:str,my_image:str) -> rx.Component():
             spacing="2",
             width="15em",
             height="100%",
+            min_height="10em",
+            align="center",
+            justify="center",
             multiple=False,
             accept = {
                 "application/pdf": [".pdf"],

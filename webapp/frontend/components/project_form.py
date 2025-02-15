@@ -1,7 +1,7 @@
 import reflex as rx
 import uuid
 from typing import List,Dict
-from .input_text import SimpleTextInput
+from .user_input_text import SimpleTextInput
 from .upload import upload_logo_org
 from ..states.project_state import ProjectState
 from ..states.org_state import OrgState

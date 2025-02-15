@@ -132,7 +132,8 @@ class AuthState(rx.State):
     
     async def update_password(self):
         url = self.router.page.raw_path
-        access_token = url.split('=')[1].split("&")[0]
+        access_token = url.split('access_token=')[1].split("&expires_at")[0]
+        refresh_token = url.split('refresh_token=')[1].split("&token_type")[0]
 
         print(access_token)
         async with httpx.AsyncClient() as client:
@@ -141,7 +142,8 @@ class AuthState(rx.State):
                     json={
                             "email": self.email,
                             "password": self.password,
-                            "token":access_token
+                            "token":access_token,
+                            "refresh_token":refresh_token
                         },
             )
 
@@ -173,6 +175,31 @@ class AuthState(rx.State):
         else:
             response_details = response.json()["detail"]
             return rx.toast.error(f"{response_details}")
+        
+
+
+    @rx.event
+    async def refresh_login(self):
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.put(
+                    f"{urls.API_URL}api/auth/refresh_session",
+                    headers={"Content-Type": "application/x-www-form-urlencoded"},
+                )
+            if response.status_code == 200:
+                access_token = response.json()["access_token"]
+                if access_token:
+                    self.token=access_token
+                    self.is_authenticated = True
+            else:
+                response_detail = response.json()["detail"]
+                self.is_authenticated = False
+                return rx.toast.error(f"Not authenticated or session expired")
+        
+        except Exception as err:
+            self.is_authenticated = False
+            error_message = "There was an unexpected error"
+            return rx.toast.error(error_message)
 
     
     # # Check if the user is authenticated by verifying the token

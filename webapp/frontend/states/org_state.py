@@ -17,7 +17,8 @@ class OrgState(AuthState):
     orgs_locations: List[Dict[str, float]] = []
     selected_org: Dict[str, str] = {}
     org_details: Dict[str, str] = {}
-
+    
+    org_members:List[Dict[str, str]] = []
     org_id:str=""
     latitude: float =None
     longitude: float =None
@@ -115,9 +116,10 @@ class OrgState(AuthState):
                                             json=input_data, headers=headers)
 
             if response.status_code == 200:
+                self.org_details = response.json()["org_details"]
                 self.reset_org()
                 await self.get_my_orgs()
-                self.org_details = response.json()["org_details"]
+                await self.get_orgs()
                 return rx.toast("New organization uploaded")
             else:
                 detail = response.json()["detail"]
@@ -214,8 +216,48 @@ class OrgState(AuthState):
         except Exception as e:
             print(f"An error occurred: {e}")
 
+    async def find_members_org(self):
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{urls.API_URL}api/orgs/members?org_id={self.org_id}",
+                )
+            if response.status_code == 200:
+                self.org_members = response.json()
+            else:
+                print(f"Failed to get orgs: {response.status_code}, {response.text}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
 
     def select_org(self,org_id:str):
         self.org_id = org_id
         self.selected_org = [d for d in self.orgs if d['org_id']==org_id][0]
+
+    def to_org_view(self,org_id:str):
+        self.org_id = org_id
+        self.selected_org = [d for d in self.orgs if d['org_id']==org_id][0]
+        return rx.redirect(f"/org_view")
+    
+    def to_org_edit(self,org_id:str):
+        self.org_id = org_id
+        self.selected_org = [d for d in self.orgs if d['org_id']==org_id][0]
+        return rx.redirect(f"/org_edit")
+    
+    async def update_org(self,key:str,value:str):
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.put(
+                    f"{urls.API_URL}api/orgs/update_org?key={key}&value={value}&org_id={self.org_id}",
+                    headers = {"Authorization": f"Bearer {self.token}"}
+                )
+            
+            if response.status_code == 200:
+                self.selected_org = response.json()
+                return rx.toast.success(f"{key} updated successfully")
+            else:
+                detail = response.json()["detail"]
+                return rx.toast.error(f"Organization update error: {detail}")
+        except:
+            return rx.toast("Unexpected error")
 

@@ -1,6 +1,6 @@
 import reflex as rx
 from typing import List,Dict
-from .input_text import SimpleTextInput
+from .user_input_text import SimpleTextInput
 from ..states.project_state import ProjectState
 
 

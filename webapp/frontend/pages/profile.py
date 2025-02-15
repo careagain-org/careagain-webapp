@@ -3,9 +3,9 @@ from pathlib import Path
 from .platform_base import platform_base
 from ..constants import urls
 from ..components.forms_popover import add_new_popover,search_popover
-from ..components.input_text import EditableText
+from ..components.user_input_text import EditableText
 from ..components.upload import upload_image_user
-from ..components.table import table_pagination
+from ..components.org_table import table_pagination
 from ..components.list_institution import list_org_vertical
 from ..states.user_state import UserState
 from ..states.org_state import OrgState
@@ -32,21 +32,6 @@ def input_field_edit(title:str,key:str) -> rx.Component():
             editable_text(value = default_value,key = key),
         ),
 
-
-# def upload_image() -> rx.Component():
-#     return rx.upload(
-#                 rx.vstack(
-#                     rx.icon("user"),
-#                     rx.text("Drag and drop files here \n or click to select files"),
-#                     align="center",
-#                     justify="center"),
-#                 radius="full",
-#                 border="1px dotted rgb(0,0,0)",
-#                 padding="5em",
-#                 spacing="2",
-#                 height="100%",
-#                 id="my_upload",
-#             ),
 
 def user_section() -> rx.Component():
 
@@ -102,7 +87,7 @@ def search_existing(text:str)->rx.Component():
     )
 
 
-@rx.page(route=urls.PROFILE_URL, on_load= [UserState.get_my_details,OrgState.get_my_orgs])#OrgState.get_my_orgs])
+@rx.page(route=urls.PROFILE_URL, on_load= [UserState.get_my_details,OrgState.get_my_orgs,OrgState.get_orgs])
 def profile() -> rx.Component:
     profile = rx.vstack(
                 rx.heading('My profile', size="9"),
@@ -126,11 +111,12 @@ def profile() -> rx.Component:
                     align="start",
                     spacing="4",
                 ),
-                rx.divider(),
-                section_title("square-play",'My Video',"Videos", urls.PROJECTS_URL),
-                add_new("video"),
+                # rx.divider(),
+                # section_title("square-play",'My Video',"Videos", urls.PROJECTS_URL),
+                # add_new("video"),
                 spacing="5",
                 align = "start",
                 justify="start",
+                width="100%"
     )
     return platform_base(profile)

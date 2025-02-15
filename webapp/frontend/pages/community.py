@@ -3,7 +3,7 @@ import reflex as rx
 from .platform_base import platform_base
 from ..constants import urls
 from ..components.map import create_map
-from ..components.table import table_pagination
+from ..components.org_table import table_pagination
 from ..states.org_state import OrgState
 #from ..components.dropdown import selectors,SelectorsState
 
