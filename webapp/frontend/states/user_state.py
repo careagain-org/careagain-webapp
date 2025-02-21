@@ -9,6 +9,15 @@ token=AuthState.token
 class UserState(AuthState):
     image_path: str 
     my_details: Dict[str, str]
+    
+    selected_user_id:str
+    selected_user: Dict[str, str]
+    users: List[Dict[str, str]]=[]
+    filtered_users: List[Dict[str, str]]=[]
+    searched_users: List[Dict[str, str]]=[]
+    
+    user_projects: List[Dict[str, str]]=[]
+    user_orgs: List[Dict[str, str]]=[]
 
 
     async def get_image_path(self):
@@ -106,4 +115,81 @@ class UserState(AuthState):
                         return rx.toast(f"User update error: {response.status_code}, {detail}")
         except:
             return rx.toast("Unexpected error")
+        
+    async def get_users(self):
+
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{urls.API_URL}api/users/",
+            )
+        
+        if response.status_code == 200:
+            self.users = response.json()
+            self.searched_users= response.json()
+            
+        
+    async def filter_user(self,value:str=""):
+        self.filtered_users = [d for d in self.users if (value.lower() in f"{d['username']}{d['first_name']}{d['last_name']}".lower()) and (value!="")]
+        
+        
+    def to_user_view(self,user_id:str):
+        self.user_id = user_id
+        self.selected_user = [d for d in self.users if d['user_id']==user_id][0]
+        return rx.redirect(urls.IND_USER_URL)
+    
+    
+    def select_user(self,user_id:str):
+        self.selected_user_id = user_id
+        self.selected_user = [d for d in self.users if d['user_id']==(user_id)][0]
+        
+    
+    async def search_user(self,form_data):
+        if form_data["search"]=="":
+            self.searched_users =self.users
+        else:
+            self.searched_users = [d for d in self.users if (form_data["search"].lower() in (d['first_name']+d['description']+d["last_name"]+d["country"]).lower()) 
+                                      and (form_data["search"]!="")]
+    
+    
+    async def invite_user(self,form_data: dict):
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{urls.API_URL}api/users/invite_user?email={form_data["email"]}",
+                headers = {"Authorization": f"Bearer {self.token}"}
+            )
+        
+        if response.status_code == 200:
+            detail = response.json()["detail"]
+            return rx.toast.success(detail)
+        else:
+            return rx.toast.error(f"Failed to join organization: {response.status_code}, {response.text}")
+        
+
+    async def get_user_projects(self):
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{urls.API_URL}api/users/user_projects?user_id={self.selected_user_id}",
+                )
+            if response.status_code == 200:
+                self.user_projects = response.json()
+            else:
+                print(f"Failed to get projects: {response.status_code}, {response.text}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            
+    
+    async def get_user_orgs(self):
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{urls.API_URL}api/users/user_orgs?user_id={self.selected_user_id}",
+                )
+            if response.status_code == 200:
+                self.user_orgs = response.json()
+            else:
+                print(f"Failed to get orgs: {response.status_code}, {response.text}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
 

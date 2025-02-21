@@ -168,22 +168,28 @@ def current_user():
         raise HTTPException(status_code=400, detail=f": {str(e)}")
     
 @auth_route.get("/session",tags = ['auth'])
-def current_user(session = Depends(oauth2schema)):
+def current_session():
     try:
         response = supa.auth.get_session()
-        data = response.json() 
-        parsed_data = json.loads(data)
-        return parsed_data
+        if response:
+            data = response.json() 
+            parsed_data = json.loads(data)
+            return parsed_data
+        else:
+            raise HTTPException(status_code=401, detail="No session not authorized")
     except Exception as e:
         raise HTTPException(status_code=400, detail=f": {str(e)}")
     
 
-@auth_route.get("/refresh_session",tags = ['auth'])
+@auth_route.post("/refresh_session",tags = ['auth'])
 def refresh_session(session = Depends(oauth2schema)):
     try:
         response = supa.auth.refresh_session()
-        data = response.json() 
-        parsed_data = json.loads(data)
-        return parsed_data["session"]
+        if response:
+            data = response.json() 
+            parsed_data = json.loads(data)
+            return parsed_data["session"]
+        else:
+            return {"detail": "No session open"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=f": {str(e)}")

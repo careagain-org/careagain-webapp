@@ -4,11 +4,11 @@ from ..constants import urls
 from ..states.org_state import OrgState
 from ..states.auth_state import AuthState
 from typing import Dict
-from ..components.map import interactive_map
+from ..components.map import interactive_map,map_org
 from ..components.user_card import users_grid_horizontal
 
 
-@rx.page(route=f"/org_view")
+@rx.page(route=urls.IND_ORG_URL)
 def view_organization() -> rx.Component:
     my_child = rx.vstack(
         rx.link(rx.icon('arrow_left'),href=urls.COMMUNITY_PLATFORM),
@@ -28,21 +28,23 @@ def view_organization() -> rx.Component:
             # rx.text(OrgState.selected_org['email'])
         ),
         rx.divider(width='90%'),
-        rx.hstack(
-            rx.icon("file-text"),
-            rx.heading("Description",size="5"),
-            id="description_section",
-            width='90%',
-            align="start",
-        ),
+        
         rx.flex(
             rx.image(OrgState.selected_org['logo'],
                      width="30%"),
             rx.vstack(
+                rx.hstack(
+                    rx.icon("file-text"),
+                    rx.heading("Description",size="5"),
+                    id="description_section",
+                    width='90%',
+                    align="start",
+                ),
                 rx.text(OrgState.selected_org['description']),
                 width="60%"
             ),
             align='start',
+            spacing = "5",
         ),
         rx.divider(width='90%'),
         rx.hstack(
@@ -50,7 +52,7 @@ def view_organization() -> rx.Component:
             rx.heading("Location",size="5"),
         ),
         rx.hstack(
-            interactive_map(),
+            map_org(),
             rx.vstack(
                 rx.heading("Address",size="3"),
                 rx.text(OrgState.selected_org['address']),
@@ -64,7 +66,7 @@ def view_organization() -> rx.Component:
             rx.icon("circle-user-round"),
             rx.heading("Members",size="5"),
         ),
-        users_grid_horizontal(OrgState.org_members)
+        users_grid_horizontal(OrgState.org_members,cols=6,rows=3)
         
     )
 

@@ -9,10 +9,11 @@ class Organization(BaseModel):
     name:str
     type: str
     address: Optional[str]
+    email:Optional[str]
     latitude: Optional[float]
     longitude: Optional[float]
     logo: Optional[str]
-    web_link: Optional[str]
+    website: Optional[str]
     activation_date: Optional[dt.date]
     active: Optional[bool]
     verified: Optional[bool]
@@ -35,7 +36,8 @@ class CreateOrganization(BaseModel):
     latitude: Optional[float]
     longitude: Optional[float]
     logo: Optional[str]
-    web_link: Optional[str]
+    website: Optional[str]
+    email: Optional[str]
     visible:bool
 
     class Config:

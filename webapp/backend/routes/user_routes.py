@@ -3,13 +3,14 @@ from typing import List
 from ..schemas import user_schema as schema
 from ..models import model
 from sqlalchemy.orm import Session
+from sqlalchemy import desc
 # from ..config.db_setup import get_db
 from ..config.supabase_config import get_db,url_s3_object,supa_client,bucket_s3
 from ..services import user_functions
 import passlib.hash as hash
 from urllib.parse import unquote
 import uuid
-
+import json
 
 user_route = APIRouter(prefix="/api/users")
 
@@ -112,6 +113,139 @@ async def update_user(key: str,
     db.refresh(user)
 
     return user
+
+
+@user_route.get("/",response_model=List[schema.User],tags = ['users'])
+def show_projects(db:Session=Depends(get_db)):
+    users = db.query(model.User).order_by(desc(model.User.user_id)).all()
+    return users
+
+
+@user_route.post("/invite_user",tags = ['users']) 
+def invite_user(email: str,
+                  user: schema.User = Depends(user_functions.get_current_user),
+                  db: Session = Depends(get_db)):
+    try:
+        response = supa_client.auth.admin.invite_user_by_email(email) #not working as admin permission needed
+
+        if response:
+            data = response.json() 
+            parsed_data = json.loads(data)
+            return {"detail": "Email sent","data": parsed_data}
+        else:
+            return {"detail": "Email could not be sent"}
+    
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Email invitation error: {str(e)}")
     
 
+@user_route.put("/join_project",tags = ['users'])
+async def join_project(project_id:str,
+                       user_id:str,
+                       role:str,
+                       db:Session=Depends(get_db)):
+    admin_roles = db.query(model.User_Project).filter(model.User_Project.project_id == project_id,
+                                              model.User_Project.member_type == "admin").all()
+    
+    my_roles = db.query(model.User_Project).filter(model.User_Project.project_id == project_id,
+                                              model.User_Project.user_id == user_id).all()
+    if my_roles==[]:
+        if admin_roles==[]:
+            rel_obj = model.User_Project(user_id = user_id,
+                                        project_id = project_id,
+                                        member_type = "admin")
+            db.add(rel_obj)
+            db.commit()
+        else:
+            rel_obj = model.User_Project(user_id = user_id,
+                                        project_id = project_id,
+                                        member_type = role)
+            db.add(rel_obj)
+            db.commit()
+        
+        return {"detail": "User joined the project"} 
+    else:
+        raise HTTPException(status_code=422, detail="User is already a member of this project")
+
+    
+
+@user_route.put("/join_org",tags = ['users'])
+async def join_org(org_id:str,
+                       user_id:str,
+                       role:str,
+                       db:Session=Depends(get_db)):
+    admin_roles = db.query(model.User_Organization).filter(model.User_Organization.org_id == org_id,
+                                              model.User_Organization.member_type == "admin").all()
+    
+    my_roles = db.query(model.User_Organization).filter(model.User_Organization.org_id == org_id,
+                                              model.User_Organization.user_id == user_id).all()
+    if my_roles==[]:
+        if admin_roles==[]:
+            rel_obj = model.User_Organization(user_id = user_id,
+                                        org_id = org_id,
+                                        member_type = "admin")
+            db.add(rel_obj)
+            db.commit()
+        else:
+            rel_obj = model.User_Organization(user_id = user_id,
+                                        org_id = org_id,
+                                        member_type = role)
+            db.add(rel_obj)
+            db.commit()
+        
+        return {"detail": "User joined the organization"} 
+    else:
+        raise HTTPException(status_code=422, detail="User is already a member of this organization")
+    
+
+@user_route.get("/user_projects",tags = ['users'])
+async def get_user_projects(user_id:str,
+                            db:Session=Depends(get_db)):
+    projects = db.query(model.Project).join(
+            model.User_Project,
+            model.User_Project.project_id == model.Project.project_id
+        ).filter(model.User_Project.user_id == user_id).all()
+    my_roles = (db.query(model.User_Project)
+        .filter(model.User_Project.user_id == user_id)).all()
+
+    # Create a dictionary of users by user_id for fast lookups
+    project_dict = {project.project_id: project for project in projects}
+
+    # Now merge by matching user_id in both lists and merge all fields
+    merged_list = []
+    for role in my_roles:
+        project = project_dict.get(role.project_id)  # Look up the corresponding Project
+        if project:
+            # Merge all fields from both the Project and the role
+            merged_dict = {**project.__dict__, **role.__dict__}  # Combine all fields
+            merged_dict.pop('_sa_instance_state', None)  # Remove SQLAlchemy internal state attribute
+            merged_list.append(merged_dict)
+        
+    return merged_list
+
+
+@user_route.get("/user_orgs",tags = ['users'])
+async def get_user_orgs(user_id:str,
+                            db:Session=Depends(get_db)):
+    orgs = db.query(model.Organization).join(
+            model.User_Organization,
+            model.User_Organization.org_id == model.Organization.org_id
+        ).filter(model.User_Organization.user_id == user_id).all()
+    my_roles = (db.query(model.User_Organization)
+        .filter(model.User_Organization.user_id == user_id)).all()
+
+    # Create a dictionary of users by user_id for fast lookups
+    org_dict = {org.org_id: org for org in orgs}
+
+    # Now merge by matching user_id in both lists and merge all fields
+    merged_list = []
+    for role in my_roles:
+        org = org_dict.get(role.org_id)  # Look up the corresponding org
+        if org:
+            # Merge all fields from both the org and the role
+            merged_dict = {**org.__dict__, **role.__dict__}  # Combine all fields
+            merged_dict.pop('_sa_instance_state', None)  # Remove SQLAlchemy internal state attribute
+            merged_list.append(merged_dict)
+        
+    return merged_list
     

@@ -4,20 +4,25 @@ from ..constants import urls
 from ..states.project_state import ProjectState
 from ..states.auth_state import AuthState
 from typing import Dict
-urls.INDIVIDUAL_PROJECT_URL
+from ..components.user_card import users_grid_horizontal
 
-@rx.page(route=f"/[urls.INDIVIDUAL_PROJECT_URL][ProjectState.selected_id]")
-def individual_project() -> rx.Component:
+
+@rx.page(route=urls.IND_PROJECT_URL,on_load=ProjectState.find_members_project)
+def view_project() -> rx.Component:
     my_child = rx.vstack(
         rx.link(rx.icon('arrow_left'),href=urls.PROJECTS_URL),
-        rx.heading(ProjectState.selected_project['project_name'], size="9"),
         rx.hstack(
-            rx.icon("globe"),
-            rx.link("Link to Website",href=ProjectState.selected_project['link'])
+            rx.heading(ProjectState.selected_project['name'], size="9"),
+            rx.avatar(src=f"{ProjectState.selected_project['logo']}", heigh="50px",justify="end"),
+            justify="between",
         ),
         rx.hstack(
-            rx.icon("building-2"),
-            rx.link(f"Developed by: {'org'}",href=ProjectState.selected_project['link'])
+            rx.icon("globe"),
+            rx.link(ProjectState.selected_project['website'],href=ProjectState.selected_project['website'])
+        ),
+        rx.hstack(
+            rx.icon("github"),
+            rx.link(ProjectState.selected_project['repo'])#,href=ProjectState.selected_project['repo'])
         ),
         rx.divider(width='90%'),
         rx.hstack(
@@ -35,6 +40,8 @@ def individual_project() -> rx.Component:
                 width="60%"
             ),
             align='start',
+            spacing="5",
+            padding="5"
         ),
         rx.divider(width='90%'),
         rx.hstack(
@@ -53,9 +60,14 @@ def individual_project() -> rx.Component:
             rx.icon("newspaper"),
             rx.heading("News and Publications",size="5"),
         ),
-        align = "start",
-        justify="start",
-        width ="100%"
+        rx.divider(width='90%'),
+        rx.hstack(
+            rx.icon("circle-user-round"),
+            rx.heading("Members",size="5"),
+        ),
+        users_grid_horizontal(ProjectState.project_members,cols=6,rows=3),
+        width ="100%",
+        spacing="3"
     )
 
     return platform_base(my_child)

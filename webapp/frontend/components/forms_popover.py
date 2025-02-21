@@ -2,36 +2,57 @@ import reflex as rx
 from .user_input_text import SimpleTextInput
 from .forms import ProjectForm,InstitutionForm, VideoForm
 from .org_forms  import form_org,search_org
+from .project_forms  import form_project,search_project
+from .user_forms import form_user,search_user_org,search_user_project
 
-project_form = ProjectForm.create
-video_form = VideoForm.create
+
+def add_new(text:str)->rx.Component():
+    return rx.container(
+        rx.hstack(
+            add_new_popover(text),
+            rx.text(f"Click to add a new {text}"),
+            align="center",   
+        )
+    )
+
+def search_existing(text:str)->rx.Component():
+    return rx.container(
+        rx.hstack(
+            search_popover(text),
+            rx.text(f"Click to search an existing {text}"),
+            align="center", 
+        )
+    )
+
 
 def add_new_popover(my_title:str) -> rx.Component:
     return rx.dialog.root(
-        rx.dialog.trigger(rx.icon_button("square-plus", size="3")),
-        
+        rx.tooltip(rx.dialog.trigger(rx.icon_button("square-plus", size="3")),
+                    content=f"Add new {my_title}"),
         rx.match(
             my_title,
-            ("project", project_form()),
+            ("project", form_project()),
             ("organization", form_org()),
-            ("video",video_form()),
-            ("device", form_org()),
+            ("user", form_user()),
             form_org(),
             ),
-        
     )
 
 def search_popover(my_title:str) -> rx.Component:
     return rx.dialog.root(
         rx.dialog.trigger(rx.icon_button("search-check", size="3")),
-        
         rx.match(
             my_title,
-            ("project", project_form()),
+            ("project", search_project()),
             ("organization", search_org()),
-            ("video",video_form()),
-            ("device", form_org()),
-            form_org(),
-            ),
-        
+            form_org()),
+    )
+    
+def search_user(my_title:str) -> rx.Component:
+    return rx.dialog.root(
+        rx.dialog.trigger(rx.icon_button("user-round-search", size="3")),
+        rx.match(
+            my_title,
+            ("project", search_user_project()),
+            ("organization", search_user_org()),)
     )

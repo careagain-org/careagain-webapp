@@ -22,7 +22,12 @@ supa_client: Client = create_client(url, key)
 # Connect to supabase DB using sqlalchemy
 uri_db: str = os.environ.get("SUPABASE_DB_URI")
 
-engine = create_engine(uri_db)   
+engine = create_engine(uri_db,
+                       pool_size=10,  # Adjust based on your needs
+                        max_overflow=5,  # Additional connections allowed beyond pool_size
+                        pool_timeout=30,  # Timeout for acquiring a connection
+                        pool_recycle=1800,  # Recycle connections after 30 minutes
+                    )  
 SessionLocal = sessionmaker(autocommit = False,autoflush = False, bind =engine)
 Base = declarative_base()
 conn = engine.connect()

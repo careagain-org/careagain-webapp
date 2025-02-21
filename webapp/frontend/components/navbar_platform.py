@@ -16,14 +16,14 @@ def navbar_platform() -> rx.Component:
     return rx.box(
         rx.desktop_only(
             rx.hstack(
-                rx.input(      
-                    rx.input.slot(rx.icon("search")),
-                    placeholder="Search...",
-                    type="search",
-                    size="2",
-                    ),
+                # rx.input(      
+                #     rx.input.slot(rx.icon("search")),
+                #     placeholder="Search...",
+                #     type="search",
+                #     size="2",
+                #     ),
                 rx.menu.separator(),
-                rx.color_mode.button(color="teal"),
+                rx.color_mode.button(color="teal",size="3"),
                 notification_popover(),
                 navbar_profile(),
                 spacing="5",

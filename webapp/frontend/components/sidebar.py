@@ -112,7 +112,7 @@ def sidebar() -> rx.Component:
                 sidebar_items(),
                 rx.spacer(),
                 rx.vstack(
-                    sidebar_item("Settings", "settings", "/#"),
+                    # sidebar_item("Settings", "settings", "/#"),
                     #sidebar_item("Log out", "log-out", "/#"),
                     rx.divider(),
                     profile_button(),

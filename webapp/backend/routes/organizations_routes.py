@@ -53,7 +53,8 @@ async def create_org(input:org_schema.CreateOrganization,
                                  latitude = input.latitude,
                                  longitude = input.longitude,
                                  logo = input.logo,
-                                 web_link = input.web_link,
+                                 website = input.website,
+                                 email = input.email,
                                  visible = input.visible,
                                  )
     
@@ -127,7 +128,7 @@ async def join_organization(org_id:str,
 
 
 @organization_route.get("/members",tags = ['organizations'])
-async def join_organization(org_id:str,
+async def get_members(org_id:str,
                             db:Session=Depends(get_db)):
     members = db.query(model.User).join(
             model.User_Organization,
@@ -199,6 +200,7 @@ async def show_organizations(
     # Return the list of organizations
     return merged_list
 
+
 @organization_route.put("/update_org", tags=['organizations'])
 async def update_org(key: str, 
                       value: str, 
@@ -223,4 +225,67 @@ async def update_org(key: str,
     db.refresh(org)
 
     return org
+
+
+@organization_route.put("/user_join_org",tags = ['organizations'])
+async def join_org(org_id:str,
+                       user_id:str,
+                       db:Session=Depends(get_db)):
+    admin_roles = db.query(model.User_Organization).filter(model.User_Organization.org_id == org_id,
+                                              model.User_Organization.member_type == "admin").all()
+    
+    my_roles = db.query(model.User_Organization).filter(model.User_Organization.org_id == org_id,
+                                              model.User_Organization.user_id == user_id).all()
+    if my_roles==[]:
+        if admin_roles==[]:
+            rel_obj = model.User_Organization(user_id = user_id,
+                                        org_id = org_id,
+                                        member_type = "admin")
+            db.add(rel_obj)
+            db.commit()
+        else:
+            rel_obj = model.User_Organization(user_id = user_id,
+                                        org_id = org_id,
+                                        member_type = "user")
+            db.add(rel_obj)
+            db.commit()
+        
+        return {"detail": "User joined the organization"} 
+    else:
+        raise HTTPException(status_code=422, detail="User is already a member of this organization")
+    
+
+@organization_route.put("/user_dettached_org",tags = ['organizations'])
+async def dettach_org(org_id:str,
+                       user_id:str,
+                       db:Session=Depends(get_db)):
+    (db.query(model.User_Organization).filter(model.User_Organization.org_id == org_id,
+                                              model.User_Organization.user_id == user_id).delete(synchronize_session='fetch'))
+
+    db.commit()
+
+    return {"detail": "User removedfrom organization"} 
+
+
+@organization_route.put("/change_member_type",tags = ['organizations'])
+async def change_member_type(org_id:str,
+                       user_id:str,
+                       role:str,
+                       db:Session=Depends(get_db)):
+    
+    user_org= (db.query(model.User_Organization).filter(model.User_Organization.org_id == org_id,
+                                                        model.User_Organization.user_id == user_id)).first()
+    
+    if user_org is None:
+        raise HTTPException(status_code=404, detail="User not found in this organization")
+    
+    # Set the attribute dynamically
+    setattr(user_org, "member_type", role)
+    
+    # Commit the changes to the database
+    db.add(user_org)
+    db.commit()
+    db.refresh(user_org)
+
+    return {"detail": "member_type changed"} 
 

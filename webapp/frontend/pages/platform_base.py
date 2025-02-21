@@ -38,7 +38,7 @@ def platform_base(child: rx.Component ,*args,**kwargs) -> rx.Component:
             ),
             render_menu(),
             width="100%",
-            # on_mount= AuthState.refresh_login
+            # on_mount= AuthState.check_session
         )
     return  rx.cond(
         AuthState.is_authenticated,

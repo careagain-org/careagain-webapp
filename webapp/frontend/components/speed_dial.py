@@ -36,7 +36,7 @@ class SpeedDialMenu(rx.ComponentState):
                     rx.vstack(
                         menu_item("bug", "Report issue", urls.REPORT_URL),
                         rx.divider(margin="0"),
-                        menu_item("repeat-2", "Feedback", urls.REPORT_URL),
+                        menu_item("repeat-2", "Feedback", urls.FEEDBACK_URL),
                         direction="column-reverse",
                         align_items="end",
                         justify_content="end",

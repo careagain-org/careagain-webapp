@@ -2,10 +2,13 @@
 
 # frontend imports
 import reflex as rx
-from webapp.frontend.pages import (ind_org_view, ind_org_edit, webpage,login, projects, signup,
+from webapp.frontend.pages import (ind_org_view, ind_org_edit, 
+                                   ind_project_view, ind_project_edit, 
+                                   ind_user_view,
+                                   webpage,login, projects, signup,
                                    platform, projects, profile,
                                    videos,community, questions,
-                                   individual_project,reset_password) #contact,community,
+                                   reset_password) #contact,community,
 from webapp.frontend.constants import urls
 from rxconfig import config
 
@@ -51,7 +54,6 @@ app = rx.App(
         accent_color="teal"
     )
 )
-# app.add_page(view_organization, route="/org_view=[org_id]")
 
 ## ---------------- ADD BACKEND --------------------------- ##
 
@@ -79,11 +81,3 @@ app.api.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# # app.mount("/", StaticFiles(directory="../frontend-webapp/build", html=True), name="frontend")
-# clerk.install_pages(
-#     app,
-#     publishable_key=os.environ.get("CLERK_PUBLISHABLE_KEY"),
-# )
-
-# clerk.clerk_provider(publishable_key=os.environ.get("CLERK_PUBLISHABLE_KEY"))

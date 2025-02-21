@@ -11,9 +11,12 @@ import os
 
 
 class OrgState(AuthState):
+    org_types: list[str] = ["Hospital", "Logistics & transport",
+                            "Research & Development","Manufacturer"]
     orgs: List[Dict[str, str]] = []
     my_orgs: List[Dict[str, str]] = []
     filtered_orgs: List[Dict[str, str]] = []
+    searched_orgs: List[Dict[str, str]]=[]
     orgs_locations: List[Dict[str, float]] = []
     selected_org: Dict[str, str] = {}
     org_details: Dict[str, str] = {}
@@ -24,6 +27,7 @@ class OrgState(AuthState):
     longitude: float =None
     logo: str =""
     visible: bool =False
+    org_type: str=None
 
     @rx.event
     def update_location(self):
@@ -40,6 +44,7 @@ class OrgState(AuthState):
         self.longitude=None
         self.logo =""
         self.visible=False
+        self.org_type=False
 
         
     @rx.event
@@ -84,10 +89,12 @@ class OrgState(AuthState):
                     return rx.toast(f"User update error: {response.status_code}, {detail}")
         except Exception as e:
             return rx.toast(f"File upload error: {str(e)}")
+        
     
     async def filter_org(self,value:str=""):
         self.filtered_orgs = [d for d in self.orgs if (value.lower() in d['name'].lower()) and (value!="")]
         print(self.filtered_orgs)
+
 
     async def create_new_org(self, form_data: dict):
         try:
@@ -105,8 +112,9 @@ class OrgState(AuthState):
                 "longitude": self.longitude,
                 "address": form_data["address"],
                 "logo": f"{urls.SUPABASE_S3_URL}orgs/{org_id}/images/{self.logo}" if self.logo else "",
-                "web_link": form_data["web_link"],
-                "visible": True
+                "website": form_data["website"],
+                "email":form_data["email"],
+                "visible": self.visible
             }
 
             headers = {"Authorization": f"Bearer {self.token}"}
@@ -140,6 +148,7 @@ class OrgState(AuthState):
             self.my_orgs = response.json()
         else:
             print(f"Failed to get orgs: {response.status_code}, {response.text}")
+            
 
     async def delete_my_org(self,org_id):
 
@@ -154,7 +163,7 @@ class OrgState(AuthState):
             await self.get_my_orgs()
             return rx.toast.success(detail)
         else:
-            return rx.toast.error(f"Failed to get orgs: {response.status_code}, {response.text}")
+            return rx.toast.error(f"Failed to delete organization: {response.status_code}, {response.text}")
         
     
     async def leave_my_org(self,org_id):
@@ -199,8 +208,17 @@ class OrgState(AuthState):
         
         if response.status_code == 200:
             self.orgs = response.json()
+            self.searched_orgs= response.json()
         else:
             print(f"Failed to get orgs: {response.status_code}, {response.text}")
+            
+    
+    async def search_orgs(self,form_data):
+        if form_data["search"]=="":
+            self.searched_orgs =self.orgs
+        else:
+            self.searched_orgs = [d for d in self.orgs if (form_data["search"].lower() in (d['name']+d['description']+d["type"]+d["address"]).lower()) 
+                                      and (form_data["search"]!="")]
 
 
     async def get_location(self):
@@ -215,6 +233,7 @@ class OrgState(AuthState):
                 print(f"Failed to get orgs: {response.status_code}, {response.text}")
         except Exception as e:
             print(f"An error occurred: {e}")
+
 
     async def find_members_org(self):
         try:
@@ -234,15 +253,18 @@ class OrgState(AuthState):
         self.org_id = org_id
         self.selected_org = [d for d in self.orgs if d['org_id']==org_id][0]
 
+
     def to_org_view(self,org_id:str):
         self.org_id = org_id
         self.selected_org = [d for d in self.orgs if d['org_id']==org_id][0]
         return rx.redirect(f"/org_view")
     
+    
     def to_org_edit(self,org_id:str):
         self.org_id = org_id
         self.selected_org = [d for d in self.orgs if d['org_id']==org_id][0]
         return rx.redirect(f"/org_edit")
+    
     
     async def update_org(self,key:str,value:str):
         try:
@@ -260,4 +282,57 @@ class OrgState(AuthState):
                 return rx.toast.error(f"Organization update error: {detail}")
         except:
             return rx.toast("Unexpected error")
+    
+    async def update_coordinates(self):
+        lat = float(clipboard.paste().split(",")[0])
+        lon = float(clipboard.paste().split(",")[-1])
+        
+        await self.update_org(key="latitude",value=lat)
+        await self.update_org(key="longitude",value=lon)
+        
+        
+    async def user_join_org(self,user_id:str):
+        print("hola")
+
+        async with httpx.AsyncClient() as client:
+            response = await client.put(
+                f"{urls.API_URL}api/orgs/user_join_org?org_id={self.org_id}&user_id={user_id}",
+            )
+        
+        if response.status_code == 200:
+            detail = response.json()["detail"]
+            await self.find_members_org()
+            return rx.toast.success(detail)
+        else:
+            return rx.toast.error(f"Failed to join organization: {response.status_code}, {response.text}")
+        
+    
+    async def user_dettached_org(self,user_id:str):
+
+        async with httpx.AsyncClient() as client:
+            response = await client.put(
+                f"{urls.API_URL}api/orgs/user_dettached_org?org_id={self.org_id}&user_id={user_id}",
+            )
+        
+        if response.status_code == 200:
+            detail = response.json()["detail"]
+            await self.find_members_org()
+            return rx.toast.success(detail)
+        else:
+            return rx.toast.error(f"Failed to remove user: {response.status_code}, {response.text}")
+        
+    
+    async def change_member(self,user_id:str,role:str):
+
+        async with httpx.AsyncClient() as client:
+            response = await client.put(
+                f"{urls.API_URL}api/orgs/change_member_type?org_id={self.org_id}&user_id={user_id}&role={role}",
+            )
+        
+        if response.status_code == 200:
+            detail = response.json()["detail"]
+            await self.find_members_org()
+            return rx.toast.success(detail)
+        else:
+            return rx.toast.error(f"Change member type: {response.status_code}, {response.text}")
 

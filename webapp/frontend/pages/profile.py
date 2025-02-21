@@ -5,16 +5,47 @@ from ..constants import urls
 from ..components.forms_popover import add_new_popover,search_popover
 from ..components.user_input_text import EditableText
 from ..components.upload import upload_image_user
-from ..components.org_table import table_pagination
+from ..components.org_table import table_pagination as org_table
+from ..components.project_table import table_pagination as project_table
 from ..components.list_institution import list_org_vertical
 from ..states.user_state import UserState
 from ..states.org_state import OrgState
+from ..states.project_state import ProjectState
 from ..states.auth_state import AuthState
 
 editable_text = EditableText.create
 
 class Profile():
     value: str
+    
+    
+def orgs_section():
+    return rx.vstack(
+        section_title("building-2",'My Organizations',"Community", urls.COMMUNITY_PLATFORM),
+        rx.hstack(
+            add_new("organization"),
+            search_existing("organization"),
+            align="start",
+            justify="start",
+            spacing="5"),
+        org_table(OrgState.my_orgs),
+        width="100%",
+        id="my-organizations"
+    )
+    
+def projects_section():
+    return rx.vstack(
+        section_title("square-library",'My Projects',"Projects", urls.PROJECTS_URL),
+        rx.hstack(
+            add_new("project"),
+            search_existing("project"),
+            align="start",
+            spacing="4",
+        ),
+        project_table(ProjectState.my_projects),
+        width="100%",
+        id="my-projects"
+    )
 
 def section_title(section_icon:str,section_title:str, go_to_section:str,section_link:str) -> rx.Component():
     return rx.hstack(
@@ -87,33 +118,18 @@ def search_existing(text:str)->rx.Component():
     )
 
 
-@rx.page(route=urls.PROFILE_URL, on_load= [UserState.get_my_details,OrgState.get_my_orgs,OrgState.get_orgs])
+@rx.page(route=urls.PROFILE_URL, on_load= [UserState.get_my_details,
+                                           OrgState.get_my_orgs,OrgState.get_orgs,
+                                           ProjectState.get_list_projects,ProjectState.get_my_projects])
 def profile() -> rx.Component:
     profile = rx.vstack(
                 rx.heading('My profile', size="9"),
                 section_title("book-user",'My User',"Users", urls.PROJECTS_URL),
                 user_section(),
                 rx.divider(),
-                section_title("building-2",'My Organizations',"Community", urls.PROJECTS_URL),
-                rx.hstack(
-                    add_new("organization"),
-                    search_existing("organization"),
-                    align="start",
-                    justify="start",
-                    spacing="5"),
-                table_pagination(OrgState.my_orgs),
-                #list_org_vertical(),
+                orgs_section(),
                 rx.divider(),
-                section_title("square-library",'My Projects',"Projects", urls.PROJECTS_URL),
-                rx.hstack(
-                    add_new("project"),
-                    search_existing("project"),
-                    align="start",
-                    spacing="4",
-                ),
-                # rx.divider(),
-                # section_title("square-play",'My Video',"Videos", urls.PROJECTS_URL),
-                # add_new("video"),
+                projects_section(),
                 spacing="5",
                 align = "start",
                 justify="start",

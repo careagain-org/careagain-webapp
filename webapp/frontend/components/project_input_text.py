@@ -1,8 +1,8 @@
 import reflex as rx
 import typing as Callable
-from ..states.org_state import OrgState
+from ..states.project_state import ProjectState
 
-class OrgEditableText(rx.ComponentState):
+class ProjectEditableText(rx.ComponentState):
     text: str = "Click to edit"
     original_text: str
     editing: bool = False
@@ -61,7 +61,7 @@ class OrgEditableText(rx.ComponentState):
                 edit_controls,
                 on_submit=lambda _: [on_change(cls.text),
                                      cls.stop_editing(),
-                                     OrgState.update_org(key,cls.text)]
+                                     ProjectState.update_project(key,cls.text)]
             ),
             rx.hstack(
                 rx.text(
@@ -78,7 +78,7 @@ class OrgEditableText(rx.ComponentState):
         
         
 
-class OrgEditableTextArea(rx.ComponentState):
+class ProjectEditableTextArea(rx.ComponentState):
     text: str = "Click to edit"
     original_text: str
     editing: bool = False
@@ -108,7 +108,7 @@ class OrgEditableTextArea(rx.ComponentState):
                 value=value,
                 on_change=on_change,
                 **props,
-                width="40vw",
+                width="60vw",
                 min_height="10em"
             ),
             rx.icon_button(
@@ -139,7 +139,7 @@ class OrgEditableTextArea(rx.ComponentState):
                 edit_controls,
                 on_submit=lambda _: [on_change(cls.text),
                                      cls.stop_editing(),
-                                     OrgState.update_org(key,cls.text)]
+                                     ProjectState.update_project(key,cls.text)]
             ),
             rx.hstack(
                 rx.text(

@@ -27,11 +27,12 @@ class User(Base):
     user_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
     username = Column(String(255),unique=True)
     first_name = Column(String(255))
-    last_name1 = Column(String(255))
-    last_name2 = Column(String(255))
+    last_name = Column(String(255))
     profile_image = Column(String(255))
     country = Column(String(255))
     role = Column(String(255))
+    linkedin = Column(String(255))
+    description = Column(Text)
     active = Column(Boolean, default=True)
     verified = Column(Boolean, default=False)
     visible = Column(Boolean, default=True)
@@ -49,7 +50,8 @@ class Organization(Base):
     latitude = Column(Float,default=None)
     longitude = Column(Float,default=None)
     logo = Column(String(255)) 
-    web_link = Column(String(255)) 
+    website = Column(String(255)) 
+    email = Column(String(255)) 
     activation_date = Column(DATE,default=dt.date.today)
     active = Column(Boolean, default=True)
     verified = Column(Boolean, default=False)
@@ -71,12 +73,16 @@ class Project(Base):
     __tablename__= 'projects'
     __table_args__ = {'schema': supabase_schema}
     project_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
-    name = Column(String(100))
+    name = Column(String(255))
     type = Column(String(255))
-    link = Column(String(255))
+    classification = Column(String(255))
+    website = Column(String(255))
+    repo = Column(String(255))
     description = Column(Text)
     image = Column(String(255))
     logo = Column(String(255))
+    status = Column(String(255))
+    verified = Column(Boolean,default=False)
 
 
 

@@ -28,18 +28,18 @@ class AuthState(rx.State):
     def get_token(self) -> str:
         return self.token
 
-    @rx.background
-    async def check_auth(self):
-        """Check if the token is not None every 60 sec"""
-        while self.is_authenticated:
-            token=self.get_token()
-            if token:
-                self.is_authenticated = True
-                return self.token
-            else:
-                self.is_authenticated = False
+    # @rx.background
+    # async def check_auth(self):
+    #     """Check if the token is not None every 60 sec"""
+    #     while self.is_authenticated:
+    #         token=self.get_token()
+    #         if token:
+    #             self.is_authenticated = True
+    #             return self.token
+    #         else:
+    #             self.is_authenticated = False
             
-            await asyncio.sleep(60)
+    #         await asyncio.sleep(60)
     
     @rx.event
     async def handle_login(self):
@@ -85,7 +85,7 @@ class AuthState(rx.State):
             
             if response.status_code == 200:
                 response_detail = response.json()["detail"]
-                return [rx.redirect(urls.LOGIN_URL),rx.toast.success(f"{response_detail}")]
+                return [rx.toast.success(f"{response_detail}")]
 
             else:
                 response_details = response.json()["detail"]
@@ -94,6 +94,7 @@ class AuthState(rx.State):
         except Exception as err:
             response_detail = response.json()["detail"]
             return rx.toast.error(f"{response_detail}")
+        
         
     async def handle_logout(self):
         async with httpx.AsyncClient() as client:
@@ -176,15 +177,36 @@ class AuthState(rx.State):
             response_details = response.json()["detail"]
             return rx.toast.error(f"{response_details}")
         
+    
+    @rx.event
+    async def check_session(self):
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{urls.API_URL}api/auth/session",
+                )
+            if response.status_code == 200:
+                access_token = response.json()["access_token"]
+                if access_token:
+                    self.token=access_token
+                    self.is_authenticated = True
+            else:
+                response_detail = response.json()["detail"]
+                self.is_authenticated = False
+                return rx.toast.error(f"Auth error {response_detail}")
+        
+        except Exception as err:
+            self.is_authenticated = False
+            return rx.toast.error(err)
+        
 
 
     @rx.event
     async def refresh_login(self):
         try:
             async with httpx.AsyncClient() as client:
-                response = await client.put(
+                response = await client.post(
                     f"{urls.API_URL}api/auth/refresh_session",
-                    headers={"Content-Type": "application/x-www-form-urlencoded"},
                 )
             if response.status_code == 200:
                 access_token = response.json()["access_token"]

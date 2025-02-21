@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 import datetime as dt
+import uuid
 
 class UserCreate(BaseModel):
     email:str
@@ -13,11 +14,13 @@ class UserCreate(BaseModel):
         }
 
 class User(BaseModel):
-    user_id:int
+    user_id:uuid.UUID
     username:str
     first_name:Optional[str]
-    last_name1:Optional[str]
-    last_name2:Optional[str] 
+    last_name:Optional[str]
+    linkedin:Optional[str]
+    description:Optional[str] 
+    profile_image:Optional[str] 
     country:Optional[str] 
     role:Optional[str]
     active:bool
@@ -32,7 +35,7 @@ class User(BaseModel):
         }
 
 class TokenData(BaseModel):
-    user_id:int
+    user_id: uuid.UUID
 
 
 

@@ -13,7 +13,7 @@ def upload_image_user(title:str,my_image:str) -> rx.Component():
     return rx.vstack(
         rx.heading(title,size="3", color = "grey"),
         rx.upload(
-            rx.vstack(
+            rx.center(
                 rx.cond(my_image=="",
                         rx.icon("image",size=40,color="teal"),
                         rx.image(my_image)),
@@ -70,22 +70,22 @@ def upload_image_user(title:str,my_image:str) -> rx.Component():
 def upload_logo_org(title:str,my_image:str) -> rx.Component():
 
     return rx.vstack(
-        rx.heading(title,size="3", color = "grey"),
+        rx.hstack(
+            rx.icon("image"),
+            rx.heading(title,size="3"),
+        ),
         rx.upload(
-            rx.vstack(
+            rx.center(
                 rx.cond(my_image=="",
                         rx.icon("image",size=40,color="teal"),
-                        rx.image(my_image)),
-                align="center",
-                justify="center"),
+                        rx.image(my_image),),
+                ),
             radius="full",
             border="1px dotted rgb(0,0,0)",
             spacing="2",
-            width="15em",
+            width="19em",
             height="100%",
             min_height="10em",
-            align="center",
-            justify="center",
             multiple=False,
             accept = {
                 "application/pdf": [".pdf"],
@@ -98,6 +98,7 @@ def upload_logo_org(title:str,my_image:str) -> rx.Component():
             _hover={"cursor": "pointer"},
             background_image=rx.get_upload_url("logo_org.png"),
             id="upload_logo_org",
+            align="center",
         ),
         rx.hstack(
             rx.foreach(

@@ -13,97 +13,103 @@ from ..components.org_card import org_grid_vertical
 
 
 def form_org() -> rx.Component:
-        all_organization: list[str] = ["Hospital","Intermediate NGO", "Logistics & transport",
-                                   "University", "Research & Development",
-                                   "Manufacturer", "Religious entity"]
-        longitude: str = clipboard.paste().split(",")[-1]
-        latitude: str = clipboard.paste().split(",")[0]
+    all_organization: list[str] = ["Hospital", "Logistics & transport",
+                                    "Research & Development","Manufacturer"]
 
-        outfile = rx.get_upload_url("logo_org.png")
-
-        return rx.dialog.content(
-            rx.dialog.title(f"Add new organization"),
-            rx.dialog.description(
-                    f"Add new organization details, required fields marked with *",
-                    size="2",
-                    margin_bottom="16px",
-                ),
-            rx.form(
-                    rx.flex(
-                        rx.hstack(
-                            rx.vstack(
-                                rx.heading("Name *",size="3"),
-                                rx.input(placeholder="Enter organization name",
-                                name="name",
-                                required=True,
-                                width="100%"),
-                                width="100%"
-                            ),
-                            rx.vstack(
-                                rx.heading("Type of organization *",size="3"),
-                                rx.select(all_organization, 
-                                        placeholder="Select Organization Type",
-                                        name="type",
-                                        required=True,
-                                        width="100%"),
-                                width="100%"
-                            ),
-                            width="100%",
+    return rx.dialog.content(
+        rx.dialog.title(f"Add new organization"),
+        rx.dialog.description(
+                f"Add new organization details, required fields marked with *",
+                size="2",
+                margin_bottom="16px",
+            ),
+        rx.form(
+                rx.flex(
+                    rx.hstack(
+                        rx.vstack(
+                            rx.heading("Name *",size="3"),
+                            rx.input(placeholder="Enter organization name",
+                            name="name",
+                            required=True,
+                            width="100%"),
+                            width="100%"
                         ),
-                        rx.heading("Organization Description",size="3"),
-                        rx.text_area(
-                            placeholder="Type here...",
-                            name="description",),
-                        rx.heading("Website url (if aplicable)",size="3"),
-                        rx.input(placeholder="Enter url link",
-                                    name= "web_link"),
-                        rx.hstack(
-                                upload_logo_org(title="Logo",my_image=rx.get_upload_url(OrgState.logo)),
-                                rx.vstack(
-                                    rx.hstack(rx.heading("Locate in the map",color="grey",size="3"),
-                                            rx.text(value=OrgState.longitude,name="location")),
-                                    interactive_map(),
-                                    rx.text("** one click to add a new pin, double-click to remove it",size="1"),
-                                    rx.flex(
-                                        rx.text("Visibility in the community map"),
-                                        rx.switch(id="visibility",on_change=OrgState.update_location),
-                                        spacing="5",
-                                        ),
-                                    ),
-                                ),
-                        rx.heading("Address",size="3"),
-                            rx.input(placeholder="Enter organization address",
-                                name="address",),
-                            rx.heading("E-mail",size="3"),
-                            rx.input(placeholder="Enter organization email",
-                                name="email",),
-                        rx.flex(
-                            rx.dialog.close(
-                                rx.button(
-                                    "Cancel",
-                                    color_scheme="gray",
-                                    variant="soft",
-                                    justify="start",),
-                            ),
-                            rx.dialog.close(
-                                rx.button("Save",
-                                    type ="submit",
-                                    justify="end",
-                                    color_scheme="teal",),
-                            ),
-                            spacing="3",
-                            margin_top="16px",
-                            justify="end",
-                            width="100%",
+                        rx.vstack(
+                            rx.heading("Type of organization *",size="3"),
+                            rx.select(all_organization, 
+                                    placeholder="Select Organization Type",
+                                    name="type",
+                                    default_value=None,
+                                    required=True,
+                                    width="100%"),
+                            width="100%"
                         ),
-                        spacing = "3",
-                        direction = "column",
                         width="100%",
                     ),
-                    on_submit=OrgState.create_new_org,
-                    reset_on_submit=True,
-                    )
-                )
+                    rx.heading("Organization Description",size="3"),
+                    rx.text_area(
+                        placeholder="Type here...",
+                        name="description",),
+                    rx.hstack(
+                        rx.vstack(
+                            rx.heading("Website url / social media",size="3"),
+                            rx.input(placeholder="Enter url link",
+                                name= "website",
+                                width="100%"),
+                            width="100%"
+                        ),
+                        rx.vstack(
+                            rx.heading("E-mail",size="3"),
+                            rx.input(placeholder="Enter organization email",
+                                name="email",width="100%"),
+                            width="100%",
+                        ),
+                        width="100%",
+                    ),
+                    rx.hstack(
+                            upload_logo_org(title="Logo",my_image=rx.get_upload_url(OrgState.logo)),
+                            rx.vstack(
+                                rx.hstack(rx.heading("Locate in the map",color="grey",size="3"),
+                                        rx.text(value=OrgState.longitude,name="location")),
+                                interactive_map(),
+                                rx.text("** one click to add a new pin, double-click to remove it",size="1"),
+                                rx.flex(
+                                    rx.text("Visibility in the community map"),
+                                    rx.switch(id="visibility",on_change=OrgState.update_location),
+                                    spacing="5",
+                                    ),
+                                ),
+                            ),
+                    rx.heading("Address",size="3"),
+                    rx.text_area(placeholder="Enter organization address",
+                        name="address",),
+                    rx.flex(
+                        rx.dialog.close(
+                            rx.button(
+                                "Cancel",
+                                color_scheme="gray",
+                                variant="soft",
+                                justify="start",),
+                        ),
+                        rx.dialog.close(
+                            rx.button("Save",
+                                type ="submit",
+                                justify="end",
+                                color_scheme="teal",),
+                        ),
+                        spacing="3",
+                        margin_top="16px",
+                        justify="end",
+                        width="100%",
+                    ),
+                    spacing = "3",
+                    direction = "column",
+                    width="100%",
+                ),
+                on_submit=OrgState.create_new_org,
+                reset_on_submit=True,
+            )
+        )
 
 
 
@@ -151,6 +157,50 @@ def search_org() -> rx.Component:
         reset_on_submit=True,
     )
 )
+    
+def discover_org():
+    return rx.form(
+            rx.text('Discover the different organizations:',),
+            rx.hstack(
+                rx.input(name="search",
+                         width="30vw"),
+                rx.icon_button("search"),
+                width="100%"
+            ),
+            on_submit=OrgState.search_orgs,
+            width="100%",
+            spacing="2"
+        ),
+    
+def update_coordinates_form():
+    return rx.dialog.root(
+        rx.dialog.trigger(rx.button("Update coordenates")),
+        rx.dialog.content(
+            rx.dialog.title("Update location"),
+            interactive_map(),
+            rx.text("** one click to add a new pin, double-click to remove it",size="1"),
+            rx.flex(
+                rx.dialog.close(
+                    rx.button(
+                        "Cancel",
+                        color_scheme="gray",
+                        variant="soft",
+                        justify="start",),
+                ),
+                rx.dialog.close(
+                    rx.button("Save",
+                        type ="submit",
+                        justify="end",
+                        color_scheme="teal",
+                        on_click=OrgState.update_coordinates),
+                ),
+                spacing="3",
+                margin_top="16px",
+                justify="end",
+                width="100%",
+            ),
+        ),
+    ),
 
 # class OrganizationForm(rx.ComponentState):
 #     form_data: dict = {}
