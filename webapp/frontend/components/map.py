@@ -87,20 +87,6 @@ def find_popup_variable_name(html):
 def interactive_map():
     map_ = folium.Map(location=[40.463667, -3.74922], zoom_start=2)
 
-    # if OrgState.str_location is None:
-    # folium.LatLngPopup().add_to(map_)
-    folium.ClickForMarker(popup="<b>Lat:</b> ${lat}<br /><b>Lon:</b> ${lng}").add_to(map_)
-    folium.ClickForLatLng(format_str='lat + "," + lng', alert=True).add_to(map_)
-
-    return rx.box(
-        rx.html(map_._repr_html_()),
-        style={"width": "100%","align":"center"}
-        )
-    
-
-def interactive_map():
-    map_ = folium.Map(location=[40.463667, -3.74922], zoom_start=2)
-
     folium.ClickForMarker(popup="<b>Lat:</b> ${lat}<br /><b>Lon:</b> ${lng}").add_to(map_)
     folium.ClickForLatLng(format_str='lat + "," + lng', alert=True).add_to(map_)
 
@@ -111,15 +97,19 @@ def interactive_map():
     
 @rx.dynamic
 def map_org(org_state: OrgState):
-    map_ = folium.Map(location=[org_state.selected_org["latitude"], 
-                                org_state.selected_org["longitude"]], zoom_start=6)
     
-    folium.Marker(
-            location=[float(org_state.selected_org["latitude"]), 
-                      float(org_state.selected_org["longitude"])],
-            popup=org_state.selected_org["name"],
-            icon=folium.Icon(color="red") #atom
-        ).add_to(map_)
+    try:
+        map_ = folium.Map(location=[org_state.selected_org["latitude"], 
+                                    org_state.selected_org["longitude"]], zoom_start=6)
+        
+        folium.Marker(
+                location=[float(org_state.selected_org["latitude"]), 
+                        float(org_state.selected_org["longitude"])],
+                popup=org_state.selected_org["name"],
+                icon=folium.Icon(color="red") #atom
+            ).add_to(map_)
+    except Exception as err:
+        map_ = folium.Map(location=[40.463667, -3.74922], zoom_start=2)
 
     return rx.box(
         rx.html(map_._repr_html_()),
