@@ -3,7 +3,7 @@ name: Build and Push Container
 on:
   workflow_dispatch:
   push:
-    branches: ["main"]
+    branches: ["dev"]
     paths:
       - "Dockerfile.stage"
       - "compose.prod.yaml"
@@ -52,7 +52,7 @@ jobs:
 
       - name: Build and push
         run: |
-          docker build -f Dockerfile.production -t ${{ env.DOCKER_IMAGE }}:latest .
+          docker build -f Dockerfile.stage -t ${{ env.DOCKER_IMAGE }}:latest .
           docker tag ${{ env.DOCKER_IMAGE }}:latest ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
           docker push ${{ env.DOCKER_IMAGE }} --all-tags
 
