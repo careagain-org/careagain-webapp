@@ -11,3 +11,5 @@ webapp/frontend/pages_web/
 /uploaded_files/
 careagain-webapp.pub
 careagain-webapp
+devops/vars.yaml
+inventory.ini
