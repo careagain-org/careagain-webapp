@@ -8,5 +8,8 @@ venv/
 .env
 *.pdf
 webapp/frontend/pages_web/
-webapp/frontend/constants/urls.py
 /uploaded_files/
+careagain-webapp.pub
+careagain-webapp
+devops/vars.yaml
+inventory.ini
