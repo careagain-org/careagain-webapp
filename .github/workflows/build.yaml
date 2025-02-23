@@ -6,7 +6,7 @@ on:
     branches: ["dev"]
     paths:
       - "Dockerfile.stage"
-      - "compose.prod.yaml"
+      - "compose.stage.yaml"
       - "requirements.txt"
       - assets/
       - webapp/
