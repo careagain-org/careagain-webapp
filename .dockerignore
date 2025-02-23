@@ -1,0 +1,12 @@
+*.db
+*.py[cod]
+.web
+__pycache__/
+assets/external/
+assets/users_tests
+no_sql/
+venv/
+.env
+*.pdf
+webapp/frontend/pages_web/
+/uploaded_files/

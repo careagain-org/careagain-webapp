@@ -1,0 +1,10 @@
+@font-face {
+    font-family: MyFont;
+    src: url("arialroundedmtbold.ttf") format("opentype");
+}
+
+@font-face {
+    font-family: MyFont;
+    font-weight: bold;
+    src: url("arialroundedmtbold.ttf") format("opentype");
+}
