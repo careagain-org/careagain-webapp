@@ -71,7 +71,7 @@ app.api.include_router(question_route)
 app.api.include_router(auth_route)
 
 # CORS middleware to allow communication between frontend and backend
-origins = ['http://localhost:3000',
+origins = [urls.WEB_URL,
             'www.careagain.org'] # specify the http where the api is going to run
 
 app.api.add_middleware(
