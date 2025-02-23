@@ -146,8 +146,8 @@ class ProjectState(AuthState):
                 "name": form_data["name"],
                 "type": form_data["type"],
                 "description": form_data["description"],
-                "logo": f"{urls.SUPABASE_S3_URL}projects/{project_id}/images/{self.logo}" if self.logo else "",
-                "image": f"{urls.SUPABASE_S3_URL}projects/{project_id}/images/{self.image}" if self.image else "",
+                "logo": f"{self.logo}" if self.logo else "",
+                "image": f"{self.image}" if self.image else "",
                 "website": form_data["website"],
             }
 

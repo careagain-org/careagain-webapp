@@ -9,12 +9,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Connect to supabase storage
-url_s3: str = os.environ.get("SUPABASE_S3_URL")
+url: str = os.environ.get("SUPABASE_URL")
 bucket_s3: str = os.environ.get("SUPABASE_S3_BUCKET")
-url_s3_object: str = f"{os.environ.get("SUPABASE_S3_URL")}object/public/{os.environ.get("SUPABASE_S3_BUCKET")}"
+url_s3_object: str = f"{os.environ.get("SUPABASE_URL")}storage/v1/object/public/{os.environ.get("SUPABASE_S3_BUCKET")}"
 
 # Set supabase client
-url: str = os.environ.get("SUPABASE_URL")
 key: str = os.environ.get("SUPABASE_ANON_KEY")
 schema: str = os.environ.get("SUPABASE_DB_SCHEMA")
 supa_client: Client = create_client(url, key)

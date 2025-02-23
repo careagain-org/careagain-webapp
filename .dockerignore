@@ -4,9 +4,9 @@
 __pycache__/
 assets/external/
 assets/users_tests
+no_sql/
 venv/
 .env
 *.pdf
 webapp/frontend/pages_web/
-webapp/frontend/constants/urls.py
 /uploaded_files/

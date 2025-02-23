@@ -111,7 +111,7 @@ class OrgState(AuthState):
                 "latitude": self.latitude,
                 "longitude": self.longitude,
                 "address": form_data["address"],
-                "logo": f"{urls.SUPABASE_S3_URL}orgs/{org_id}/images/{self.logo}" if self.logo else "",
+                "logo": f"{self.logo}" if self.logo else "",
                 "website": form_data["website"],
                 "email":form_data["email"],
                 "visible": self.visible
