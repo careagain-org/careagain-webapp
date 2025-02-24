@@ -44,8 +44,7 @@ def show_user(org,role:str):
     )
 
 def table_pagination(all_orgs):
-    # df=pd.read_csv("assets/test.csv")
-    # print(df)
+
     return rx.cond(all_orgs !=[],
         rx.table.root(
             rx.table.header(

@@ -40,8 +40,7 @@ def show_project(project,role:str):
     )
 
 def table_pagination(all_projects):
-    # df=pd.read_csv("assets/test.csv")
-    # print(df)
+    
     return rx.cond(all_projects !=[],
         rx.table.root(
             rx.table.header(
