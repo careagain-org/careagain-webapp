@@ -93,7 +93,6 @@ class OrgState(AuthState):
     
     async def filter_org(self,value:str=""):
         self.filtered_orgs = [d for d in self.orgs if (value.lower() in d['name'].lower()) and (value!="")]
-        print(self.filtered_orgs)
 
 
     async def create_new_org(self, form_data: dict):
@@ -292,7 +291,6 @@ class OrgState(AuthState):
         
         
     async def user_join_org(self,user_id:str):
-        print("hola")
 
         async with httpx.AsyncClient() as client:
             response = await client.put(

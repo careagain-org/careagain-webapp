@@ -68,7 +68,6 @@ async def upload_image(file: UploadFile= File(...),
             raise HTTPException(status_code=400, detail="No file uploaded")
         user_id = user.user_id
         url_photo = f"users/{user_id}/images/{uuid.uuid4()}.png"
-        print(url_photo)
         contents = await file.read()
 
         # Upload with auth headers

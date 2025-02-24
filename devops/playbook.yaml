@@ -4,7 +4,7 @@
   vars:
     project_dir: /app/
     remote_env_file: "{{ project_dir }}/.env"
-    compose_file: "{{ project_dir }}/compose.stage.yaml"
+    compose_file: "{{ project_dir }}/docker-compose.yaml"
     env_file: "{{ playbook_dir | dirname }}/.env"
   vars_files:
     - "{{playbook_dir}}/vars.yaml"
@@ -40,7 +40,7 @@
 
     - name: Copy Docker Compose file to server
       copy:
-        src: "{{ playbook_dir | dirname }}/compose.stage.yaml"
+        src: "{{ playbook_dir | dirname }}/docker-compose.yaml"
         dest: "{{ compose_file }}"
 
     - name: Login to Docker Hub
@@ -49,21 +49,21 @@
 
     - name: Pull latest Docker images
       shell:
-        cmd: docker compose -f compose.stage.yaml pull
+        cmd: docker compose -f docker-compose.yaml pull
       args:
         chdir: "{{ project_dir }}"
 
     - name: Update Docker services
       shell:
         cmd: |
-          services=$(docker compose -f compose.stage.yaml config --services)
+          services=$(docker compose -f docker-compose.yaml config --services)
           for service in $services; do
-            if docker compose -f compose.stage.yaml ps --status running $service | grep -q $service; then
+            if docker compose -f docker-compose.yaml ps --status running $service | grep -q $service; then
               echo "Updating running service: $service"
-              docker compose -f compose.stage.yaml up -d --no-deps "$service"
+              docker compose -f docker-compose.yaml up -d --no-deps "$service"
             else
               echo "Starting service: $service"
-              docker compose -f compose.stage.yaml up -d --no-deps "$service"
+              docker compose -f docker-compose.yaml up -d --no-deps "$service"
             fi
           done
       args:
@@ -71,7 +71,7 @@
 
     - name: Remove orphaned containers
       shell:
-        cmd: docker compose -f compose.stage.yaml up -d --remove-orphans
+        cmd: docker compose -f docker-compose.yaml up -d --remove-orphans
       args:
         chdir: "{{ project_dir }}"
 
