@@ -1,5 +1,6 @@
 services:
   frontend:
+    platform: linux/arm64
     build:
       context: .
       dockerfile: Dockerfile
@@ -10,6 +11,7 @@ services:
       - 3000:3000
     command: reflex run --env prod --frontend-only
   app:
+    platform: linux/arm64
     build:
       context: .
       dockerfile: Dockerfile

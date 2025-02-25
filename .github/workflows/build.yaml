@@ -50,11 +50,14 @@ jobs:
           SUPABASE_URL=${{ secrets.SUPABASE_URL}}
           EOF
 
-      - name: Build and push
+      - name: Build and push Docker image for linux/arm64
         run: |
-          docker build -f Dockerfile -t ${{ env.DOCKER_IMAGE }}:latest .
-          docker tag ${{ env.DOCKER_IMAGE }}:latest ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
-          docker push ${{ env.DOCKER_IMAGE }} --all-tags
+          docker buildx build \
+            --platform linux/arm64 \
+            -f Dockerfile \
+            -t ${{ env.DOCKER_IMAGE }}:latest \
+            -t ${{ env.DOCKER_IMAGE }}:${{ github.sha }} \
+            --push .
 
       - name: Remove build env file
         run: rm .build-env
