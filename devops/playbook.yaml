@@ -4,7 +4,7 @@
   vars:
     project_dir: /app/
     remote_env_file: "{{ project_dir }}/.env"
-    compose_file: "{{ project_dir }}/docker-compose.yaml"
+    compose_file: "{{ project_dir }}/compose.stage.yaml"
     env_file: "{{ playbook_dir | dirname }}/.env"
   vars_files:
     - "{{playbook_dir}}/vars.yaml"
@@ -52,6 +52,15 @@
         cmd: docker compose -f docker-compose.yaml pull
       args:
         chdir: "{{ project_dir }}"
+
+    - name: Check Docker platform
+      shell: |
+        docker version --format '{{.Server.Arch}}'
+      register: docker_arch
+
+    - name: Print Docker platform
+      debug:
+        msg: "Docker platform: {{ docker_arch.stdout }}"
 
     - name: Update Docker services
       shell:
