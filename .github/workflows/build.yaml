@@ -52,7 +52,7 @@ jobs:
 
       - name: Build and push
         run: |
-          docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile -t ${{ env.DOCKER_IMAGE }}:latest .
+          docker build --platform linux/arm64 -f Dockerfile -t ${{ env.DOCKER_IMAGE }}:latest .
           docker tag ${{ env.DOCKER_IMAGE }}:latest ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
           docker push ${{ env.DOCKER_IMAGE }} --all-tags
 
