@@ -8,7 +8,7 @@ venv/
 .env
 *.pdf
 webapp/frontend/pages_web/
-/uploaded_files/
+uploaded_files/*
 careagain-webapp.pub
 careagain-webapp
 devops/vars.yaml

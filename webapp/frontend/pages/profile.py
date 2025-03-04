@@ -72,8 +72,9 @@ def user_section() -> rx.Component():
                 upload_image_user("Profile photo",UserState.my_details["profile_image"]), 
                 rx.vstack(
                     input_field_edit(title= "First name",key = 'first_name'),
-                    input_field_edit("Last name",key='last_name1'),
+                    input_field_edit("Last name",key='last_name'),
                     input_field_edit("Country",key='country'),
+                    input_field_edit(title= "LinkedIn / Social media",key = 'linkedin'),
                     input_field_edit(title= "Username (unique id)",key = 'username'),
                     # input_field_edit("Phone number",UserState.my_details['phone_number']),
                     spacing="2",

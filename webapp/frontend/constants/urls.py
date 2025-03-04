@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 vm = os.getenv("VIRTUAL_MACHINE_IP")
+BACKEND_PORT = os.getenv("BACKEND_PORT")
+FRONTEND_PORT= os.getenv("FRONTEND_PORT")
 
 HOME_URL = '/'
 ABOUT_URL = '/#home_logo'
@@ -46,6 +48,6 @@ PATREON_URL = "https://patreon.com/CareAgain"
 
 
 # api
-API_URL = f"{vm}:8000/"
-WEB_URL = f"{vm}:3000/"
+API_URL = f"http://localhost:8000/"
+WEB_URL = f"http://localhost:3000"
 STORAGE_URL = 'http://0.0.0.0:9000/'

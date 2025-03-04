@@ -8,7 +8,7 @@ from ..components.map import interactive_map
 from ..components.user_card import users_grid_horizontal
 from ..components.user_table import table_pagination
 from ..components.project_input_text import ProjectEditableText,ProjectEditableTextArea
-from ..components.project_upload import upload_logo_project
+from ..components.project_upload import upload_logo_project,upload_image_project
 from ..components.forms_popover import add_new,search_user
 
 editable_text = ProjectEditableText.create
@@ -46,7 +46,7 @@ def edit_project() -> rx.Component:
         ),
         rx.divider(width='90%'),
         rx.flex(
-            upload_logo_project(title="Logo",my_image=project["logo"]),
+            upload_image_project(title="Representative image",my_image=project["logo"]),
             rx.vstack(
                 title_section("Description","file_text"),
                 editable_textarea(value = project["description"],key = "description"),
@@ -54,20 +54,6 @@ def edit_project() -> rx.Component:
             ),
             align='start',
             spacing="5",
-        ),
-        rx.divider(width='90%'),
-        rx.hstack(
-            rx.icon("map-pin-house"),
-            rx.heading("Location",size="5"),
-        ),
-        rx.hstack(
-            interactive_map(),
-            rx.vstack(
-                rx.heading("Address",size="3"),
-                editable_text(value = project["address"],key = "address"),
-            ),
-            align="center",
-            justify="center",
         ),
         rx.divider(width='90%'),
         rx.hstack(
