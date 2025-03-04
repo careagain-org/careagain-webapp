@@ -10,9 +10,9 @@ speed_dial_menu = SpeedDialMenu.create
 
 def home_logo() -> rx.Component:
     return rx.vstack(
-        rx.heading("Welcome to Care Again",size="8",color="gray",high_contrast=True,),
+        rx.heading("Welcome to a Open Source Community",size="8",color="gray",high_contrast=True,),
         rx.image('full_logo.png', width="50%",),
-        rx.heading("The community to ease the access to medical technology",
+        rx.heading("to facilitate the access to medical technology",
                    size="8",color="gray",high_contrast=True,align="center"), 
         rx.spacer(size=5),   
         margin="12px",

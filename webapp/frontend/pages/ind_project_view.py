@@ -33,7 +33,7 @@ def view_project() -> rx.Component:
             align="start",
         ),
         rx.flex(
-            rx.image(ProjectState.selected_project['image'],
+            rx.image(src=f"{ProjectState.selected_project['image']}",
                      width="30%"),
             rx.vstack(
                 rx.text(ProjectState.selected_project['description']),

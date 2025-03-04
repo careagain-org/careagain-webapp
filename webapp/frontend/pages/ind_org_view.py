@@ -21,16 +21,16 @@ def view_organization() -> rx.Component:
         ),
         rx.hstack(
             rx.icon("globe"),
-            rx.link(OrgState.selected_org['web_link'],href="https://www."+OrgState.selected_org['web_link'])
+            rx.link(OrgState.selected_org['website'],href=OrgState.selected_org['website'])
         ),
         rx.hstack(
             rx.icon("mail"),
-            # rx.text(OrgState.selected_org['email'])
+            rx.text(OrgState.selected_org['email'])
         ),
         rx.divider(width='90%'),
         
         rx.flex(
-            rx.image(OrgState.selected_org['logo'],
+            rx.image(src=f"{OrgState.selected_org['logo']}",
                      width="30%"),
             rx.vstack(
                 rx.hstack(
@@ -52,14 +52,19 @@ def view_organization() -> rx.Component:
             rx.heading("Location",size="5"),
         ),
         rx.hstack(
-            map_org(),
+            rx.box(
+                map_org(),
+                width="30%"
+            ),
             rx.vstack(
                 rx.heading("Address",size="3"),
                 rx.text(OrgState.selected_org['address']),
-                rx.text(OrgState.selected_org['country']), 
+                rx.text(OrgState.selected_org['country']),
+                width="70%" 
             ),
             align="center",
             justify="center",
+            width='100%'
         ),
         rx.divider(width='90%'),
         rx.hstack(

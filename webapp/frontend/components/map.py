@@ -33,36 +33,39 @@ def create_map(org_state: OrgState):
     map_.add_child(g4)
 
     # Fetch organization locations
-    orgs = org_state.orgs_locations 
+    orgs = org_state.orgs
     
     # Only add markers if orgs is a non-empty list
     if orgs:
         for org in orgs:
-            if org["type"] == "Research & Development":
-                folium.Marker(
-                    location=[float(org["latitude"]), float(org["longitude"])],
-                    popup=org["name"],
-                    icon=folium.Icon(color="green",icon="cogs", prefix="fa") #atom
-                ).add_to(g1)
-            elif org["type"] == "Logistics & transport":
-                folium.Marker(
-                    location=[float(org["latitude"]), float(org["longitude"])],
-                    popup=org["name"],
-                    icon=folium.Icon(color="blue",icon="truck", prefix="fa") #route
-                ).add_to(g2)
-            elif org["type"] == "Hospital":
-                folium.Marker(
-                    location=[float(org["latitude"]), float(org["longitude"])],
-                    popup=org["name"],
-                    icon=folium.Icon(color="red",icon="medkit", prefix="fa")
-                ).add_to(g3)
-            elif org["type"] == "Manufacturer":
-                folium.Marker(
-                    location=[float(org["latitude"]), float(org["longitude"])],
-                    popup=org["name"],
-                    icon=folium.Icon(color="beige",icon="wrench")
-                ).add_to(g4)
-                
+            try:
+                if org["type"] == "Research & Development":
+                    folium.Marker(
+                        location=[float(org["latitude"]), float(org["longitude"])],
+                        popup=org["name"],
+                        icon=folium.Icon(color="green",icon="cogs", prefix="fa") #atom
+                    ).add_to(g1)
+                elif org["type"] == "Logistics & transport":
+                    folium.Marker(
+                        location=[float(org["latitude"]), float(org["longitude"])],
+                        popup=org["name"],
+                        icon=folium.Icon(color="blue",icon="truck", prefix="fa") #route
+                    ).add_to(g2)
+                elif org["type"] == "Hospital":
+                    folium.Marker(
+                        location=[float(org["latitude"]), float(org["longitude"])],
+                        popup=org["name"],
+                        icon=folium.Icon(color="red",icon="medkit", prefix="fa")
+                    ).add_to(g3)
+                elif org["type"] == "Manufacturer":
+                    folium.Marker(
+                        location=[float(org["latitude"]), float(org["longitude"])],
+                        popup=org["name"],
+                        icon=folium.Icon(color="beige",icon="wrench")
+                    ).add_to(g4)
+            except Exception as err:
+                print(err)
+                  
     folium.LayerControl(collapsed=False).add_to(map_)
     
     map_html=map_._repr_html_()
@@ -100,7 +103,7 @@ def map_org(org_state: OrgState):
     
     try:
         map_ = folium.Map(location=[org_state.selected_org["latitude"], 
-                                    org_state.selected_org["longitude"]], zoom_start=6)
+                                    org_state.selected_org["longitude"]], zoom_start=7)
         
         folium.Marker(
                 location=[float(org_state.selected_org["latitude"]), 
