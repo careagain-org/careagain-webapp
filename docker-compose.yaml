@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     ports:
-      - 80:3000
+      - ${FRONTEND_PORT}:3000
     command: reflex run --env prod --frontend-only
   app:
     build:
@@ -17,4 +17,4 @@ services:
     env_file:
       - .env
     ports:
-      - 8000:8000
+      - ${BACKEND_PORT}:8000
