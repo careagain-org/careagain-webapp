@@ -12,4 +12,6 @@ config = rx.Config(
         "/fonts/ArialRoundedMTBold/arial_rounded.css",  # This path is relative to assets/
     ],
     db_url = SUPABASE_DB_URI,
+    frontend_port=3000,
+    backend_port=8000
 )
