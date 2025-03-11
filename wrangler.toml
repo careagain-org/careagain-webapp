@@ -1,0 +1,15 @@
+# Configuración básica del proyecto
+name = "careagaing-webapp"
+type = "python"  # Si tu proyecto es en Python o tiene otra estructura, se puede ajustar a 'python' u otros
+
+# Dirección del proyecto de Cloudflare
+account_id = ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}   # Reemplaza con tu account_id de Cloudflare
+workers_dev = true  # Habilita el entorno de desarrollo de Workers (si lo estás usando)
+
+# Configuración de la build (si tu proyecto usa Python o reflex)
+[build]
+command = "./build.sh"
+
+# Configuración del entorno de producción
+[env.production]
+route = "https://careagain-webapp.pages.dev*"  # Asegúrate de usar tu dominio de Cloudflare Pages
