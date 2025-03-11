@@ -81,8 +81,7 @@ PyYAML==6.0.2
 readme_renderer==44.0
 realtime==2.1.0
 redis==5.2.1
-reflex==0.6.8
-reflex-chakra==0.6.2
+reflex==0.7.1
 reflex-hosting-cli==0.1.34
 reflex-local-auth==0.2.2
 requests==2.32.3
