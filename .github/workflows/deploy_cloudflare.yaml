@@ -23,9 +23,6 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Install dependencies
-        run: poetry install
-
       - name: Export
         env:
           API_URL: ${{ env.API_URL }}
