@@ -14,16 +14,17 @@ jobs:
         with:
           python-version: 3.12
 
-      - name: Install poetry
-        uses: abatilo/actions-poetry@v3
-        with:
-          poetry-version: 1.8.3
+      - name: Create venv
+        run: python3 -m venv venv
+
+      - name: Activate env
+        run: source venv/bin/activate
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
       - name: Install dependencies
         run: poetry install
-
-      - name: Init Reflex
-        run: poetry run task init
 
       - name: Export
         env:
@@ -37,10 +38,7 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-        run: poetry run reflex export --frontend-only
-
-      - name: Unzip
-        run: unzip frontend.zip -d frontend-public
+        run: reflex run
 
       - name: Publish
         uses: cloudflare/pages-action@1
