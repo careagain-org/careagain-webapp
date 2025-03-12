@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     ports:
-      - 443:3000
+      - 3000:3000
     command: reflex run --env prod --frontend-only
   app:
     build:
