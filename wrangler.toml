@@ -10,6 +10,9 @@ workers_dev = true  # Habilita el entorno de desarrollo de Workers (si lo estás
 [build]
 command = "./build.sh"
 
+[pages_build_output]
+directory = "./"
+
 # Configuración del entorno de producción
 [env.production]
 route = "https://careagain-webapp.pages.dev*"  # Asegúrate de usar tu dominio de Cloudflare Pages
