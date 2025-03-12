@@ -1,6 +1,8 @@
 name: Deploy with cloudflare
 
-on: [push]
+on:
+  workflow_dispatch:
+  push:
 
 jobs:
   deploy-frontend-to-cloudflare:
