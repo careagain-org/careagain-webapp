@@ -25,7 +25,8 @@ jobs:
 
       - name: Export
         env:
-          API_URL: ${{ env.API_URL }}
+          FRONTEND_PORT: ${{ secrets.FRONTEND_PORT }}
+          BACKEND_PORT: ${{ secrets.BACREND_PORT }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           SUPABASE_DB_SCHEMA: ${{ secrets.SUPABASE_DB_SCHEMA }}
           SUPABASE_DB_URI: ${{ secrets.SUPABASE_DB_URI }}
@@ -35,7 +36,7 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-        run: reflex export --frontend-only
+        run: reflex export
 
       - name: Unzip
         run: unzip frontend.zip -d frontend-public
