@@ -48,6 +48,5 @@ PATREON_URL = "https://patreon.com/CareAgain"
 
 
 # api
-API_URL = f"http://0.0.0.0:{BACKEND_PORT}/"
-WEB_URL = f"http://localhost:{FRONTEND_PORT}"
-STORAGE_URL = 'http://0.0.0.0:9000/'
+API_URL = f"http://{vm}:{str(BACKEND_PORT)}/"
+WEB_URL = f"http://{vm}:{str(FRONTEND_PORT)}"
