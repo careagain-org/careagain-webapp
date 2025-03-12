@@ -35,7 +35,10 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-        run: reflex run
+        run: reflex export --frontend-only
+
+      - name: Unzip
+        run: unzip frontend.zip -d frontend-public
 
       - name: Publish
         uses: cloudflare/pages-action@1
