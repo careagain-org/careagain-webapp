@@ -7,6 +7,7 @@ load_dotenv()
 vm = os.getenv("VIRTUAL_MACHINE_IP")
 BACKEND_PORT = os.getenv("BACKEND_PORT")
 FRONTEND_PORT= os.getenv("FRONTEND_PORT")
+API_URL = os.getenv("API_URL")
 
 HOME_URL = '/'
 ABOUT_URL = '/#home_logo'
@@ -48,6 +49,5 @@ PATREON_URL = "https://patreon.com/CareAgain"
 
 
 # api
-API_URL = f"http://localhost:8000/"
-WEB_URL = f"http://localhost:3000"
+WEB_URL = f"http://localhost:{FRONTEND_PORT}"
 STORAGE_URL = 'http://0.0.0.0:9000/'

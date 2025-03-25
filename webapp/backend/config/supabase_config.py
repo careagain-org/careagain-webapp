@@ -29,12 +29,12 @@ engine = create_engine(uri_db,
                     )  
 SessionLocal = sessionmaker(autocommit = False,autoflush = False, bind =engine)
 Base = declarative_base()
-conn = engine.connect()
+# conn = engine.connect()
 meta = MetaData()
 
 def get_db():
     try:
-        db =SessionLocal()
+        db=SessionLocal()
         yield db
     finally:
         db.close()
