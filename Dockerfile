@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-ARG NODE_VERSION=20.x
+ARG NODE_VERSION=18.x
 
 # Install necessary tools, Node.js, and unzip
 RUN apt-get update && apt-get install -y \
@@ -50,7 +50,7 @@ RUN rm -f .env
 ENV PATH="/app/.venv/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 ENV NODE_PATH="/usr/lib/node_modules"
 ENV REFLEX_DB_URL="sqlite:///reflex.db"
-ENV API_URL="$API_URL"
+ENV API_URL="https://api.careagain.org"
 
 # Needed until Reflex properly passes SIGTERM on backend.
 STOPSIGNAL SIGKILL

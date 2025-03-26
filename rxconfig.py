@@ -17,6 +17,5 @@ config = rx.Config(
     frontend_port=3000,
     backend_port=8000,
     show_built_with_reflex=False,
-    cp_backend_url= "https://api.careagain.org",
     loglevel="info",
 )
