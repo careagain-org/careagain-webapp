@@ -30,7 +30,7 @@ from webapp.backend.routes.auth_routes import auth_route
 from webapp.backend.models import model
 from webapp.backend.config.supabase_config import engine,Base,Session
 from webapp.backend.config.tags_metadata import tags_metadata
-import logging
+# import logging
 # load env
 from dotenv import load_dotenv,find_dotenv
 import os
@@ -39,9 +39,9 @@ load_dotenv(find_dotenv())
 
 ## ---------------- LOGGING CONFIG APP ---------------------- ##
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+# logging.basicConfig(
+#     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+# )
 
 ## ---------------- RUN FRONTEND APP ---------------------- ##
 app = rx.App(

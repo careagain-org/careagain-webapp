@@ -1,4 +1,5 @@
-.states
+.states/*
+*.pkl
 *.db
 *.py[cod]
 .web
@@ -15,3 +16,5 @@ careagain-webapp
 devops/vars.yaml
 inventory.ini
 frontend.zip
+/.states
+*.pkl

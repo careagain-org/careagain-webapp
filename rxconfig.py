@@ -15,5 +15,8 @@ config = rx.Config(
     db_url=SUPABASE_DB_URI,
     api_url="https://api.careagain.org",#ENV_API_URL,
     frontend_port=3000,
-    backend_port=8000
+    backend_port=8000,
+    show_built_with_reflex=False,
+    cp_backend_url= "https://api.careagain.org",
+    loglevel="info",
 )
