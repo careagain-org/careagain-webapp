@@ -79,7 +79,7 @@ class OrgState(AuthState):
                 headers = {"Authorization": f"Bearer {self.token}"}
 
                 async with httpx.AsyncClient() as client:
-                    response = await client.post(f"{urls.API_URL}api/orgs/upload_image?org_id={org_id}", 
+                    response = await client.post(f"{urls.API_URL}/api/orgs/upload_image?org_id={org_id}", 
                                                 files=files, data=data, headers=headers)
 
                 if response.status_code == 200:
@@ -119,7 +119,7 @@ class OrgState(AuthState):
             headers = {"Authorization": f"Bearer {self.token}"}
 
             async with httpx.AsyncClient() as client:
-                response = await client.post(f"{urls.API_URL}api/orgs/create_org", 
+                response = await client.post(f"{urls.API_URL}/api/orgs/create_org", 
                                             json=input_data, headers=headers)
 
             if response.status_code == 200:
@@ -139,7 +139,7 @@ class OrgState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{urls.API_URL}api/orgs/my_organizations",
+                f"{urls.API_URL}/api/orgs/my_organizations",
                 headers = {"Authorization": f"Bearer {self.token}"},
             )
         
@@ -153,7 +153,7 @@ class OrgState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.delete(
-                f"{urls.API_URL}api/orgs/delete_org?org_id={org_id}",
+                f"{urls.API_URL}/api/orgs/delete_org?org_id={org_id}",
                 # headers = {"Authorization": f"Bearer {self.token}"},
             )
         
@@ -169,7 +169,7 @@ class OrgState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.delete(
-                f"{urls.API_URL}api/orgs/leave_org?org_id={org_id}",
+                f"{urls.API_URL}/api/orgs/leave_org?org_id={org_id}",
                 headers = {"Authorization": f"Bearer {self.token}"},
             )
         
@@ -185,7 +185,7 @@ class OrgState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.put(
-                f"{urls.API_URL}api/orgs/join_org?org_id={self.org_id}",
+                f"{urls.API_URL}/api/orgs/join_org?org_id={self.org_id}",
                 headers = {"Authorization": f"Bearer {self.token}"},
             )
         
@@ -202,7 +202,7 @@ class OrgState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{urls.API_URL}api/orgs/organizations",
+                f"{urls.API_URL}/api/orgs/organizations",
             )
         
         if response.status_code == 200:
@@ -224,7 +224,7 @@ class OrgState(AuthState):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
-                    f"{urls.API_URL}api/orgs/locations",
+                    f"{urls.API_URL}/api/orgs/locations",
                 )
             if response.status_code == 200:
                 self.orgs_locations = response.json()
@@ -238,7 +238,7 @@ class OrgState(AuthState):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
-                    f"{urls.API_URL}api/orgs/members?org_id={self.org_id}",
+                    f"{urls.API_URL}/api/orgs/members?org_id={self.org_id}",
                 )
             if response.status_code == 200:
                 self.org_members = response.json()
@@ -269,7 +269,7 @@ class OrgState(AuthState):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.put(
-                    f"{urls.API_URL}api/orgs/update_org?key={key}&value={value}&org_id={self.org_id}",
+                    f"{urls.API_URL}/api/orgs/update_org?key={key}&value={value}&org_id={self.org_id}",
                     headers = {"Authorization": f"Bearer {self.token}"}
                 )
             
@@ -294,7 +294,7 @@ class OrgState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.put(
-                f"{urls.API_URL}api/orgs/user_join_org?org_id={self.org_id}&user_id={user_id}",
+                f"{urls.API_URL}/api/orgs/user_join_org?org_id={self.org_id}&user_id={user_id}",
             )
         
         if response.status_code == 200:
@@ -309,7 +309,7 @@ class OrgState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.put(
-                f"{urls.API_URL}api/orgs/user_dettached_org?org_id={self.org_id}&user_id={user_id}",
+                f"{urls.API_URL}/api/orgs/user_dettached_org?org_id={self.org_id}&user_id={user_id}",
             )
         
         if response.status_code == 200:
@@ -324,7 +324,7 @@ class OrgState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.put(
-                f"{urls.API_URL}api/orgs/change_member_type?org_id={self.org_id}&user_id={user_id}&role={role}",
+                f"{urls.API_URL}/api/orgs/change_member_type?org_id={self.org_id}&user_id={user_id}&role={role}",
             )
         
         if response.status_code == 200:

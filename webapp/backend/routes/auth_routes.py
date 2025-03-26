@@ -16,7 +16,7 @@ import json
 
 auth_route = APIRouter(prefix="/api/auth")
 supa = supa_client
-oauth2schema = security.OAuth2PasswordBearer(tokenUrl="api/auth/token")
+oauth2schema = security.OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 
 
 # Modelo para credenciales
@@ -126,7 +126,7 @@ def login_with_cookie(form_data: security.OAuth2PasswordRequestForm = Depends())
 def reset_password(input:AuthCredentials):
     try:
         response = supa.auth.reset_password_for_email(unquote(input.email), {
-        "redirect_to": "http://localhost:3000/reset_password",
+        "redirect_to": "https://careagain.org/reset_password",
         })
         return response
         # return parsed_data {"access_token": response.json()["access_token"],"token_type":"bearer"}
@@ -150,7 +150,7 @@ def login_without_password(input:AuthCredentials):
         response = supa.auth.sign_in_with_otp(
             {
                 "email": input.email,
-                "options": {"email_redirect_to": "http://localhost:3000/platform"},
+                "options": {"email_redirect_to": "https://careagain.org/platform"},
             })
         return response
     except Exception as e:

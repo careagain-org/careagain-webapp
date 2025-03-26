@@ -10,7 +10,7 @@ class QuestionState(rx.State):
 
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{urls.API_URL}api/questions/",
+                f"{urls.API_URL}/api/questions/",
             )
         
         if response.status_code == 200:

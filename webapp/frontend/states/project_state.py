@@ -31,7 +31,7 @@ class ProjectState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{urls.API_URL}api/projects/",
+                f"{urls.API_URL}/api/projects/",
             )
         
         if response.status_code == 200:
@@ -120,7 +120,7 @@ class ProjectState(AuthState):
                 headers = {"Authorization": f"Bearer {self.token}"}
 
                 async with httpx.AsyncClient() as client:
-                    response = await client.post(f"{urls.API_URL}api/projects/upload_image?project_id={project_id}", 
+                    response = await client.post(f"{urls.API_URL}/api/projects/upload_image?project_id={project_id}", 
                                                 files=files, data=data, headers=headers)
 
                 if response.status_code == 200:
@@ -154,7 +154,7 @@ class ProjectState(AuthState):
             headers = {"Authorization": f"Bearer {self.token}"}
 
             async with httpx.AsyncClient() as client:
-                response = await client.post(f"{urls.API_URL}api/projects/create_project", 
+                response = await client.post(f"{urls.API_URL}/api/projects/create_project", 
                                             json=input_data, headers=headers)
 
             if response.status_code == 200:
@@ -174,7 +174,7 @@ class ProjectState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.delete(
-                f"{urls.API_URL}api/projects/delete_project?project_id={project_id}",
+                f"{urls.API_URL}/api/projects/delete_project?project_id={project_id}",
                 # headers = {"Authorization": f"Bearer {self.token}"},
             )
         
@@ -190,7 +190,7 @@ class ProjectState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.delete(
-                f"{urls.API_URL}api/projects/leave_project?project_id={project_id}",
+                f"{urls.API_URL}/api/projects/leave_project?project_id={project_id}",
                 headers = {"Authorization": f"Bearer {self.token}"},
             )
         
@@ -206,7 +206,7 @@ class ProjectState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.put(
-                f"{urls.API_URL}api/projects/join_project?project_id={self.project_id}",
+                f"{urls.API_URL}/api/projects/join_project?project_id={self.project_id}",
                 headers = {"Authorization": f"Bearer {self.token}"},
             )
         
@@ -234,7 +234,7 @@ class ProjectState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{urls.API_URL}api/projects/my_projects",
+                f"{urls.API_URL}/api/projects/my_projects",
                 headers = {"Authorization": f"Bearer {self.token}"},
             )
         
@@ -260,7 +260,7 @@ class ProjectState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.put(
-                f"{urls.API_URL}api/projects/user_dettached_project?project_id={self.project_id}&user_id={user_id}",
+                f"{urls.API_URL}/api/projects/user_dettached_project?project_id={self.project_id}&user_id={user_id}",
             )
         
         if response.status_code == 200:
@@ -275,7 +275,7 @@ class ProjectState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.put(
-                f"{urls.API_URL}api/projects/user_join_project?project_id={self.project_id}&user_id={user_id}",
+                f"{urls.API_URL}/api/projects/user_join_project?project_id={self.project_id}&user_id={user_id}",
             )
         
         if response.status_code == 200:
@@ -290,7 +290,7 @@ class ProjectState(AuthState):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
-                    f"{urls.API_URL}api/projects/members?project_id={self.project_id}",
+                    f"{urls.API_URL}/api/projects/members?project_id={self.project_id}",
                 )
             if response.status_code == 200:
                 self.project_members = response.json()
@@ -304,7 +304,7 @@ class ProjectState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.put(
-                f"{urls.API_URL}api/projects/change_member_type?project_id={self.project_id}&user_id={user_id}&role={role}",
+                f"{urls.API_URL}/api/projects/change_member_type?project_id={self.project_id}&user_id={user_id}&role={role}",
             )
         
         if response.status_code == 200:
@@ -319,7 +319,7 @@ class ProjectState(AuthState):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.put(
-                    f"{urls.API_URL}api/projects/update_project?key={key}&value={value}&project_id={self.project_id}",
+                    f"{urls.API_URL}/api/projects/update_project?key={key}&value={value}&project_id={self.project_id}",
                     headers = {"Authorization": f"Bearer {self.token}"}
                 )
             

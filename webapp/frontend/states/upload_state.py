@@ -47,7 +47,7 @@ class UploadState(AuthState):
 
                     # Send the POST request
                     async with httpx.AsyncClient() as client:
-                        response = await client.post(f"{urls.API_URL}api/users/upload_image", 
+                        response = await client.post(f"{urls.API_URL}/api/users/upload_image", 
                                                     files=files, data=data, headers=headers)
 
                     if response.status_code == 200:
@@ -123,7 +123,7 @@ def upload_image(title:str,my_image:str) -> rx.Component():
 #                 with open(file, "rb") as file:
                     
 #                     # Make the asynchronous POST request
-#                     response = await client.post(f"{urls.API_URL}api/{type}/upload_image", 
+#                     response = await client.post(f"{urls.API_URL}/api/{type}/upload_image", 
 #                                     headers = {"Authorization": f"Bearer {token}",
 #                                                 "Content-Type": "multipart/form-data"},
 #                                     file = file)

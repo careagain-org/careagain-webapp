@@ -230,33 +230,6 @@ async def dettach_project(project_id:str,
     return {"detail": "User dettached from Project"} 
 
 
-@project_route.get("/members",tags = ['projects'])
-async def get_members(project_id:str,
-                            db:Session=Depends(get_db)):
-    members = db.query(model.User).join(
-            model.User_Project,
-            model.User_Project.user_id == model.User.user_id
-        ).filter(model.User_Project.project_id == project_id).all()
-    my_roles = (db.query(model.User_Project)
-        .filter(model.User_Project.project_id == project_id)).all()
-
-    # Create a dictionary of users by user_id for fast lookups
-    user_dict = {user.user_id: user for user in members}
-
-    # Now merge by matching user_id in both lists and merge all fields
-    merged_list = []
-    for role in my_roles:
-        project = user_dict.get(role.user_id)  # Look up the corresponding Project
-        if project:
-            # Merge all fields from both the Project and the role
-            merged_dict = {**project.__dict__, **role.__dict__}  # Combine all fields
-            merged_dict.pop('_sa_instance_state', None)  # Remove SQLAlchemy internal state attribute
-            merged_list.append(merged_dict)
-        
-    return merged_list
-
-
-
 @project_route.put("/update_project", tags=['projects'])
 async def update_project(key: str, 
                       value: str, 

@@ -14,7 +14,7 @@ from dotenv import load_dotenv,find_dotenv
 
 load_dotenv(find_dotenv())
 
-oauth2schema = security.OAuth2PasswordBearer(tokenUrl="api/users/token")
+oauth2schema = security.OAuth2PasswordBearer(tokenUrl="/api/users/token")
 
 async def get_user_by_username(username:str,db:Session,):
     '''Return the email if exists in db'''

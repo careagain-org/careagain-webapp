@@ -16,7 +16,7 @@ class AuthState(rx.State):
     token: Optional[str] = ""
     is_authenticated: bool = False
     error_message: str = ""
-    auth_data: Dict[str,str]
+    auth_data: dict[str,str]
 
     def set_email(self, value: str):
         self.email = value
@@ -46,7 +46,7 @@ class AuthState(rx.State):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
-                    f"{urls.API_URL}api/auth/token",
+                    f"{urls.API_URL}/api/auth/token",
                     data={
                         "username": self.email,
                         "password": self.password,
@@ -76,7 +76,7 @@ class AuthState(rx.State):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
-                    f"{urls.API_URL}api/auth/sign_up",
+                    f"{urls.API_URL}/api/auth/sign_up",
                     json={
                         "email": self.email,
                         "password": self.password,
@@ -99,7 +99,7 @@ class AuthState(rx.State):
     async def handle_logout(self):
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{urls.API_URL}api/auth/sign_out",
+                f"{urls.API_URL}/api/auth/sign_out",
             )
 
         if response.status_code == 200:
@@ -115,7 +115,7 @@ class AuthState(rx.State):
     async def reset_password(self):
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{urls.API_URL}api/auth/reset_password",
+                f"{urls.API_URL}/api/auth/reset_password",
                 json={
                         "email": self.email,
                         "password": self.password,
@@ -139,7 +139,7 @@ class AuthState(rx.State):
         print(access_token)
         async with httpx.AsyncClient() as client:
             response = await client.put(
-                f"{urls.API_URL}api/auth/update_password",
+                f"{urls.API_URL}/api/auth/update_password",
                     json={
                             "email": self.email,
                             "password": self.password,
@@ -161,7 +161,7 @@ class AuthState(rx.State):
        
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{urls.API_URL}api/auth/token",
+                f"{urls.API_URL}/api/auth/token",
                     json={
                             "email": self.email,
                             "password": "",
@@ -183,7 +183,7 @@ class AuthState(rx.State):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
-                    f"{urls.API_URL}api/auth/session",
+                    f"{urls.API_URL}/api/auth/session",
                 )
             if response.status_code == 200:
                 access_token = response.json()["access_token"]
@@ -206,7 +206,7 @@ class AuthState(rx.State):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
-                    f"{urls.API_URL}api/auth/refresh_session",
+                    f"{urls.API_URL}/api/auth/refresh_session",
                 )
             if response.status_code == 200:
                 access_token = response.json()["access_token"]

@@ -23,7 +23,7 @@ class UserState(AuthState):
     async def get_image_path(self):
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{urls.API_URL}api/users/my_foto",
+                f"{urls.API_URL}/api/users/my_foto",
                 headers={"Authorization": f"Bearer {self.token}"}
             )
         
@@ -40,7 +40,7 @@ class UserState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{urls.API_URL}api/users/me",
+                f"{urls.API_URL}/api/users/me",
                 headers={"Authorization": f"Bearer {self.token}"}
             )
         
@@ -56,7 +56,7 @@ class UserState(AuthState):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.put(
-                    f"{urls.API_URL}api/users/update_user?key={key}&value={value}",
+                    f"{urls.API_URL}/api/users/update_user?key={key}&value={value}",
                     headers = {"Authorization": f"Bearer {self.token}"}
                 )
             
@@ -104,7 +104,7 @@ class UserState(AuthState):
 
                     # Send the POST request
                     async with httpx.AsyncClient() as client:
-                        response = await client.post(f"{urls.API_URL}api/users/upload_image", 
+                        response = await client.post(f"{urls.API_URL}/api/users/upload_image", 
                                                     files=files, data=data, headers=headers)
 
                     if response.status_code == 200:
@@ -120,7 +120,7 @@ class UserState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{urls.API_URL}api/users/",
+                f"{urls.API_URL}/api/users/",
             )
         
         if response.status_code == 200:
@@ -155,7 +155,7 @@ class UserState(AuthState):
 
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{urls.API_URL}api/users/invite_user?email={form_data["email"]}",
+                f"{urls.API_URL}/api/users/invite_user?email={form_data["email"]}",
                 headers = {"Authorization": f"Bearer {self.token}"}
             )
         
@@ -170,7 +170,7 @@ class UserState(AuthState):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
-                    f"{urls.API_URL}api/users/user_projects?user_id={self.selected_user_id}",
+                    f"{urls.API_URL}/api/users/user_projects?user_id={self.selected_user_id}",
                 )
             if response.status_code == 200:
                 self.user_projects = response.json()
@@ -184,7 +184,7 @@ class UserState(AuthState):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
-                    f"{urls.API_URL}api/users/user_orgs?user_id={self.selected_user_id}",
+                    f"{urls.API_URL}/api/users/user_orgs?user_id={self.selected_user_id}",
                 )
             if response.status_code == 200:
                 self.user_orgs = response.json()

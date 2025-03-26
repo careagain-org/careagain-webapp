@@ -72,7 +72,7 @@ app.api.include_router(auth_route)
 
 # CORS middleware to allow communication between frontend and backend
 origins = [urls.WEB_URL,
-            'https://www.careagain.org'] # specify the http where the api is going to run
+           urls.API_URL] # specify the http where the api is going to run
 
 app.api.add_middleware(
     CORSMiddleware,
