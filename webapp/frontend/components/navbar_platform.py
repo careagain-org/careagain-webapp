@@ -34,15 +34,11 @@ def navbar_platform() -> rx.Component:
         rx.mobile_and_tablet(
             
             rx.hstack(
-                navbar_icon("search", urls.HOME_URL),
+                # navbar_icon("search", urls.HOME_URL),
                 rx.menu.separator(),
                 rx.color_mode.button(color="teal"),
-                navbar_icon("bell", urls.HOME_URL),
-                rx.icon_button(
-                        rx.icon("user"),
-                        size="3",
-                        radius="full",
-                    ),
+                notification_popover(),
+                navbar_profile(),
                 spacing="5",
                 justify="end",
                 align_items="center"

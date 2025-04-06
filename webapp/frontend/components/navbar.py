@@ -77,7 +77,7 @@ def navbar() -> rx.Component:
             rx.hstack(
                 rx.hstack(
                     rx.image(
-                        src="/logo1.png",
+                        src="/logo0.png",
                         width="2em",
                         height="auto",
                         border_radius="25%",

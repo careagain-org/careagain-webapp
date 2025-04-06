@@ -9,7 +9,8 @@ def base_page(child: rx.Component ,*args,**kwargs) -> rx.Component:
         rx.box(
             child,
             text_align="centre", 
-            id="box-content-area"
+            id="box-content-area",
+            width="100%"
         ),
         low_footer()
     )
