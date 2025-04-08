@@ -31,7 +31,7 @@ def problem_section(direction: str) -> rx.Component:
                         height="50em",
                         align="start"),
                 rx.vstack(
-                    rx.heading("Current situation", size="9"),
+                    rx.heading("Current situation", size="9",align="center"),
                     create_feature_box(
                         icon_tag="dollar-sign",
                         heading_text="High Costs",

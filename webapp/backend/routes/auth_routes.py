@@ -5,7 +5,7 @@ from ..schemas import user_schema as schema
 # from ..config.db_setup import get_db
 from ..models import model
 from sqlalchemy.orm import Session
-from ..config.supabase_config import get_db,supa_client
+from ..config.supabase_config import get_db,supa_client,url
 from ..services import user_functions
 import passlib.hash as hash
 from pydantic import BaseModel
@@ -125,6 +125,7 @@ def login_with_cookie(form_data: security.OAuth2PasswordRequestForm = Depends())
 @auth_route.post("/reset_password",tags = ['auth'])
 def reset_password(input:AuthCredentials):
     try:
+        print(url)
         response = supa.auth.reset_password_for_email(unquote(input.email), {
         "redirect_to": "https://careagain.org/reset_password",
         })
