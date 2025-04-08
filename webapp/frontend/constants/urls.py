@@ -8,6 +8,7 @@ vm = os.getenv("VIRTUAL_MACHINE_IP")
 BACKEND_PORT = os.getenv("BACKEND_PORT")
 FRONTEND_PORT= os.getenv("FRONTEND_PORT")
 API_URL = os.getenv("API_URL")
+WEB_URL = os.getenv("WEB_URL")
 
 HOME_URL = '/'
 ABOUT_URL = '/#home_logo'
@@ -46,8 +47,3 @@ GITHUB_URL = "https://github.com/careagain-org/careagain-webapp/"
 LINKEDIN_URL = "https://linkedin.com/company/care-again"
 DISCORD_URL = "https://discord.gg/FJfJWrpZTq" 
 PATREON_URL = "https://patreon.com/CareAgain" 
-
-
-# api
-WEB_URL = f"http://localhost:{FRONTEND_PORT}"
-STORAGE_URL = 'http://0.0.0.0:9000/'
