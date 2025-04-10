@@ -57,7 +57,6 @@ jobs:
       - name: Build and push Docker image for linux/arm64
         run: |
           docker buildx build \
-            --dns=1.1.1.1 \
             --platform linux/arm64 \
             -f Dockerfile \
             -t ${{ env.DOCKER_IMAGE }}:latest \
