@@ -10,6 +10,8 @@ services:
     ports:
       - 3000:3000
     command: reflex run --env prod --frontend-only
+    depends_on:
+      - app
   app:
     platform: linux/arm64
     build:
