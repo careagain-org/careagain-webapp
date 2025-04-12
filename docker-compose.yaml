@@ -9,7 +9,11 @@ services:
       - .env
     ports:
       - 3000:3000
+    dns:
+      - 1.1.1.1
     command: reflex run --env prod --frontend-only
+    depends_on:
+      - app
   app:
     platform: linux/arm64
     build:
@@ -20,3 +24,5 @@ services:
       - .env
     ports:
       - 8000:8000
+    dns:
+      - 1.1.1.1

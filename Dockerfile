@@ -15,6 +15,12 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Install CA certs and dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl gnupg && \
+    update-ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
 # Verify Node.js installation
 RUN node --version && npm --version
 
@@ -50,7 +56,6 @@ RUN rm -f .env
 ENV PATH="/app/.venv/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 ENV NODE_PATH="/usr/lib/node_modules"
 ENV REFLEX_DB_URL="sqlite:///reflex.db"
-ENV API_URL="https://api.careagain.org"
 
 # Needed until Reflex properly passes SIGTERM on backend.
 STOPSIGNAL SIGKILL
