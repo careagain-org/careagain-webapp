@@ -28,7 +28,7 @@ def home_logo() -> rx.Component:
 def problem_section(direction: str) -> rx.Component:
     return rx.flex(
                 rx.image('hombre_repadando_equipos.webp',
-                        height="50em",
+                        # height="50em",
                         align="start"),
                 rx.vstack(
                     rx.heading("Current situation", size="9"),
@@ -94,10 +94,10 @@ def solution_section(direction: str) ->rx.Component:
             ),
             rx.image('padre_hijo_reparando.png',
                     align="center",
-                    justify="center",
-                    height="50em"),
+                    justify="center",),
             width="100%",
             direction=direction,
+            padding="5",
             id="solution_section",
         )
 

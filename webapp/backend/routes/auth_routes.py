@@ -66,7 +66,6 @@ def sign_out():
 def login_with_cookie(form_data: security.OAuth2PasswordRequestForm = Depends()):
     try:
         response = supa.auth.get_session()
-        # print(response)
         # if response is not None:
         if response:
             data = response.json() 

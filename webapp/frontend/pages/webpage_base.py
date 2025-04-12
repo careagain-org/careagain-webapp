@@ -7,6 +7,10 @@ def base_page(child: rx.Component ,*args,**kwargs) -> rx.Component:
     return rx.fragment(
         navbar(),
         rx.box(
+            rx.box(
+                # text_align="center", 
+                height="3em"
+            ),
             child,
             text_align="centre", 
             id="box-content-area",

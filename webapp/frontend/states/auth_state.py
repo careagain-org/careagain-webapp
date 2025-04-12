@@ -53,7 +53,6 @@ class AuthState(rx.State):
                     },
                     headers={"Content-Type": "application/x-www-form-urlencoded"},
                 )
-                print(response.json()["access_token"])
             if response.status_code == 200:
                 access_token = response.json()["access_token"]
                 if access_token:
@@ -136,7 +135,6 @@ class AuthState(rx.State):
         access_token = url.split('access_token=')[1].split("&expires_at")[0]
         refresh_token = url.split('refresh_token=')[1].split("&token_type")[0]
 
-        print(access_token)
         async with httpx.AsyncClient() as client:
             response = await client.put(
                 f"{urls.API_URL}/api/auth/update_password",

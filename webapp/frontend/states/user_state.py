@@ -89,18 +89,9 @@ class UserState(AuthState):
                 
                 # Open the image file in binary mode
                 with open(outfile, "rb") as image_file:
-                    # Prepare the files dictionary
                     files = {"file": ("image.jpg", image_file, "image/jpeg")}
-
-                    # Additional data
-                    data = {
-                        "description": "This is a sample image."
-                    }
-
-                    # Add authentication token
-                    headers = {
-                        "Authorization": f"Bearer {self.token}"
-                    }
+                    data = {"description": "This is a sample image."}
+                    headers = {"Authorization": f"Bearer {self.token}"}
 
                     # Send the POST request
                     async with httpx.AsyncClient() as client:
