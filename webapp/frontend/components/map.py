@@ -109,10 +109,11 @@ def map_org(org_state: OrgState):
                 location=[float(org_state.selected_org["latitude"]), 
                         float(org_state.selected_org["longitude"])],
                 popup=org_state.selected_org["name"],
-                icon=folium.Icon(color="red") #atom
+                icon=folium.Icon(color="red") 
             ).add_to(map_)
     except Exception as err:
         map_ = folium.Map(location=[40.463667, -3.74922], zoom_start=2)
+        print(err)
 
     return rx.box(
         rx.html(map_._repr_html_()),
