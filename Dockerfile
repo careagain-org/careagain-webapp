@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     && curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION} | bash - \
     && apt-get install -y nodejs \
     && apt-get install -y xclip \
-    && apt-get install -y xselect \
+    && apt-get install -y xsel \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
