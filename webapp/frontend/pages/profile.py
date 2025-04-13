@@ -47,7 +47,7 @@ def projects_section():
         id="my-projects"
     )
 
-def section_title(section_icon:str,section_title:str, go_to_section:str,section_link:str) -> rx.Component():
+def section_title(section_icon:str,section_title:str, go_to_section:str,section_link:str):
     return rx.hstack(
         rx.icon(section_icon,color = "teal"),
         rx.heading(section_title,size="5", color = "teal"),
@@ -56,7 +56,7 @@ def section_title(section_icon:str,section_title:str, go_to_section:str,section_
         color = "accent"
     )
 
-def input_field_edit(title:str,key:str) -> rx.Component():
+def input_field_edit(title:str,key:str):
     default_value =UserState.my_details[f"{key}"]
     return rx.vstack(
             rx.heading(title,size="3", color = "grey"),
@@ -64,7 +64,7 @@ def input_field_edit(title:str,key:str) -> rx.Component():
         ),
 
 
-def user_section() -> rx.Component():
+def user_section():
 
     return rx.container(
         rx.tablet_and_desktop(
@@ -100,7 +100,7 @@ def user_section() -> rx.Component():
         )
     )
 
-def add_new(text:str)->rx.Component():
+def add_new(text:str):
     return rx.container(
         rx.hstack(
             add_new_popover(text),
@@ -109,7 +109,7 @@ def add_new(text:str)->rx.Component():
         )
     )
 
-def search_existing(text:str)->rx.Component():
+def search_existing(text:str):
     return rx.container(
         rx.hstack(
             search_popover(text),

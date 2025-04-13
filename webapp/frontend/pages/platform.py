@@ -9,7 +9,7 @@ from ..states.question_state import QuestionState
 from ..states.org_state import OrgState
 from ..states.user_state import UserState
 
-def section_title(section_icon:str,section_title:str, section_link:str) -> rx.Component(): # type: ignore
+def section_title(section_icon:str,section_title:str, section_link:str): # type: ignore
     return rx.hstack(
         rx.icon(section_icon,color = "teal"),
         rx.heading(section_title,size="5", color = "teal"),

@@ -8,7 +8,7 @@ from typing import List
 import reflex as rx
 
 
-def upload_image_user(title:str,my_image:str) -> rx.Component():
+def upload_image_user(title:str,my_image:str):
 
     return rx.vstack(
         rx.heading(title,size="3", color = "grey"),
@@ -67,7 +67,7 @@ def upload_image_user(title:str,my_image:str) -> rx.Component():
 
 
 
-def upload_logo_org(title:str,my_image:str) -> rx.Component():
+def upload_logo_org(title:str,my_image:str):
 
     return rx.vstack(
         rx.hstack(
