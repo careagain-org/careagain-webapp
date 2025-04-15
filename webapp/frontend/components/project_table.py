@@ -39,7 +39,7 @@ def show_project(project,role:str):
         align="center",
     )
 
-def table_pagination(all_projects):
+def table_pagination(all_projects,my_role="viewer"):
     
     return rx.cond(all_projects !=[],
         rx.table.root(
@@ -54,10 +54,10 @@ def table_pagination(all_projects):
             ),
             rx.table.body(
                 rx.foreach(all_projects, lambda project, i: 
-                           rx.cond(project.contains("member_type"),
-                               show_project(project=project,role=project["member_type"]),
-                               show_project(project=project,role="viewer"),
-                           )
+                        rx.cond(project.contains("member_type") & my_role!="viewer",
+                                show_project(project=project,role=project["member_type"]),
+                                show_project(project=project,role="viewer"),
+                            ),
                 ),
             ),
             variant="surface",

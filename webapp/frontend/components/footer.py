@@ -89,7 +89,7 @@ def socials() -> rx.Component:
 
 def low_footer()-> rx.Component:
     return rx.vstack(
-        rx.divider(),
+        rx.divider(width="100%"),
                 rx.flex(
                     rx.hstack(
                         rx.image(
@@ -100,7 +100,7 @@ def low_footer()-> rx.Component:
                             white_space="nowrap",
                         ),
                         rx.text(
-                            "© 2024 CareAgain, Inc",
+                            "© 2025 CareAgain, Inc",
                             size="3",
                             white_space="nowrap",
                             weight="medium",

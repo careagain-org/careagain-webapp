@@ -1,69 +1,142 @@
-# Welcome to Reflex!
+# CareAgain WebApp
 
-This is the base Reflex template - installed when you run `reflex init`.
+**CareAgain WebApp** is a web application built using the [Reflex](https://reflex.dev/) framework.
+It serves as the frontend for CareAgain's platform, aiming to connect institutions and organizations involved in medical devices—such as R&D, manufacturing, logistics, and hospitals—into a unified network to foster a thriving community.
 
-If you want to use a different template, pass the `--template` flag to `reflex init`.
-For example, if you want a more basic starting point, you can run:
+## Table of Contents
 
-```bash
-reflex init --template blank
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Development](#development)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+
+- Modular and extensible architecture using Reflex.
+- Predefined components and templates for rapid development.
+- Dockerized setup for consistent development and deployment environments.
+- Integration-ready with backend services and databases.
+
+## Project Structure
+
+The project follows the standard Reflex template structure:
+
 ```
-
-## About this Template
-
-This template has the following directory structure:
-
-```bash
 ├── README.md
-├── assets
+├── assets/
 ├── rxconfig.py
-└── {your_app}
-    ├── __init__.py
-    ├── components
-    │   ├── __init__.py
-    │   └── sidebar.py
-    ├── pages
-    │   ├── __init__.py
-    │   ├── dashboard.py
-    │   ├── index.py
-    │   └── settings.py
-    ├── styles.py
-    ├── templates
-    │   ├── __init__.py
-    │   └── template.py
-    └── {your_app}.py
+├── webapp/
+│   ├── __init__.py
+│   ├── components/
+│   │   ├── __init__.py
+│   │   └── sidebar.py
+│   ├── pages/
+│   │   ├── __init__.py
+│   │   ├── dashboard.py
+│   │   ├── index.py
+│   │   └── settings.py
+│   ├── styles.py
+│   ├── templates/
+│   │   ├── __init__.py
+│   │   └── template.py
+│   └── webapp.py
+├── Dockerfile
+├── docker-compose.yaml
+├── requirements.txt
+├── requirements_manual.txt
+├── pyproject.toml
+├── alembic/
+├── alembic.ini
+├── devops/
+└── .github/workflows/
 ```
 
-See the [Project Structure docs](https://reflex.dev/docs/getting-started/project-structure/) for more information on general Reflex project structure.
+## Getting Started
 
-### Adding Pages
+### Prerequisites
 
-In this template, the pages in your app are defined in `{your_app}/pages/`.
-Each page is a function that returns a Reflex component.
-For example, to edit this page you can modify `{your_app}/pages/index.py`.
-See the [pages docs](https://reflex.dev/docs/pages/routes/) for more information on pages.
+- Python 3.8 or higher
+- Docker and Docker Compose (optional, for containerized setup)
 
-In this template, instead of using `rx.add_page` or the `@rx.page` decorator,
-we use the `@template` decorator from `{your_app}/templates/template.py`.
+### Installation
 
-To add a new page:
+1. Clone the repository:
 
-1. Add a new file in `{your_app}/pages/`. We recommend using one file per page, but you can also group pages in a single file.
-2. Add a new function with the `@template` decorator, which takes the same arguments as `@rx.page`.
-3. Import the page in your `{your_app}/pages/__init__.py` file and it will automatically be added to the app.
+   ```bash
+   git clone https://github.com/careagain-org/careagain-webapp.git
+   cd careagain-webapp
+   ```
 
+2. Install dependencies:
 
-### Adding Components
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-In order to keep your code organized, we recommend putting components that are
-used across multiple pages in the `{your_app}/components/` directory.
+3. Run the application:
 
-In this template, we have a sidebar component in `{your_app}/components/sidebar.py`.
+   ```bash
+   reflex run
+   ```
 
-### Adding State
+   The application will be accessible at `http://localhost:3000`.
 
-As your app grows, we recommend using [substates](https://reflex.dev/docs/substates/overview/)
-to organize your state.
+## Development
 
-You can either define substates in their own files, or if the state is
-specific to a page, you can define it in the page file itself.
+- To add new pages, create a Python file in `webapp/pages/` and define a function with the `@template` decorator.
+- For reusable components, add them to `webapp/components/`.
+- Use `webapp/styles.py` for styling and theming.
+
+## Deployment
+
+### Using Docker
+
+1. Build the Docker image:
+
+   ```bash
+   docker build -t careagain-webapp .
+   ```
+
+2. Run the Docker container:
+
+   ```bash
+   docker run -p 3000:3000 careagain-webapp
+   ```
+
+   The application will be accessible at `http://localhost:3000`.
+
+## Contributing
+
+We welcome contributions from the community. To contribute:
+
+1. Fork the repository.
+2. Create a new branch:
+
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+3. Make your changes and commit them:
+
+   ```bash
+   git commit -m "Add your message here"
+   ```
+
+4. Push to your forked repository:
+
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+5. Open a pull request detailing your changes.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+For more information on the Reflex framework, visit the [official documentation](https://reflex.dev/docs).

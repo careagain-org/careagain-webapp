@@ -43,7 +43,7 @@ def show_user(org,role:str):
         align="center",
     )
 
-def table_pagination(all_orgs):
+def table_pagination(all_orgs,my_role="viewer"):
 
     return rx.cond(all_orgs !=[],
         rx.table.root(
@@ -59,7 +59,7 @@ def table_pagination(all_orgs):
             ),
             rx.table.body(
                 rx.foreach(all_orgs, lambda org, i: 
-                           rx.cond(org.contains("member_type"),
+                           rx.cond(org.contains("member_type") & my_role!="viewer",
                                show_user(org=org,role=org["member_type"]),
                                show_user(org=org,role="viewer"),
                            )

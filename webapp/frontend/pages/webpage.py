@@ -128,13 +128,18 @@ def support_section(direction:str) -> rx.Component:
             create_feature_box(
                 icon_tag="users",
                 heading_text="Be part of the community",
-                description_text="If you have developed medical tecnology or you want to start your project, don't hesitate on sharing your knowledge with the community.",
+                description_text="Add your institution or organization—whether involved in medical device R&D, manufacturing, logistics, or healthcare—to join a unified network and help build a thriving community.",
             ),
             create_feature_box(
-                icon_tag="handshake",
-                heading_text=rx.link("Become a patreon",href = urls.PATREON_URL),
-                description_text="Your financial support help us to mantain, improve and grow the community. Be in touch with all the new advances",
+                icon_tag="atom",
+                heading_text=rx.link("Upload your project",href = urls.PATREON_URL),
+                description_text="If you have developed medical tecnology or you want to start your project, don't hesitate on sharing your knowledge with the community.",
             ),
+            # create_feature_box(
+            #     icon_tag="handshake",
+            #     heading_text=rx.link("Become a patreon",href = urls.PATREON_URL),
+            #     description_text="Your financial support help us to mantain, improve and grow the community. Be in touch with all the new advances",
+            # ),
             columns="3",
             width="90%",
             flow="column",

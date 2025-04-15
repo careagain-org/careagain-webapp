@@ -71,7 +71,7 @@ def view_organization() -> rx.Component:
             rx.icon("circle-user-round"),
             rx.heading("Members",size="5"),
         ),
-        users_grid_horizontal(OrgState.org_members,cols=6,rows=3)
+        users_grid_horizontal(OrgState.org_members)
         
     )
 

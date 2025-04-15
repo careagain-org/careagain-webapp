@@ -10,6 +10,8 @@ import pandas as pd
 import requests
 import clipboard
 import logging
+from folium import Map, CustomIcon, Html, Element, MacroElement
+from jinja2 import Template
 
 @rx.dynamic
 def create_map(org_state: OrgState):
@@ -17,19 +19,19 @@ def create_map(org_state: OrgState):
     map_ = folium.Map(location=[0, 0], zoom_start=2)
     
     # add markercluster
-    marker_cluster = folium.plugins.MarkerCluster(control=False)
-    map_.add_child(marker_cluster)
+    # marker_cluster = folium.plugins.MarkerCluster(control=False)
+    # map_.add_child(marker_cluster)
     
-    g1 = folium.plugins.FeatureGroupSubGroup(marker_cluster, "Research & Dev")
+    g1 = folium.plugins.FeatureGroupSubGroup(map_, "Research & Dev")
     map_.add_child(g1)
 
-    g2 = folium.plugins.FeatureGroupSubGroup(marker_cluster, "Logistics & Transport")
+    g2 = folium.plugins.FeatureGroupSubGroup(map_, "Logistics & Transport")
     map_.add_child(g2)
     
-    g3 = folium.plugins.FeatureGroupSubGroup(marker_cluster, "Hospital")
+    g3 = folium.plugins.FeatureGroupSubGroup(map_, "Hospital")
     map_.add_child(g3)
     
-    g4 = folium.plugins.FeatureGroupSubGroup(marker_cluster, "Manufacturer")
+    g4 = folium.plugins.FeatureGroupSubGroup(map_, "Manufacturer")
     map_.add_child(g4)
 
     # Fetch organization locations
@@ -66,7 +68,7 @@ def create_map(org_state: OrgState):
             except Exception as err:
                 print(err)
                   
-    folium.LayerControl(collapsed=False).add_to(map_)
+    folium.LayerControl(collapsed=True).add_to(map_)
     
     map_html=map_._repr_html_()
 
@@ -87,9 +89,23 @@ def find_popup_variable_name(html):
     return html[starting_index:ending_index]
 
 
+class ClickCopyJS(MacroElement):
+    def __init__(self):
+        super().__init__()
+        self._template = Template("""
+        {% macro script(this, kwargs) %}
+            function onMapClick(e) {
+                const coords = e.latlng.lat.toFixed(6) + "," + e.latlng.lng.toFixed(6);
+                navigator.clipboard.writeText(coords).then(function() {
+                    alert("Copied to clipboard: " + coords);
+                });
+            }
+            {{ this._parent.get_name() }}.on('click', onMapClick);
+        {% endmacro %}
+        """)
+
 def interactive_map():
     map_ = folium.Map(location=[40.463667, -3.74922], zoom_start=2)
-
     folium.ClickForMarker(popup="<b>Lat:</b> ${lat}<br /><b>Lon:</b> ${lng}").add_to(map_)
     folium.ClickForLatLng(format_str='lat + "," + lng', alert=True).add_to(map_)
 

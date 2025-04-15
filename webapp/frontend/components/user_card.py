@@ -35,7 +35,7 @@ def user_card_horizontal(user)-> rx.Component:
             size="5",
             height='220px',
             width='180px',
-            padding ="5%",
+            padding ="2%",
             align="start",
         ),
         height = 'auto',
@@ -44,26 +44,35 @@ def user_card_horizontal(user)-> rx.Component:
     )
     
 
-def users_grid_horizontal(users,cols:int,rows:int)-> rx.Component:
-    return rx.grid(
-            rx.cond(
-                users != [],
-                rx.foreach(users, lambda value, i: 
-                            user_card_horizontal(value)),
-                rx.text("No users available")
-            ),   
-            spacing="5",
-            columns=str(cols),
-            rows=str(rows),
-            width="100%",
-            align ="start",
-            justify = "start"
-        ),
-        # align ="start",
-        # justify = "start",
-        # type="hover",
-        # scrollbars="horizontal",
+def users_scroll_horizontal(users)-> rx.Component:
+    return rx.scroll_area(
+        rx.flex(
+        rx.cond(
+            users != [],
+            rx.foreach(users, lambda value, i: 
+                        user_card_horizontal(value)),
+            rx.text("No projects available")
+            ), 
+        ),   
+        spacing="2",
+        flex_wrap="nowrap",
+        width="100%",
+        justify = "start"
+    )
     
+def users_grid_horizontal(users)-> rx.Component:
+    return rx.flex(
+        rx.cond(
+            users != [],
+            rx.foreach(users, lambda value, i: 
+                        user_card_horizontal(value)),
+            rx.text("No projects available")
+            ),  
+        spacing="2",
+        flex_wrap="wrap",
+        width="100%",
+        justify = "start"
+    )
 
 def user_card_vertical(user)-> rx.Component:
 

@@ -21,14 +21,14 @@ class Profile():
     
 def orgs_section():
     return rx.vstack(
-        section_title("building-2",'My Organizations',"Community", urls.COMMUNITY_PLATFORM),
+        section_title("building-2",'My Organizations',"Community", f"{urls.COMMUNITY_PLATFORM}/#organizations"),
         rx.hstack(
             add_new("organization"),
             search_existing("organization"),
             align="start",
             justify="start",
             spacing="5"),
-        org_table(OrgState.my_orgs),
+        org_table(OrgState.my_orgs,my_role="editor"),
         width="100%",
         id="my-organizations"
     )
@@ -42,7 +42,7 @@ def projects_section():
             align="start",
             spacing="4",
         ),
-        project_table(ProjectState.my_projects),
+        project_table(ProjectState.my_projects,my_role="editor"),
         width="100%",
         id="my-projects"
     )
@@ -125,7 +125,7 @@ def search_existing(text:str):
 def profile() -> rx.Component:
     profile = rx.vstack(
                 rx.heading('My profile', size="9"),
-                section_title("book-user",'My User',"Users", urls.PROJECTS_URL),
+                section_title("book-user",'My User',"Users", f"{urls.COMMUNITY_PLATFORM}/#users"),
                 user_section(),
                 rx.divider(),
                 orgs_section(),

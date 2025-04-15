@@ -124,7 +124,7 @@ class UserState(AuthState):
         
         
     def to_user_view(self,user_id:str):
-        self.user_id = user_id
+        self.selected_user_id = user_id
         self.selected_user = [d for d in self.users if d['user_id']==user_id][0]
         return rx.redirect(urls.IND_USER_URL)
     

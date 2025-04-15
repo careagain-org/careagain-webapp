@@ -6,6 +6,7 @@ from .auth_state import AuthState
 import uuid
 import datetime as dt
 import clipboard
+import pyperclip
 import json
 import os
 
@@ -33,8 +34,8 @@ class OrgState(AuthState):
     def update_location(self):
         try:
             self.visible = True
-            self.latitude = float(clipboard.paste().split(",")[0])
-            self.longitude = float(clipboard.paste().split(",")[-1])
+            self.latitude = float(pyperclip.paste().split(",")[0])
+            self.longitude = float(pyperclip.paste().split(",")[-1])
         except Exception as err:
             return rx.toast(err)
 
@@ -283,8 +284,8 @@ class OrgState(AuthState):
             return rx.toast("Unexpected error")
     
     async def update_coordinates(self):
-        lat = float(clipboard.paste().split(",")[0])
-        lon = float(clipboard.paste().split(",")[-1])
+        lat = float(pyperclip.paste().split(",")[0])
+        lon = float(pyperclip.paste().split(",")[-1])
         
         await self.update_org(key="latitude",value=lat)
         await self.update_org(key="longitude",value=lon)

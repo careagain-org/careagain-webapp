@@ -10,11 +10,14 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     gnupg \
     unzip \
-    xclip \
     && curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION} | bash - \
     && apt-get install -y nodejs \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+    apt-get install -y xclip && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install CA certs and dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \

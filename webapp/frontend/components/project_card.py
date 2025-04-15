@@ -123,7 +123,7 @@ def project_card_horizontal(project)-> rx.Component:
             size="5",
             height='220px',
             width='180px',
-            padding ="5%",
+            padding ="2%",
             align="start",
         ),
         height = 'auto',
@@ -132,18 +132,32 @@ def project_card_horizontal(project)-> rx.Component:
 
     )
 
-def project_grid_horizontal(projects,cols:int,rows:int)-> rx.Component:
-    return rx.grid(
-        rx.cond(
-            projects != [],
-            rx.foreach(projects, lambda value, i: 
-                        project_card_horizontal(value)),
-            rx.text("No projects available")
+def project_scroll_horizontal(projects)-> rx.Component:
+    return rx.scroll_area(
+        rx.flex(
+            rx.cond(
+                    projects != [],
+                    rx.foreach(projects, lambda value, i: 
+                                project_card_horizontal(value)),
+                    rx.text("No projects available")
+                    ), 
         ),   
-        spacing="5",
-        columns=str(cols),
-        rows=str(rows),
+        spacing="2",
+        flex_wrap="wrap",
         width="100%",
-        align ="start",
         justify = "start"
-    ),
+    )
+    
+def project_grid_horizontal(projects)-> rx.Component:
+    return rx.flex(
+            rx.cond(
+                    projects != [],
+                    rx.foreach(projects, lambda value, i: 
+                                project_card_horizontal(value)),
+                    rx.text("No projects available")
+                    ),  
+        spacing="2",
+        flex_wrap="wrap",
+        width="100%",
+        justify = "start"
+    )

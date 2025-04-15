@@ -78,6 +78,7 @@ def community_page() -> rx.Component:
                             value="tab-orgs",
                             spacing="5",
                             padding="5",
+                            id="organizations",
                         ),
                         rx.tabs.content(
                             rx.spacer(size="5"),
@@ -85,10 +86,11 @@ def community_page() -> rx.Component:
                                 rx.vstack(
                                     rx.spacer(),
                                     discover_user(),
-                                    users_grid_horizontal(UserState.searched_users,cols=6,rows=3),
+                                    users_grid_horizontal(UserState.searched_users),
                                 padding="2",
                                 spacing="5"),),
                             value="tab-users",
+                            id="users",
                         ),
                         default_value="tab-map",
                         spacing="5",

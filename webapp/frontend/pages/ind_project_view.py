@@ -65,7 +65,7 @@ def view_project() -> rx.Component:
             rx.icon("circle-user-round"),
             rx.heading("Members",size="5"),
         ),
-        users_grid_horizontal(ProjectState.project_members,cols=6,rows=3),
+        users_grid_horizontal(ProjectState.project_members),
         width ="100%",
         spacing="3"
     )

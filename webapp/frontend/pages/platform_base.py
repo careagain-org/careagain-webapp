@@ -28,23 +28,20 @@ def platform_base(child: rx.Component ,*args,**kwargs) -> rx.Component:
                 ),
                 rx.vstack(
                     navbar_platform(),
-                    rx.tablet_and_desktop(
+                    rx.desktop_only(
                         rx.box(
                         child,
                         # text_align="center", 
                         id="box-content-area",
                         width="83vw"
-                    ),),
-                    rx.mobile_only(
+                    ), ),
+                    rx.mobile_and_tablet(
                         rx.box(
-                        rx.heading("Sorry, the mobile version is under development, please change to desktop version.",
-                                   size="5",
-                                   align="center"),
+                        child,
                         # text_align="center", 
                         id="box-content-area",
-                        width="83vw"
-                    ),
-                        ),  
+                        width="100vw"
+                    ), ),
                     low_footer(),
                 ),
             ),
