@@ -21,14 +21,14 @@ class Profile():
     
 def orgs_section():
     return rx.vstack(
-        section_title("building-2",'My Organizations',"Community", urls.COMMUNITY_PLATFORM),
+        section_title("building-2",'My Organizations',"Community", f"{urls.COMMUNITY_PLATFORM}/#organizations"),
         rx.hstack(
             add_new("organization"),
             search_existing("organization"),
             align="start",
             justify="start",
             spacing="5"),
-        org_table(OrgState.my_orgs),
+        org_table(OrgState.my_orgs,my_role="editor"),
         width="100%",
         id="my-organizations"
     )
@@ -42,12 +42,12 @@ def projects_section():
             align="start",
             spacing="4",
         ),
-        project_table(ProjectState.my_projects),
+        project_table(ProjectState.my_projects,my_role="editor"),
         width="100%",
         id="my-projects"
     )
 
-def section_title(section_icon:str,section_title:str, go_to_section:str,section_link:str) -> rx.Component():
+def section_title(section_icon:str,section_title:str, go_to_section:str,section_link:str):
     return rx.hstack(
         rx.icon(section_icon,color = "teal"),
         rx.heading(section_title,size="5", color = "teal"),
@@ -56,7 +56,7 @@ def section_title(section_icon:str,section_title:str, go_to_section:str,section_
         color = "accent"
     )
 
-def input_field_edit(title:str,key:str) -> rx.Component():
+def input_field_edit(title:str,key:str):
     default_value =UserState.my_details[f"{key}"]
     return rx.vstack(
             rx.heading(title,size="3", color = "grey"),
@@ -64,7 +64,7 @@ def input_field_edit(title:str,key:str) -> rx.Component():
         ),
 
 
-def user_section() -> rx.Component():
+def user_section():
 
     return rx.container(
         rx.tablet_and_desktop(
@@ -100,7 +100,7 @@ def user_section() -> rx.Component():
         )
     )
 
-def add_new(text:str)->rx.Component():
+def add_new(text:str):
     return rx.container(
         rx.hstack(
             add_new_popover(text),
@@ -109,7 +109,7 @@ def add_new(text:str)->rx.Component():
         )
     )
 
-def search_existing(text:str)->rx.Component():
+def search_existing(text:str):
     return rx.container(
         rx.hstack(
             search_popover(text),
@@ -119,13 +119,14 @@ def search_existing(text:str)->rx.Component():
     )
 
 
-@rx.page(route=urls.PROFILE_URL, on_load= [UserState.get_my_details,
+@rx.page(route=urls.PROFILE_URL, on_load= [AuthState.check_session,
+                                           UserState.get_my_details,
                                            OrgState.get_my_orgs,OrgState.get_orgs,
                                            ProjectState.get_list_projects,ProjectState.get_my_projects])
 def profile() -> rx.Component:
     profile = rx.vstack(
                 rx.heading('My profile', size="9"),
-                section_title("book-user",'My User',"Users", urls.PROJECTS_URL),
+                section_title("book-user",'My User',"Users", f"{urls.COMMUNITY_PLATFORM}/#users"),
                 user_section(),
                 rx.divider(),
                 orgs_section(),

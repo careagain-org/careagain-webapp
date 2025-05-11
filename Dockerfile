@@ -15,6 +15,10 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+    apt-get install -y xclip && \
+    rm -rf /var/lib/apt/lists/*
+
 # Install CA certs and dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl gnupg && \

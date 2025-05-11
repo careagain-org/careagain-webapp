@@ -8,7 +8,7 @@ from typing import List
 import reflex as rx
 
 
-def upload_image_project(title:str,my_image:str) -> rx.Component():
+def upload_image_project(title:str,my_image:str):
 
     return rx.vstack(
         rx.heading(title,size="3", color = "grey"),
@@ -22,7 +22,7 @@ def upload_image_project(title:str,my_image:str) -> rx.Component():
             radius="full",
             border="1px dotted rgb(0,0,0)",
             spacing="2",
-            width="15em",
+            width="19em",
             height="100%",
             multiple=False,
             accept = {
@@ -69,7 +69,7 @@ def upload_image_project(title:str,my_image:str) -> rx.Component():
 
 
 
-def upload_logo_project(title:str,my_image:str) -> rx.Component():
+def upload_logo_project(title:str,my_image:str):
 
     return rx.vstack(
         rx.heading(title,size="3", color = "grey"),
@@ -83,7 +83,7 @@ def upload_logo_project(title:str,my_image:str) -> rx.Component():
             radius="full",
             border="1px dotted rgb(0,0,0)",
             spacing="2",
-            width="15em",
+            width="19em",
             height="100%",
             multiple=False,
             accept = {

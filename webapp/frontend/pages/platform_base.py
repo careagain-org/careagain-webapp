@@ -34,26 +34,24 @@ def platform_base(child: rx.Component ,*args,**kwargs) -> rx.Component:
                         # text_align="center", 
                         id="box-content-area",
                         width="83vw"
-                    ),),
+                    ), ),
                     rx.mobile_and_tablet(
                         rx.box(
-                        rx.heading("Sorry, the mobile version is under development, please change to desktop version.",
-                                   size="5",
-                                   align="center"),
+                        child,
                         # text_align="center", 
                         id="box-content-area",
-                        width="83vw"
-                    ),
-                        ),  
+                        width="100vw"
+                    ), ),
                     low_footer(),
                 ),
             ),
             render_menu(),
             width="100%",
-            on_mount= [AuthState.check_session]
+            # on_mount= AuthState.check_session
         )
-    return  rx.cond(
-        AuthState.is_authenticated,
-        platform,
-        login_page() 
-    )
+    return platform
+    # rx.cond(
+    #     AuthState.is_authenticated,
+    #     platform,
+    #     login_page() 
+    # )

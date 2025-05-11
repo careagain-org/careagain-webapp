@@ -1,6 +1,7 @@
 import reflex as rx
 from ..constants import urls
 from ..states.user_state import UserState
+from ..states.auth_state import AuthState
 
 def sidebar_item(
     text: str, icon: str, href: str
@@ -40,6 +41,7 @@ def sidebar_items() -> rx.Component:
         # sidebar_item("Analytics", "bar-chart-4", urls.PLATFORM_URL),
         # sidebar_item("Questions", "file-question", urls.QUESTIONS_URL),
         sidebar_item("Chat & FAQs", "message-square-code", urls.DISCORD_URL),
+        sidebar_item("Documentation", "file-text", urls.DOCS_URL),
         # sidebar_item("Videos", "square-play", urls.YOUTUBE_URL),
         spacing="1",
         width="100%",
@@ -49,13 +51,13 @@ def profile_button() -> rx.Component:
     return rx.container(
             rx.link(
                 rx.hstack(
-                    rx.cond(UserState.my_details["profile_image"]=="",
-                        rx.icon_button(rx.icon("user"),
-                                       size="3",
-                                       radius="full",),
-                        rx.avatar(src=UserState.my_details["profile_image"],
+                    rx.cond(AuthState.is_authenticated,
+                            rx.avatar(src=UserState.my_details["profile_image"],
                                   size="3",
-                                  radius="full",)),
+                                  radius="full",),
+                            rx.icon_button(rx.icon("user"),
+                                       size="3",
+                                       radius="full",),),
                     rx.vstack(
                     rx.box(
                         rx.text(
@@ -63,8 +65,9 @@ def profile_button() -> rx.Component:
                             size="3",
                             weight="bold",
                         ),
-                        rx.text(
+                        rx.text(rx.cond(AuthState.is_authenticated,
                             f"@{UserState.my_details["username"]}",
+                            f"@undefined"),
                             size="2",
                             weight="medium",
                         ),
@@ -86,11 +89,14 @@ def profile_button() -> rx.Component:
 
 def brand_header() ->rx.Component:
     return rx.hstack(
-                rx.image(
-                src="/logo0.png",
-                width="2.25em",
-                height="auto",
-                border_radius="10%",
+                rx.link(
+                    rx.image(
+                    src="/logo0.png",
+                    width="2.25em",
+                    height="auto",
+                    border_radius="10%",),
+                    hfref=urls.WEB_URL,
+                    on_click=rx.redirect(urls.WEB_URL),
             ),
             rx.heading(
                 "CareAgain", size="7", weight="bold"

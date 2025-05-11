@@ -81,6 +81,8 @@ class Project(Base):
     description = Column(Text)
     image = Column(String(255))
     logo = Column(String(255))
+    guide = Column(Text)
+    attachment = Column(Text)
     status = Column(String(255))
     verified = Column(Boolean,default=False)
 

@@ -4,9 +4,10 @@ from .forms import ProjectForm,InstitutionForm, VideoForm
 from .org_forms  import form_org,search_org
 from .project_forms  import form_project,search_project
 from .user_forms import form_user,search_user_org,search_user_project
+from ..states.auth_state import AuthState
 
 
-def add_new(text:str)->rx.Component():
+def add_new(text:str):
     return rx.container(
         rx.hstack(
             add_new_popover(text),
@@ -15,7 +16,7 @@ def add_new(text:str)->rx.Component():
         )
     )
 
-def search_existing(text:str)->rx.Component():
+def search_existing(text:str):
     return rx.container(
         rx.hstack(
             search_popover(text),
@@ -25,10 +26,13 @@ def search_existing(text:str)->rx.Component():
     )
 
 
-def add_new_popover(my_title:str) -> rx.Component:
+def add_new_popover(my_title:str):
     return rx.dialog.root(
-        rx.tooltip(rx.dialog.trigger(rx.icon_button("square-plus", size="3")),
-                    content=f"Add new {my_title}"),
+        rx.tooltip(
+            rx.cond(AuthState.is_authenticated,
+                rx.dialog.trigger(rx.icon_button("square-plus", size="3")),
+                rx.dialog.trigger(rx.icon_button("square-plus", size="3",
+                                            disabled=True)))),   
         rx.match(
             my_title,
             ("project", form_project()),
@@ -38,7 +42,7 @@ def add_new_popover(my_title:str) -> rx.Component:
             ),
     )
 
-def search_popover(my_title:str) -> rx.Component:
+def search_popover(my_title:str):
     return rx.dialog.root(
         rx.dialog.trigger(rx.icon_button("search-check", size="3")),
         rx.match(
@@ -48,7 +52,7 @@ def search_popover(my_title:str) -> rx.Component:
             form_org()),
     )
     
-def search_user(my_title:str) -> rx.Component:
+def search_user(my_title:str):
     return rx.dialog.root(
         rx.dialog.trigger(rx.icon_button("user-round-search", size="3")),
         rx.match(

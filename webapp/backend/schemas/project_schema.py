@@ -11,6 +11,8 @@ class Project(BaseModel):
     classification: Optional[str]
     website: Optional[str]
     repo: Optional[str]
+    guide: Optional[str]
+    attachment: Optional[str]
     description: Optional[str]
     image: Optional[str]
     logo: Optional[str]

@@ -8,7 +8,7 @@ from ..components.map import interactive_map,map_org
 from ..components.user_card import users_grid_horizontal
 
 
-@rx.page(route=urls.IND_ORG_URL)
+@rx.page(route=urls.IND_ORG_URL,on_load=[OrgState.find_members_org])
 def view_organization() -> rx.Component:
     my_child = rx.vstack(
         rx.link(rx.icon('arrow_left'),href=urls.COMMUNITY_PLATFORM),
@@ -71,7 +71,7 @@ def view_organization() -> rx.Component:
             rx.icon("circle-user-round"),
             rx.heading("Members",size="5"),
         ),
-        users_grid_horizontal(OrgState.org_members,cols=6,rows=3)
+        users_grid_horizontal(OrgState.org_members)
         
     )
 

@@ -28,7 +28,7 @@ def home_logo() -> rx.Component:
 def problem_section(direction: str) -> rx.Component:
     return rx.flex(
                 rx.image('hombre_repadando_equipos.webp',
-                        height="50em",
+                        # height="50em",
                         align="start"),
                 rx.vstack(
                     rx.heading("Current situation", size="9"),
@@ -94,10 +94,10 @@ def solution_section(direction: str) ->rx.Component:
             ),
             rx.image('padre_hijo_reparando.png',
                     align="center",
-                    justify="center",
-                    height="50em"),
+                    justify="center",),
             width="100%",
             direction=direction,
+            padding="5",
             id="solution_section",
         )
 
@@ -128,13 +128,18 @@ def support_section(direction:str) -> rx.Component:
             create_feature_box(
                 icon_tag="users",
                 heading_text="Be part of the community",
-                description_text="If you have developed medical tecnology or you want to start your project, don't hesitate on sharing your knowledge with the community.",
+                description_text="Add your institution or organization—whether involved in medical device R&D, manufacturing, logistics, or healthcare—to join a unified network and help build a thriving community.",
             ),
             create_feature_box(
-                icon_tag="handshake",
-                heading_text=rx.link("Become a patreon",href = urls.PATREON_URL),
-                description_text="Your financial support help us to mantain, improve and grow the community. Be in touch with all the new advances",
+                icon_tag="atom",
+                heading_text=rx.link("Upload your project",href = urls.PATREON_URL),
+                description_text="If you have developed medical tecnology or you want to start your project, don't hesitate on sharing your knowledge with the community.",
             ),
+            # create_feature_box(
+            #     icon_tag="handshake",
+            #     heading_text=rx.link("Become a patreon",href = urls.PATREON_URL),
+            #     description_text="Your financial support help us to mantain, improve and grow the community. Be in touch with all the new advances",
+            # ),
             columns="3",
             width="90%",
             flow="column",

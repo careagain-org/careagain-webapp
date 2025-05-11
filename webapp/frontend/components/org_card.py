@@ -135,18 +135,30 @@ def org_card_horizontal(org)-> rx.Component:
 
     )
 
-def org_grid_horizontal(orgs,cols:int,rows:int)-> rx.Component:
-    return rx.grid(
+def org_scroll_horizontal(orgs)-> rx.Component:
+    return rx.scroll_area(
+        rx.flex(
         rx.cond(
             orgs != [],
             rx.foreach(orgs, lambda value, i: 
                         org_card_horizontal(value)),
             rx.text("No orgs available")
         ),   
-        spacing="5",
-        columns=str(cols),
-        rows=str(rows),
-        width="100%",
-        align ="start",
-        justify = "start"
     ),
+        spacing="2",
+        flex_wrap="wrap",
+        width="100%",
+        justify = "start")
+    
+def org_grid_horizontal(orgs)-> rx.Component:
+    return rx.flex(
+        rx.cond(
+            orgs != [],
+            rx.foreach(orgs, lambda value, i: 
+                        org_card_horizontal(value)),
+            rx.text("No orgs available")
+        ),   
+        spacing="2",
+        flex_wrap="wrap",
+        width="100%",
+        justify = "start")

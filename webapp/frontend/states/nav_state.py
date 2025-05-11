@@ -32,3 +32,6 @@ class NavState(rx.State):
     def to_profile(self):
         return rx.redirect(urls.PROFILE_URL)
     
+    def to_documentation(self):
+        return rx.redirect(urls.DOCS_URL)
+    

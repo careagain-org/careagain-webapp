@@ -28,7 +28,7 @@ def navbar_platform() -> rx.Component:
                 navbar_profile(),
                 spacing="5",
                 justify="end",
-                align_items="center"
+                align_items="center",
             ),
         ),
         rx.mobile_and_tablet(
@@ -48,5 +48,8 @@ def navbar_platform() -> rx.Component:
         # position="fixed",
         # top="0px",
         # z_index="5",
-        width="95%",
-    )
+        width="100%",
+        # top="100%",
+        # right="0",
+        # padding_top="10px",
+)

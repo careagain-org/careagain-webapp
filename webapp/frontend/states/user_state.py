@@ -1,14 +1,14 @@
 import reflex as rx
 import httpx
 from ..constants import urls
-from typing import List, Dict 
+from typing import List, Dict, Any
 from .auth_state import AuthState
 
 token=AuthState.token
 
 class UserState(AuthState):
     image_path: str 
-    my_details: Dict[str, str]
+    my_details: Dict[str, Any] = {}
     
     selected_user_id:str
     selected_user: Dict[str, str]
@@ -18,7 +18,19 @@ class UserState(AuthState):
     
     user_projects: List[Dict[str, str]]=[]
     user_orgs: List[Dict[str, str]]=[]
-
+    
+    async def user_whipeout(self):
+        self.image_path: str =""
+        self.my_details: Dict[str, str]=[]
+        
+        self.selected_user_id:str=""
+        self.selected_user: Dict[str, str]={}
+        self.users: List[Dict[str, str]]=[]
+        self.filtered_users: List[Dict[str, str]]=[]
+        self.searched_users: List[Dict[str, str]]=[]
+        
+        self.user_projects: List[Dict[str, str]]=[]
+        self.user_orgs: List[Dict[str, str]]=[]
 
     async def get_image_path(self):
         async with httpx.AsyncClient() as client:
@@ -37,7 +49,7 @@ class UserState(AuthState):
 
 
     async def get_my_details(self):
-
+        await self.user_whipeout()
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"{urls.API_URL}/api/users/me",
@@ -89,18 +101,9 @@ class UserState(AuthState):
                 
                 # Open the image file in binary mode
                 with open(outfile, "rb") as image_file:
-                    # Prepare the files dictionary
                     files = {"file": ("image.jpg", image_file, "image/jpeg")}
-
-                    # Additional data
-                    data = {
-                        "description": "This is a sample image."
-                    }
-
-                    # Add authentication token
-                    headers = {
-                        "Authorization": f"Bearer {self.token}"
-                    }
+                    data = {"description": "This is a sample image."}
+                    headers = {"Authorization": f"Bearer {self.token}"}
 
                     # Send the POST request
                     async with httpx.AsyncClient() as client:
@@ -133,7 +136,7 @@ class UserState(AuthState):
         
         
     def to_user_view(self,user_id:str):
-        self.user_id = user_id
+        self.selected_user_id = user_id
         self.selected_user = [d for d in self.users if d['user_id']==user_id][0]
         return rx.redirect(urls.IND_USER_URL)
     

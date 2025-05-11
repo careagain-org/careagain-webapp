@@ -8,19 +8,23 @@ from ..states.org_state import OrgState
 from .upload import upload_logo_org
 from .map import interactive_map
 from ..components.project_card import project_grid_vertical
+from ..constants import urls
 
 
 def form_project() -> rx.Component:
+        status: list[str] = ["Prototype","Technically tested","Clinically tested",
+                             "Regulatory body approval"]
         device_class: list[str] = ["Class I","Class IIa","Class IIb","Class III",
                                    "Not Classified"]
         device_type: list[str] = ["Diagnostic","Treatment","Support",
-                                  "Biomedical Reaseach", "Rehabilitation",  
+                                  "Research", "Rehabilitation",  
                                   "Software","Monitoring","Other"]
 
         return rx.dialog.content(
             rx.dialog.title(f"Add new project"),
             rx.dialog.description(
-                    f"Add new project details, required fields marked with *",
+                    rx.link("Click here to see documentation to create projects. ",href=urls.DOCS_URL),
+                    f"Required fields marked with *",
                     size="2",
                     margin_bottom="16px",
                 ),
@@ -44,19 +48,60 @@ def form_project() -> rx.Component:
                                     width="100%"),
                             width="100%"
                         ),
+                        rx.vstack(
+                            rx.heading("Status *",size="3"),
+                            rx.select(status, 
+                                    placeholder="Select Project Status",
+                                    name="status",
+                                    required=True,
+                                    width="100%"),
+                            width="100%"
+                        ),
                         width="100%",
                     ),
                     rx.heading("Project Device Description",size="3"),
                     rx.text_area(
                         placeholder="Type here...",
                         name="description",),
-                    rx.heading("Website url (if aplicable)",size="3"),
-                    rx.input(placeholder="Enter url link",
-                                name= "website"),
                     rx.hstack(
-                            upload_logo_project(title="Logo",my_image=rx.get_upload_url(ProjectState.logo)),
-                            upload_image_project(title="Representative image",my_image=rx.get_upload_url(ProjectState.image))
-                            ),
+                        rx.vstack(
+                            rx.heading("Website url (if aplicable)",size="3"),
+                            rx.input(placeholder="Enter url link",
+                                name= "website",
+                                width="100%"),
+                            width="100%"
+                        ),
+                        rx.vstack(
+                            rx.heading("Git repo (if aplicable)",size="3"),
+                            rx.input(placeholder="Enter url link",
+                                name= "repo",
+                                width="100%"),
+                            width="100%"
+                        ),
+                        width="100%",
+                    ),
+                    rx.hstack(
+                        upload_logo_project(title="Logo",my_image=rx.get_upload_url(ProjectState.logo)),
+                        upload_image_project(title="Representative image",my_image=rx.get_upload_url(ProjectState.image)),
+                        width="100vw",
+                    ),
+                    rx.hstack(
+                        rx.vstack(
+                            rx.heading("Manual guide (.pdf)",size="3"),
+                            rx.input(placeholder="Enter url link to download",
+                                name= "website",
+                                width="100%"),
+                            width="100%"
+                        ),
+                        rx.vstack(
+                            rx.heading("Attachment (.zip)",size="3"),
+                            rx.input(placeholder="Enter url link to download",
+                                name= "repo",
+                                width="100%"),
+                            width="100%"
+                        ),
+                        width="100%",
+                    ),
                     rx.flex(
                         rx.dialog.close(
                             rx.button(
