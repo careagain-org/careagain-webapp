@@ -191,11 +191,11 @@ class AuthState(rx.State):
             else:
                 response_detail = response.json()["detail"]
                 self.is_authenticated = False
-                return [rx.toast.error(f"Auth error {response_detail}"),rx.redirect(urls.LOGIN_URL)]
+                return [rx.redirect(urls.LOGIN_URL),rx.toast.warning(f"Auth error {response_detail}")]
         
         except Exception as err:
             self.is_authenticated = False
-            return rx.toast.error(err)
+            return rx.toast.warning(err)
         
 
 

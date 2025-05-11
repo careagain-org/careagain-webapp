@@ -4,6 +4,7 @@ from .forms import ProjectForm,InstitutionForm, VideoForm
 from .org_forms  import form_org,search_org
 from .project_forms  import form_project,search_project
 from .user_forms import form_user,search_user_org,search_user_project
+from ..states.auth_state import AuthState
 
 
 def add_new(text:str):
@@ -27,8 +28,11 @@ def search_existing(text:str):
 
 def add_new_popover(my_title:str):
     return rx.dialog.root(
-        rx.tooltip(rx.dialog.trigger(rx.icon_button("square-plus", size="3")),
-                    content=f"Add new {my_title}"),
+        rx.tooltip(
+            rx.cond(AuthState.is_authenticated,
+                rx.dialog.trigger(rx.icon_button("square-plus", size="3")),
+                rx.dialog.trigger(rx.icon_button("square-plus", size="3",
+                                            disabled=True)))),   
         rx.match(
             my_title,
             ("project", form_project()),

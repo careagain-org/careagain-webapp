@@ -14,15 +14,15 @@ import os
 class OrgState(AuthState):
     org_types: list[str] = ["Hospital", "Logistics & transport",
                             "Research & Development","Manufacturer"]
-    orgs: List[Dict[str, str]] = []
-    my_orgs: List[Dict[str, str]] = []
-    filtered_orgs: List[Dict[str, str]] = []
-    searched_orgs: List[Dict[str, str]]=[]
+    orgs: List[Dict[str, Any]] = []
+    my_orgs: List[Dict[str, Any]] = []
+    filtered_orgs: List[Dict[str, Any]] = []
+    searched_orgs: List[Dict[str, Any]]=[]
     orgs_locations: List[Dict[str, float]] = []
-    selected_org: Dict[str, str] = {}
-    org_details: Dict[str, str] = {}
+    selected_org: Dict[str, Any] = {}
+    org_details: Dict[str, Any] = {}
     
-    org_members:List[Dict[str, str]] = []
+    org_members:List[Dict[str, Any]] = []
     org_id:str=""
     latitude: float =None
     longitude: float =None

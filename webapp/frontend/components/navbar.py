@@ -49,11 +49,11 @@ def navbar() -> rx.Component:
                 rx.hstack(
                     rx.color_mode.button(color="teal"),
                     rx.hstack(
-                            rx.button("Sign Up",size="3",
+                            rx.button("Documentation",size="3",
                                 variant="outline",
-                                color="teal",on_click=nav_state.NavState.to_signup()
+                                color="teal",on_click=nav_state.NavState.to_documentation()
                             ),
-                            rx.button("Log In", size="3", on_click=nav_state.NavState.to_login()),
+                            rx.button("Go to Platform", size="3", on_click=nav_state.NavState.to_platfom()),
                         ),
                     # rx.cond(auth_state.AuthState.is_authenticated,
                     #     navbar_profile(),
@@ -97,8 +97,8 @@ def navbar() -> rx.Component:
                         # rx.menu.item("Community", on_click=nav_state.NavState.to_community),
                         # rx.menu.item("Contact", on_click=nav_state.NavState.to_contact),
                         rx.menu.separator(),
-                        rx.menu.item("Log in",  on_click=nav_state.NavState.to_login),
-                        rx.menu.item("Sign up", on_click=nav_state.NavState.to_signup),
+                        rx.menu.item("Platform",  on_click=nav_state.NavState.to_platfom),
+                        rx.menu.item("Documentation", on_click=nav_state.NavState.to_documentation),
                     ),
                     justify="end",
                 ),

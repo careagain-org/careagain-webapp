@@ -22,7 +22,7 @@ def upload_image_project(title:str,my_image:str):
             radius="full",
             border="1px dotted rgb(0,0,0)",
             spacing="2",
-            width="15em",
+            width="19em",
             height="100%",
             multiple=False,
             accept = {
@@ -83,7 +83,7 @@ def upload_logo_project(title:str,my_image:str):
             radius="full",
             border="1px dotted rgb(0,0,0)",
             spacing="2",
-            width="15em",
+            width="19em",
             height="100%",
             multiple=False,
             accept = {

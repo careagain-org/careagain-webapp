@@ -65,6 +65,7 @@ def sign_out():
 @auth_route.post("/token", tags=["auth"])
 def login_with_cookie(form_data: security.OAuth2PasswordRequestForm = Depends()):
     try:
+        sign_out()
         response = supa.auth.get_session()
         # if response is not None:
         if response:
@@ -175,7 +176,7 @@ def current_session():
             parsed_data = json.loads(data)
             return parsed_data
         else:
-            raise HTTPException(status_code=401, detail="No session not authorized")
+            raise HTTPException(status_code=401, detail="No session authorized")
     except Exception as e:
         raise HTTPException(status_code=400, detail=f": {str(e)}")
     

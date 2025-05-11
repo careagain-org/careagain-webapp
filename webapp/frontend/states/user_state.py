@@ -1,14 +1,14 @@
 import reflex as rx
 import httpx
 from ..constants import urls
-from typing import List, Dict 
+from typing import List, Dict, Any
 from .auth_state import AuthState
 
 token=AuthState.token
 
 class UserState(AuthState):
     image_path: str 
-    my_details: Dict[str, str]
+    my_details: Dict[str, Any] = {}
     
     selected_user_id:str
     selected_user: Dict[str, str]
@@ -18,7 +18,19 @@ class UserState(AuthState):
     
     user_projects: List[Dict[str, str]]=[]
     user_orgs: List[Dict[str, str]]=[]
-
+    
+    async def user_whipeout(self):
+        self.image_path: str =""
+        self.my_details: Dict[str, str]=[]
+        
+        self.selected_user_id:str=""
+        self.selected_user: Dict[str, str]={}
+        self.users: List[Dict[str, str]]=[]
+        self.filtered_users: List[Dict[str, str]]=[]
+        self.searched_users: List[Dict[str, str]]=[]
+        
+        self.user_projects: List[Dict[str, str]]=[]
+        self.user_orgs: List[Dict[str, str]]=[]
 
     async def get_image_path(self):
         async with httpx.AsyncClient() as client:
@@ -37,7 +49,7 @@ class UserState(AuthState):
 
 
     async def get_my_details(self):
-
+        await self.user_whipeout()
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"{urls.API_URL}/api/users/me",

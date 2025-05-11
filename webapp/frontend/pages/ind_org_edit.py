@@ -24,7 +24,7 @@ def title_section(title:str, icon:str):
             ),
     
 
-@rx.page(route=urls.IND_EDIT_ORG_URL)
+@rx.page(route=urls.IND_EDIT_ORG_URL,on_load=[OrgState.find_members_org])
 def edit_organization() -> rx.Component:
     org=OrgState.selected_org
     my_child = rx.vstack(

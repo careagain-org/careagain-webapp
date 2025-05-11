@@ -198,6 +198,7 @@ def update_coordinates_form():
                 margin_top="16px",
                 justify="end",
                 width="100%",
+                min_height="100px",
             ),
         ),
     ),

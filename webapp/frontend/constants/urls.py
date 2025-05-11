@@ -20,6 +20,7 @@ LOGIN_URL = '/login'
 SIGNUP_URL = '/signup'
 LOGOUT_URL = '/logout'
 RESET_PASSWORD_URL = '/reset_password'
+DOCS_URL = 'https://careagain-org.github.io/careagain-webapp/'
 
 EMAIL = 'hello@careagain.org'
 
