@@ -1,7 +1,7 @@
 # CareAgain WebApp
 
 **CareAgain WebApp** is a web application built using the [Reflex](https://reflex.dev/) framework.
-It serves as the frontend for CareAgain's platform, aiming to connect institutions and organizations involved in medical devices—such as R&D, manufacturing, logistics, and hospitals—into a unified network to foster a thriving community.
+It serves as the frontend for CareAgain's platform, connecting institutions and organizations involved in medical devices—such as R&D, manufacturing, logistics, and hospitals—into a unified network to foster collaboration and innovation.
 
 ## Table of Contents
 
@@ -9,6 +9,7 @@ It serves as the frontend for CareAgain's platform, aiming to connect institutio
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
 - [Development](#development)
+- [Testing](#testing)
 - [Deployment](#deployment)
 - [Contributing](#contributing)
 - [License](#license)
@@ -19,6 +20,7 @@ It serves as the frontend for CareAgain's platform, aiming to connect institutio
 - Predefined components and templates for rapid development.
 - Dockerized setup for consistent development and deployment environments.
 - Integration-ready with backend services and databases.
+- Focused on fostering collaboration in the medical device ecosystem.
 
 ## Project Structure
 
@@ -43,6 +45,9 @@ The project follows the standard Reflex template structure:
 │   │   ├── __init__.py
 │   │   └── template.py
 │   └── webapp.py
+├── tests/
+│   ├── __init__.py
+│   └── test_pages.py
 ├── Dockerfile
 ├── docker-compose.yaml
 ├── requirements.txt
@@ -89,6 +94,17 @@ The project follows the standard Reflex template structure:
 - To add new pages, create a Python file in `webapp/pages/` and define a function with the `@template` decorator.
 - For reusable components, add them to `webapp/components/`.
 - Use `webapp/styles.py` for styling and theming.
+- Add tests in the `tests/` directory to ensure code quality.
+
+## Testing
+
+Run tests using `pytest`:
+
+```bash
+pytest tests/
+```
+
+Ensure all tests pass before submitting changes.
 
 ## Deployment
 
@@ -135,7 +151,7 @@ We welcome contributions from the community. To contribute:
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [APACHE 2.0](LICENSE).
 
 ---
 

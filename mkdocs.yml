@@ -1,0 +1,92 @@
+site_name: Care Again Documentation
+repo_url: https://github.com/careagain-org/careagain-webapp/
+site_url: https://careagain-org.github.io/careagain-webapp/
+site_description: An open-source platform to facilitate access to medical healthware.
+site_author: Care Again
+edit_uri: edit/main/docs/
+repo_name: careagain-org/careagain-webapp/
+copyright: Maintained by <a href="https://www.opencareagain.org/">Open Care Again</a>.
+
+nav:
+  - Overview: index.md
+  - Developers guide: developers.md
+  - Platform Navigation:
+      - Getting Started: tutorials/getting_started.md
+      - Home page: tutorials/home.md
+      - Community page: tutorials/community.md
+      - Projects page: tutorials/projects.md
+      - Profile page: tutorials/profile.md
+  - Contact: contact.md
+  - License: LICENSE.md
+  - Code of Conduct: CODE_OF_CONDUCT.md
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          setup_commands:
+            - import sys
+            - sys.path.append('../')
+theme:
+  name: material
+  feature:
+    tabs: true
+  highlightjs: true
+  features:
+    - content.code.copy
+  hljs_languages:
+    - python
+    - yaml
+    - bash
+    - json
+    - markdown
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/careagain-org/careagain-webapp/
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/company/care-again/
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/8J6Y5v3
+    - icon: fontawesome/brands/youtube
+      link: https://www.youtube.com/@careagain
+    # - icon: fontawesome/classic/globe-solid
+    #   link: https://www.opencareagain.org/
+
+markdown_extensions:
+  - attr_list
+  - pymdownx.snippets
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+  - toc:
+      permalink: true
+
+  - pymdownx.arithmatex:
+      generic: true
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
