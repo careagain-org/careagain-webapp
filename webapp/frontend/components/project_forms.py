@@ -87,16 +87,16 @@ def form_project() -> rx.Component:
                     ),
                     rx.hstack(
                         rx.vstack(
-                            rx.heading("Manual guide (.pdf)",size="3"),
+                            rx.heading("Manual guide url (.pdf)",size="3"),
                             rx.input(placeholder="Enter url link to download",
-                                name= "website",
+                                name= "guide",
                                 width="100%"),
                             width="100%"
                         ),
                         rx.vstack(
-                            rx.heading("Attachment (.zip)",size="3"),
+                            rx.heading("Attachment url (.zip)",size="3"),
                             rx.input(placeholder="Enter url link to download",
-                                name= "repo",
+                                name= "attachment",
                                 width="100%"),
                             width="100%"
                         ),

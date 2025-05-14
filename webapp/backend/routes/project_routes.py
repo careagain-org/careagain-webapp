@@ -29,6 +29,10 @@ async def create_project(input:project_schema.CreateProject,
                                  logo = f"{url_s3_object}projects/{input.project_id}/images/{input.logo}" if input.logo else "",
                                  image = f"{url_s3_object}projects/{input.project_id}/images/{input.image}" if input.image else "",
                                  website = input.website,
+                                 repo = input.repo,
+                                 guide = input.guide,
+                                 attachment = input.attachment,
+                                 status = input.status,
                                  )
     
     db.add(project_obj)

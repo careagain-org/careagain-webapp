@@ -22,7 +22,7 @@ def view_project() -> rx.Component:
         ),
         rx.hstack(
             rx.icon("github"),
-            rx.link(ProjectState.selected_project['repo'])#,href=ProjectState.selected_project['repo'])
+            rx.link(ProjectState.selected_project['repo'],href=ProjectState.selected_project['repo'])
         ),
         rx.divider(width='90%'),
         rx.hstack(
@@ -48,13 +48,24 @@ def view_project() -> rx.Component:
             rx.icon("download"),
             rx.heading("Downloads",size="5"),
         ),
-        rx.button("Download",
-                on_click=rx.download(
-                    url={ProjectState.selected_project['image']},
-                    filename="test",
+        rx.hstack(
+            rx.text("Manual guide (.pdf): "),
+            rx.button("Download",
+                    on_click=rx.download(
+                        url={ProjectState.selected_project['guide']},
+                        filename=f"{ProjectState.selected_project['guide']}_guide",
+                    ),
+                    id="download_button_guide",
                 ),
-                id="download_button",
-            ),
+            rx.text("Attachment - Project files (.zip): "),
+            rx.button("Download",
+                    on_click=rx.download(
+                        url={ProjectState.selected_project['attachment']},
+                        filename=f"{ProjectState.selected_project['guide']}_attachment",
+                    ),
+                    id="download_button_attachment",
+                ),
+        ),
         rx.divider(width='90%'),
         rx.hstack(
             rx.icon("newspaper"),

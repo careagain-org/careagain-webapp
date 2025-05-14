@@ -40,8 +40,8 @@ def edit_project() -> rx.Component:
             editable_text(value = project["website"],key = "website"),
         ),
         rx.hstack(
-            rx.icon("mail"),
-            editable_text(value = project["email"],key = "email"),
+            rx.icon("github"),
+            editable_text(value = project["repo"],key = "repo"),
             # rx.text(projectState.selected_project['email'])
         ),
         rx.divider(width='90%'),
@@ -54,6 +54,23 @@ def edit_project() -> rx.Component:
             ),
             align='start',
             spacing="5",
+        ),
+        rx.divider(width='90%'),
+        rx.hstack(
+            title_section("Downloads","file_text"),
+            id="download_section",
+            width='90%',
+            align="start",
+        ),
+        rx.vstack(
+            title_section("Manual Guide","scroll-text"),
+            editable_textarea(value = project["guide"],key = "guide"),
+            width="60%"
+        ),
+        rx.vstack(
+            title_section("Attachment url","package"),
+            editable_textarea(value = project["attachment"],key = "attachment"),
+            width="60%"
         ),
         rx.divider(width='90%'),
         rx.hstack(

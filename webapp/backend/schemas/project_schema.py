@@ -27,12 +27,15 @@ class CreateProject(BaseModel):
     __tablename__= 'projects'
     project_id: uuid.UUID
     name: str
-    name: str
     type: str
     website: Optional[str]
     description: Optional[str]
     image: Optional[str]
     logo: Optional[str]
+    repo: Optional[str]
+    guide: Optional[str]
+    attachment: Optional[str]
+    status: Optional[str]
     
     class Config:
         from_attributes = True

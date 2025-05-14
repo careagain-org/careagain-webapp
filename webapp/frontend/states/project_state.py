@@ -2,7 +2,7 @@ import reflex as rx
 import httpx
 import requests
 from ..constants import urls
-from typing import List, Dict
+from typing import List, Dict,Any
 from .auth_state import AuthState 
 import logging
 import json 
@@ -15,10 +15,10 @@ class ProjectState(AuthState):
     my_projects: List[Dict[str, str]] = []
     searched_projects: List[Dict[str, str]] = projects
     
-    project_details: Dict[str, str] = {}
-    project_members: List[Dict[str, str]] = []
+    project_details: Dict[str, Any] = {}
+    project_members: List[Dict[str, Any]] = []
     project_id:str=""
-    selected_project: Dict[str, str] = {}
+    selected_project: Dict[str, Any] = {}
     logo: str =None
     image: str = None
     
@@ -145,10 +145,14 @@ class ProjectState(AuthState):
                 "project_id": project_id, 
                 "name": form_data["name"],
                 "type": form_data["type"],
+                "status": form_data["status"],
                 "description": form_data["description"],
                 "logo": f"{self.logo}" if self.logo else "",
                 "image": f"{self.image}" if self.image else "",
                 "website": form_data["website"],
+                "attachment": form_data["attachment"],
+                "guide": form_data["guide"],
+                "repo": form_data["repo"],
             }
 
             headers = {"Authorization": f"Bearer {self.token}"}
