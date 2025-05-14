@@ -8,24 +8,24 @@ The Community section is divided into three main tabs, each designed to help you
    View the community map showing all registered organizations on the platform.
    This feature helps you:
 
-- Discover potential collaborators near you
+   - Discover potential collaborators near you
 
-- Join ongoing projects in your area
+   - Join ongoing projects in your area
 
-- Request support as a hospital
+   - Request support as a hospital
 
-- Connect with local manufacturers and transport providers
+   - Connect with local manufacturers and transport providers
 
 2. **Organizations:**
    Easily search for organizations by name or topic using the search bar—just type your query and press Enter.
 
-Click on any organization to view:
+   Click on any organization to view:
 
-- Detailed information about its activities
+   - Detailed information about its activities
 
-- Potential collaboration opportunities
+   - Potential collaboration opportunities
 
-- Ways to connect with its members (if available)
+   - Ways to connect with its members (if available)
 
 3. **Users:**
    Search for users by name or username using the search bar—type your query and press Enter.
