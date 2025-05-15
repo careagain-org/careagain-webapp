@@ -7,7 +7,6 @@ from sqlalchemy import desc
 #from ..config.db_setup import get_db
 from ..config.supabase_config import get_db
 from ..services import user_functions
-import passlib.hash as hash
 
 question_route = APIRouter(prefix="/api/questions")
 

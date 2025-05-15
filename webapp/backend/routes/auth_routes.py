@@ -7,7 +7,6 @@ from ..models import model
 from sqlalchemy.orm import Session
 from ..config.supabase_config import get_db,supa_client
 from ..services import user_functions
-import passlib.hash as hash
 from pydantic import BaseModel
 from typing import Optional
 from urllib.parse import unquote

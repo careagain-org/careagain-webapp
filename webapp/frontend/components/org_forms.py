@@ -7,7 +7,6 @@ from ..states.project_state import ProjectState
 from ..states.org_state import OrgState
 from .upload import upload_logo_org
 from .map import interactive_map
-import clipboard
 import os
 from ..components.org_card import org_grid_vertical
 

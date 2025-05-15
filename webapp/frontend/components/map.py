@@ -1,4 +1,3 @@
-import plotly.graph_objects as go
 import reflex as rx
 import folium
 from folium import plugins
@@ -8,7 +7,6 @@ from ..constants import urls
 import httpx
 import pandas as pd
 import requests
-import clipboard
 import logging
 from folium import Map, CustomIcon, Html, Element, MacroElement
 from jinja2 import Template
@@ -97,13 +95,6 @@ class MapState(OrgState):
             
         return map_._repr_html_()
     
-    # def inject_code:
-    #     """// Store marker data
-    #         markers.push({ lat: parseFloat(lat), lng: parseFloat(lng) });
-
-    #         // Save updated JSON file
-    #         saveMarkersToJSON();
-    #     }"""
     
     @rx.var
     def interactive_map_html(self)-> str:
@@ -111,9 +102,6 @@ class MapState(OrgState):
         folium.ClickForMarker(popup="<b>Lat:</b> ${lat}<br /><b>Lon:</b> ${lng}").add_to(map_)
         folium.ClickForLatLng(format_str='lat + "," + lng', alert=False).add_to(map_)
         # map_.get_root().html.add_child(textarea)
-        # folium.ClickForMarker(popup="<b>Lat:</b> ${lat}<br /><b>Lon:</b> ${lng}").add_to(map_)
-        # folium.ClickForLatLng(format_str='lat + "," + lng', alert=False).add_to(map_)
-        # self.map_html = map_._repr_html_()
         return map_._repr_html_()
     
     @rx.event
@@ -130,9 +118,6 @@ class MapState(OrgState):
         print(self.map_html)
         # return self.map_html[starting_index:ending_index]
     
-    rx.event
-    def hola(self):
-        print("Hola")
 
 
 def create_map() -> rx.Component:
@@ -148,21 +133,9 @@ def create_map() -> rx.Component:
     )
 
 
-def find_popup_variable_name(html):
-    pattern = "var lat_lng"
-    if html:
-        starting_index = html.find(pattern) + 4
-        tmp_html = html[starting_index:]
-        ending_index = tmp_html.find(" =") + starting_index
-
-        return html[starting_index:ending_index]
-
-
 def interactive_map():
-    # MapState.lat = find_popup_variable_name(MapState.interactive_map_html)
-    # MapState.interactive_map_html
+
     return rx.box(
-            # rx.text(MapState.lat),
             rx.el.iframe(
                 src_doc=MapState.interactive_map_html,
                 class_name="w-full h-full border-none rounded-lg shadow-md",

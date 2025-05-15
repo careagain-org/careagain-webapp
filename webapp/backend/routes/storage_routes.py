@@ -5,8 +5,6 @@ from typing import List
 from ..schemas import user_schema as schema
 # from ..config.db_setup import get_db
 from ..config.supabase_config import get_db,supa_client
-from ..services import user_functions
-import passlib.hash as hash
 from pydantic import BaseModel
 from urllib.parse import unquote
 from urllib.parse import urlparse, parse_qs

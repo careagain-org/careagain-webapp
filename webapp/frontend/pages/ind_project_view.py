@@ -18,11 +18,11 @@ def view_project() -> rx.Component:
         ),
         rx.hstack(
             rx.icon("globe"),
-            rx.link(ProjectState.selected_project['website'],href=ProjectState.selected_project['website'])
+            rx.link(ProjectState.selected_project['website'],href=f"{ProjectState.selected_project['website']}")
         ),
         rx.hstack(
             rx.icon("github"),
-            rx.link(ProjectState.selected_project['repo'],href=ProjectState.selected_project['repo'])
+            rx.link(ProjectState.selected_project['repo'],href=f"{ProjectState.selected_project['repo']}")
         ),
         rx.divider(width='90%'),
         rx.hstack(

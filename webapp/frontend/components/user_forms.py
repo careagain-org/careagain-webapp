@@ -8,7 +8,6 @@ from ..states.user_state import UserState
 from ..states.org_state import OrgState
 from .upload import upload_logo_org
 from .map import interactive_map
-import clipboard
 import os
 from ..components.user_card import user_grid_vertical
 

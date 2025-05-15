@@ -6,7 +6,6 @@ from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from ..config.supabase_config import get_db,supa_client,bucket_s3,url_s3_object
 from ..services import user_functions
-import passlib.hash as hash
 import logging
 
 project_route = APIRouter(prefix="/api/projects")

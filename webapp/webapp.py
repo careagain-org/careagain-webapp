@@ -43,8 +43,41 @@ load_dotenv(find_dotenv())
 #     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 # )
 
+
+## ---------------- RUN BACKEND --------------------------- ##
+
+api_app = FastAPI()
+
+# create table in the database
+model.Base.metadata.create_all(bind=engine)
+model.automap_base()
+
+# add all routes
+api_app.include_router(default)
+api_app.include_router(user_route)
+api_app.include_router(project_route)
+api_app.include_router(video_route)
+api_app.include_router(organization_route)
+api_app.include_router(question_route)
+api_app.include_router(auth_route)
+
+# CORS middleware to allow communication between frontend and backend
+origins = [urls.WEB_URL,
+           urls.API_URL,
+           "http://localhost:8000",
+           "http://localhost:3000"] # specify the http where the api is going to run
+
+api_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Change this in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 ## ---------------- RUN FRONTEND APP ---------------------- ##
 app = rx.App(
+    api_transformer=api_app,
     theme=rx.theme(
         appearance="light", 
         has_background=True, 
@@ -53,33 +86,4 @@ app = rx.App(
         radius="medium", 
         accent_color="teal"
     )
-)
-
-## ---------------- ADD BACKEND --------------------------- ##
-
-# create table in the database
-model.Base.metadata.create_all(bind=engine)
-model.automap_base()
-
-# add all routes
-app.api.include_router(default)
-app.api.include_router(user_route)
-app.api.include_router(project_route)
-app.api.include_router(video_route)
-app.api.include_router(organization_route)
-app.api.include_router(question_route)
-app.api.include_router(auth_route)
-
-# CORS middleware to allow communication between frontend and backend
-origins = [urls.WEB_URL,
-           urls.API_URL,
-           "http://localhost:8000",
-           "http://localhost:3000"] # specify the http where the api is going to run
-
-app.api.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,  # Change this in production
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
 )

@@ -5,7 +5,6 @@ from typing import List, Dict, Any, Optional
 from .auth_state import AuthState
 import uuid
 import datetime as dt
-import clipboard
 import pyperclip
 import json
 import os

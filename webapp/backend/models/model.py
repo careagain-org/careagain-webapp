@@ -3,11 +3,7 @@ from sqlalchemy.orm import mapped_column,relationship
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.ext.hybrid import hybrid_property
 from ..config.supabase_config import Base,engine
-from geopy.geocoders import Nominatim
-import certifi
 import datetime as dt
-import passlib.hash as hash
-import ssl
 import os
 import json
 import uuid

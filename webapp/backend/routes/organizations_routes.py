@@ -7,9 +7,7 @@ from sqlalchemy.orm import Session
 #from ..config.db_setup import get_db
 from ..config.supabase_config import get_db,supa_client,bucket_s3,url_s3_object
 from ..services import user_functions
-import numpy as np
-import datetime as dt
-import uuid
+
 
 organization_route = APIRouter(prefix="/api/orgs")
 

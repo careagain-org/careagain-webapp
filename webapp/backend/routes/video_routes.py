@@ -6,7 +6,6 @@ from sqlalchemy.orm import Session
 # from ..config.db_setup import get_db
 from ..config.supabase_config import get_db
 from ..services import user_functions
-import passlib.hash as hash
 
 video_route = APIRouter(prefix="/api/videos")
 
