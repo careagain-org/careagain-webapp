@@ -4,7 +4,7 @@ from ..constants import urls
 from ..states.org_state import OrgState
 from ..states.auth_state import AuthState
 from typing import Dict
-from ..components.map import interactive_map,map_org
+from ..components.map import map_org
 from ..components.user_card import users_grid_horizontal
 
 

@@ -11,7 +11,7 @@ services:
       - 3000:3000
     dns:
       - 1.1.1.1
-    command: reflex run --env prod --frontend-only
+    command: reflex run --frontend-only
     depends_on:
       - app
   app:
