@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     unzip \
     xclip \
+    xsel \
     && curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION} | bash - \
     && apt-get install -y nodejs \
     && apt-get clean \
