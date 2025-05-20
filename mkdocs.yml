@@ -29,6 +29,13 @@ plugins:
             - sys.path.append('../')
 theme:
   name: material
+  logo: images/logo0.png
+  favicon: images/favicon.ico
+  palette:
+    scheme: default
+    toggle:
+      icon: material/brightness-4
+      name: Switch to dark mode
   feature:
     tabs: true
   highlightjs: true
@@ -44,16 +51,16 @@ theme:
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: white
-      accent: deep orange
+      accent: blue grey
       toggle:
-        icon: material/brightness-7
+        icon: material/weather-night
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: black
-      accent: deep orange
+      accent: blue grey
       toggle:
-        icon: material/brightness-4
+        icon: material/weather-sunny
         name: Switch to light mode
   icon:
     repo: fontawesome/brands/github
@@ -68,8 +75,8 @@ extra:
       link: https://discord.gg/8J6Y5v3
     - icon: fontawesome/brands/youtube
       link: https://www.youtube.com/@careagain
-    # - icon: fontawesome/classic/globe-solid
-    #   link: https://www.opencareagain.org/
+    - icon: fontawesome/solid/globe
+      link: https://www.opencareagain.org/
 
 markdown_extensions:
   - attr_list

@@ -12,7 +12,10 @@ To create your profile, upload content, or download resources, you’ll need to 
 
 To sign up, simply provide your email address and password in the [registration form](https://careagain.org/signup/).
 
-<img src="https://github.com/careagain-org/careagain-webapp/blob/dev/assets/docs/sign_up_form.png">
+<figure>
+  <img src='images/sign_up_form.png' width='70%' />
+  <figcaption>Sign up form</figcaption>
+</figure>
 
 After submitting your information, you'll receive a confirmation email with a link to verify your account.
 Please note that you won’t be able to access the platform until your email is confirmed.
@@ -23,7 +26,10 @@ If you don’t receive the confirmation email, feel free to [contact us](contact
 
 To log in, enter your email address and password on the [login page](https://careagain.org/login/).
 
-<img src="https://github.com/careagain-org/careagain-webapp/blob/dev/assets/docs/log_in_form.png">
+<figure>
+  <img src='images/log_in_form.png' width='70%' />
+  <figcaption>Log in form</figcaption>
+</figure>
 
 Make sure your email is confirmed — you won’t be able to access the platform until it is.
 
