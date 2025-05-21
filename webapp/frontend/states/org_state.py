@@ -247,6 +247,14 @@ class OrgState(AuthState):
                 print(f"Failed to get orgs: {response.status_code}, {response.text}")
         except Exception as e:
             print(f"An error occurred: {e}")
+            
+    async def load_org_page(self):
+        current_page_route = self.router.page.raw_path
+        org_id =current_page_route.split("/")[-2]
+        print(f"org ID: {org_id}")
+        self.org_id = org_id
+        self.selected_org = [d for d in self.orgs if d['org_id']==(org_id)][0]
+
 
 
     def select_org(self,org_id:str):
@@ -257,13 +265,13 @@ class OrgState(AuthState):
     def to_org_view(self,org_id:str):
         self.org_id = org_id
         self.selected_org = [d for d in self.orgs if d['org_id']==org_id][0]
-        return rx.redirect(f"/org_view")
+        return rx.redirect(f"/{urls.IND_ORG_URL}/{org_id}")
     
     
     def to_org_edit(self,org_id:str):
         self.org_id = org_id
         self.selected_org = [d for d in self.orgs if d['org_id']==org_id][0]
-        return rx.redirect(f"/org_edit")
+        return rx.redirect(f"/{urls.IND_EDIT_ORG_URL}/{org_id}")
     
     
     async def update_org(self,key:str,value:str):

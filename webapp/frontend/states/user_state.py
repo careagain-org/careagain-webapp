@@ -47,6 +47,13 @@ class UserState(AuthState):
             print(f"Failed to get user: {response.status_code} ")
 
 
+    async def load_user_page(self):
+        current_page_route = self.router.page.raw_path
+        user_id =current_page_route.split("/")[-2]
+        print(f"User ID: {user_id}")
+        self.selected_user_id = user_id
+        self.selected_user = [d for d in self.users if d['user_id']==(user_id)][0]
+
 
     async def get_my_details(self):
         await self.user_whipeout()
@@ -138,7 +145,7 @@ class UserState(AuthState):
     def to_user_view(self,user_id:str):
         self.selected_user_id = user_id
         self.selected_user = [d for d in self.users if d['user_id']==user_id][0]
-        return rx.redirect(urls.IND_USER_URL)
+        return rx.redirect(f"{urls.IND_USER_URL}/{user_id}")
     
     
     def select_user(self,user_id:str):

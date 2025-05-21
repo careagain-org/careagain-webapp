@@ -118,7 +118,7 @@ def org_card_horizontal(org)-> rx.Component:
                     padding ="0",
                     align="center"
                 ),
-                href=urls.IND_ORG_URL,
+                href=f"{urls.IND_ORG_URL}/{org['org_id']}",
                 on_click=OrgState.to_org_view(org["org_id"]),
                 align="start"
             ),

@@ -28,8 +28,9 @@ def user_card_horizontal(user)-> rx.Component:
                     align="center"
                 ),
                 on_click=[UserState.select_user(user["user_id"]),
-                          rx.redirect(urls.IND_USER_URL)],
-                align="start"
+                          rx.redirect(f"{urls.IND_USER_URL}/{user['user_id']}")],
+                align="start",
+                href=f"{urls.IND_USER_URL}/{user['user_id']}",
             ),
             # as_child=True,
             size="5",

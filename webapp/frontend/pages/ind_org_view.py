@@ -8,10 +8,11 @@ from ..components.map import interactive_map,map_org
 from ..components.user_card import users_grid_horizontal
 
 
-@rx.page(route=urls.IND_ORG_URL,on_load=[OrgState.find_members_org])
+@rx.page(route=f"{urls.IND_ORG_URL}/[or_id]",on_load=[
+                                                    OrgState.find_members_org])
 def view_organization() -> rx.Component:
     my_child = rx.vstack(
-        rx.link(rx.icon('arrow_left'),href=urls.COMMUNITY_PLATFORM),
+        # rx.link(rx.icon('arrow_left'),href=urls.COMMUNITY_PLATFORM),
         rx.hstack(
             rx.heading(OrgState.selected_org['name'], size="9"),
             rx.cond(OrgState.selected_org['verified'],
@@ -21,7 +22,7 @@ def view_organization() -> rx.Component:
         ),
         rx.hstack(
             rx.icon("globe"),
-            rx.link(OrgState.selected_org['website'],href=OrgState.selected_org['website'])
+            rx.link(OrgState.selected_org['website'],href=OrgState.selected_org['website'],is_external=True)
         ),
         rx.hstack(
             rx.icon("mail"),

@@ -10,11 +10,13 @@ from ..components.org_table import table_pagination as orgs_tables
 from ..components.project_table import table_pagination as projects_tables
 
 
-@rx.page(route=urls.IND_USER_URL, on_load=[UserState.get_user_projects,UserState.get_user_orgs])
+@rx.page(route=f"{urls.IND_USER_URL}/[us_id]", on_load=[UserState.load_user_page,
+                                                        UserState.get_user_projects,
+                                                        UserState.get_user_orgs])
 def view_user() -> rx.Component:
     
     my_child = rx.vstack(
-        rx.link(rx.icon('arrow_left'),href=urls.COMMUNITY_PLATFORM),
+        # rx.link(rx.icon('arrow_left'),href=urls.COMMUNITY_PLATFORM),
         rx.hstack(
             rx.image(src=f"{UserState.selected_user['profile_image']}",
                         border_radius="15px 15px 15px 15px",
@@ -30,12 +32,8 @@ def view_user() -> rx.Component:
                 ),
                 rx.hstack(
                     rx.icon("globe"),
-                    rx.link(UserState.selected_user['linkedin'],href="https://www."+UserState.selected_user['web_link'])
+                    # rx.link(f"{UserState.selected_user['linkedin']}",href=f"{UserState.selected_user['web_link']}",is_external=True)
                 ),
-                # rx.hstack(
-                #     rx.icon("mail"),
-                #     # rx.text(UserState.selected_user['email'])
-                # ),
                 rx.divider(width='90%'),
                 rx.vstack(
                     rx.hstack(

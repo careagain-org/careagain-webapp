@@ -98,7 +98,7 @@ def navbar() -> rx.Component:
                         # rx.menu.item("Contact", on_click=nav_state.NavState.to_contact),
                         rx.menu.separator(),
                         rx.menu.item("Platform",  on_click=nav_state.NavState.to_platfom),
-                        rx.menu.item("Documentation", on_click=nav_state.NavState.to_documentation),
+                        rx.menu.item("Documentation", on_click=nav_state.NavState.to_documentation,is_external=True),
                     ),
                     justify="end",
                 ),

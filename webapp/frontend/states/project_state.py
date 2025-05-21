@@ -25,6 +25,13 @@ class ProjectState(AuthState):
     def reset_project(self):
         self.logo =None
         self.image =None
+        
+    async def load_project_page(self):
+        current_page_url = self.router.page.raw_path
+        project_id =current_page_url.split("/")[-2]
+        print(f"project ID: {project_id}")
+        self.project_id = project_id
+        self.selected_project = [d for d in self.projects if d['project_id']==(project_id)][0]
 
 
     async def get_list_projects(self):
@@ -251,7 +258,7 @@ class ProjectState(AuthState):
     def to_project_view(self,project_id:str):
         self.project_id = project_id
         self.selected_project = [d for d in self.projects if d['project_id']==project_id][0]
-        return rx.redirect(urls.IND_PROJECT_URL)
+        return rx.redirect(f"{urls.IND_PROJECT_URL}/{project_id}")
     
     
     def to_project_edit(self,project_id:str):

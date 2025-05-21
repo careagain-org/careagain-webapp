@@ -23,7 +23,8 @@ def title_section(title:str, icon:str):
             ),
     
 
-@rx.page(route=urls.IND_EDIT_PROJECT_URL,on_load=ProjectState.find_members_project)
+@rx.page(route=f"{urls.IND_EDIT_PROJECT_URL}/[pr_id]",on_load=[ProjectState.load_project_page,
+                                                               ProjectState.find_members_project])
 def edit_project() -> rx.Component:
     project=ProjectState.selected_project
     my_child = rx.vstack(

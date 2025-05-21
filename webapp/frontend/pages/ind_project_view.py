@@ -7,10 +7,11 @@ from typing import Dict
 from ..components.user_card import users_grid_horizontal
 
 
-@rx.page(route=urls.IND_PROJECT_URL,on_load=ProjectState.find_members_project)
+@rx.page(route=f"{urls.IND_PROJECT_URL}/[pr_id]",on_load=[ProjectState.load_project_page,
+                                                        ProjectState.find_members_project])
 def view_project() -> rx.Component:
     my_child = rx.vstack(
-        rx.link(rx.icon('arrow_left'),href=urls.PROJECTS_URL),
+        # rx.link(rx.icon('arrow_left'),href=urls.PROJECTS_URL),
         rx.hstack(
             rx.heading(ProjectState.selected_project['name'], size="9"),
             rx.avatar(src=f"{ProjectState.selected_project['logo']}", heigh="50px",justify="end"),
@@ -18,11 +19,11 @@ def view_project() -> rx.Component:
         ),
         rx.hstack(
             rx.icon("globe"),
-            rx.link(ProjectState.selected_project['website'],href=ProjectState.selected_project['website'])
+            rx.link(f"{ProjectState.selected_project['website']}",href=f"{ProjectState.selected_project['website']}",is_external=True)
         ),
         rx.hstack(
             rx.icon("github"),
-            rx.link(ProjectState.selected_project['repo'],href=ProjectState.selected_project['repo'])
+            rx.link(f"{ProjectState.selected_project['repo']}",href=f"{ProjectState.selected_project['repo']}",is_external=True)
         ),
         rx.divider(width='90%'),
         rx.hstack(
