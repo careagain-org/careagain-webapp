@@ -251,11 +251,9 @@ class OrgState(AuthState):
     async def load_org_page(self):
         current_page_route = self.router.page.raw_path
         org_id =current_page_route.split("/")[-2]
-        print(f"org ID: {org_id}")
-        self.org_id = org_id
-        self.selected_org = [d for d in self.orgs if d['org_id']==(org_id)][0]
-
-
+        self.select_org(org_id)
+        await self.find_members_org()
+        
 
     def select_org(self,org_id:str):
         self.org_id = org_id

@@ -29,10 +29,9 @@ class ProjectState(AuthState):
     async def load_project_page(self):
         current_page_url = self.router.page.raw_path
         project_id =current_page_url.split("/")[-2]
-        print(f"project ID: {project_id}")
-        self.project_id = project_id
-        self.selected_project = [d for d in self.projects if d['project_id']==(project_id)][0]
-
+        self.select_project(project_id)
+        self.find_members_project()
+        
 
     async def get_list_projects(self):
 
