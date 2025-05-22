@@ -57,7 +57,8 @@ def run_migrations_offline() -> None:
 
 def include_object(object, name, type_, reflected, compare_to):
     if type_ == "table":
-        return object.schema == "careagain_schema"
+        return object.schema == f"{os.environ.get('SUPABASE_DB_SCHEMA')}"
+
     return True
 
 

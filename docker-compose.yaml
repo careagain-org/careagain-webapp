@@ -11,7 +11,7 @@ services:
       - 3000:3000
     dns:
       - 1.1.1.1
-    command: reflex run --env prod --frontend-only
+    command: reflex run --env prod --frontend-only --loglevel debug
     depends_on:
       - app
   app:
@@ -26,4 +26,4 @@ services:
       - 8000:8000
     dns:
       - 1.1.1.1
-    command: reflex run --frontend-only
+    command: reflex run --env prod --backend-only --loglevel debug
