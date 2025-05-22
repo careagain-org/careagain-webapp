@@ -66,4 +66,4 @@ ENV REFLEX_DB_URL="sqlite:///reflex.db"
 STOPSIGNAL SIGKILL
 
 # Always apply migrations before starting the backend.
-CMD ["sh", "-c", "reflex db makemigrations && reflex db migrate"]
+CMD ["sh", "-c", "reflex db makemigrations && reflex db migrate && reflex run --env prod --backend-only --loglevel debug"]
