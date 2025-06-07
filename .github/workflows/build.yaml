@@ -58,6 +58,8 @@ jobs:
         run: |
           docker buildx build \
             --platform linux/arm64 \
+            -e DISPLAY=$DISPLAY \
+            -v /tmp/.X11-unix:/tmp/.X11-unix \
             -f Dockerfile \
             -t ${{ env.DOCKER_IMAGE }}:latest \
             -t ${{ env.DOCKER_IMAGE }}:${{ github.sha }} \
