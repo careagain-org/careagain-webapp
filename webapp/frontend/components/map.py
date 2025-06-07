@@ -74,7 +74,7 @@ class MapState(OrgState):
                 except Exception as err:
                     print(err)
                     
-        folium.LayerControl(collapsed=False).add_to(map_)
+        folium.LayerControl(collapsed=True).add_to(map_)
         
         return map_._repr_html_()
     
@@ -137,15 +137,12 @@ class MapState(OrgState):
 
 def create_map() -> rx.Component:
     """Create a map component using Folium."""
-    return rx.el.div(
-        rx.el.iframe(
+    return rx.el.iframe(
             src_doc=MapState.folium_map_html,
-            class_name="w-full h-[calc(100vh-200px)] border-none rounded-lg shadow-md",
+            class_name="w-full h-[calc(100vh-200px)]",
             width = "100%",
-        ),
-        class_name="p-1 bg-gray-50 rounded-lg shadow-inner",
-        width = "80%",
-    )
+        )
+
 
 
 def find_popup_variable_name(html):

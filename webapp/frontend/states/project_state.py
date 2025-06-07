@@ -30,7 +30,7 @@ class ProjectState(AuthState):
         current_page_url = self.router.page.raw_path
         project_id =current_page_url.split("/")[-2]
         self.select_project(project_id)
-        self.find_members_project()
+        await self.find_members_project()
         
 
     async def get_list_projects(self):
@@ -263,7 +263,7 @@ class ProjectState(AuthState):
     def to_project_edit(self,project_id:str):
         self.project_id = project_id
         self.selected_project = [d for d in self.projects if d['project_id']==project_id][0]
-        return rx.redirect(urls.IND_EDIT_PROJECT_URL)
+        return rx.redirect(f"{urls.IND_EDIT_PROJECT_URL}/{project_id}")
     
     
     async def user_dettached_project(self,user_id:str):
@@ -334,7 +334,7 @@ class ProjectState(AuthState):
                 )
             
             if response.status_code == 200:
-                self.selected_org = response.json()
+                self.selected_project = response.json()
                 return rx.toast.success(f"{key} updated successfully")
             else:
                 detail = response.json()["detail"]

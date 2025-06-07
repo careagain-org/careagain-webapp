@@ -12,18 +12,32 @@ from ..components.user_card import users_grid_horizontal
 def view_project() -> rx.Component:
     my_child = rx.vstack(
         # rx.link(rx.icon('arrow_left'),href=urls.PROJECTS_URL),
-        rx.hstack(
-            rx.heading(ProjectState.selected_project['name'], size="9"),
-            rx.avatar(src=f"{ProjectState.selected_project['logo']}", heigh="50px",justify="end"),
+        rx.flex(
+            rx.vstack(
+                rx.hstack(
+                    rx.heading(ProjectState.selected_project['name'], size="9"),
+                    rx.cond(ProjectState.selected_project['verified'],
+                        rx.badge("Verified",variant="surface",color_scheme="teal"),
+                        rx.badge("Non-Verified",variant="surface",color_scheme="amber")),
+                    align="center",
+                ),
+                rx.hstack(
+                    rx.icon("globe"),
+                    rx.link(f"{ProjectState.selected_project['website']}",href=f"{ProjectState.selected_project['website']}",is_external=True)
+                ),
+                rx.hstack(
+                    rx.icon("github"),
+                    rx.link(f"{ProjectState.selected_project['repo']}",href=f"{ProjectState.selected_project['repo']}",is_external=True)
+                ),
+                justify="start",
+            ),
+            rx.image(src=f"{ProjectState.selected_project['logo']}", 
+                     border_radius="15px 15px 15px 15px",
+                     height="100px",align="end"),
             justify="between",
-        ),
-        rx.hstack(
-            rx.icon("globe"),
-            rx.link(f"{ProjectState.selected_project['website']}",href=f"{ProjectState.selected_project['website']}",is_external=True)
-        ),
-        rx.hstack(
-            rx.icon("github"),
-            rx.link(f"{ProjectState.selected_project['repo']}",href=f"{ProjectState.selected_project['repo']}",is_external=True)
+            direction="row",
+            align="center",
+            width="90%",
         ),
         rx.divider(width='90%'),
         rx.hstack(

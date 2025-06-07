@@ -14,7 +14,7 @@ def show_user(org,role:str):
             ),),
             rx.table.cell(org["name"]),
             rx.table.cell(org["type"]),
-            rx.table.cell(org["website"]),
+            rx.table.cell(rx.link(f"{org["website"]}",href=f"{org["website"]}",is_external=True)),
             rx.match(org["verified"],
                      (True,rx.table.cell(rx.badge("Verified",variant="surface",color_scheme="teal"))),
                      (False,rx.table.cell(rx.badge("Non-Verified",variant="surface",color_scheme="amber"))),

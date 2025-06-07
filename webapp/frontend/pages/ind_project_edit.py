@@ -47,7 +47,8 @@ def edit_project() -> rx.Component:
         ),
         rx.divider(width='90%'),
         rx.flex(
-            upload_image_project(title="Representative image",my_image=project["logo"]),
+            upload_image_project(title="Logo",my_image=project["logo"]),
+            upload_image_project(title="Representative image",my_image=project["image"]),
             rx.vstack(
                 title_section("Description","file_text"),
                 editable_textarea(value = project["description"],key = "description"),

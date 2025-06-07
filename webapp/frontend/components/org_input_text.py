@@ -3,7 +3,7 @@ import typing as Callable
 from ..states.org_state import OrgState
 
 class OrgEditableText(rx.ComponentState):
-    text: str = "Click to edit"
+    text: str = ""
     original_text: str
     editing: bool = False
     key: str = None

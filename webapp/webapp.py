@@ -73,6 +73,8 @@ app.api.include_router(auth_route)
 # CORS middleware to allow communication between frontend and backend
 origins = [urls.WEB_URL,
            urls.API_URL,
+           "https://www.careagain.org/",
+           "https://www.opencareagain.org/",
            "http://localhost:8000",
            "http://localhost:3000"] # specify the http where the api is going to run
 

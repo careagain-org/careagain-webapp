@@ -3,7 +3,7 @@ import typing as Callable
 from ..states.project_state import ProjectState
 
 class ProjectEditableText(rx.ComponentState):
-    text: str = "Click to edit"
+    text: str = ""
     original_text: str
     editing: bool = False
     key: str = None
