@@ -4,6 +4,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        DISPLAY: ${DISPLAY}
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    tty: true
     image: careagain/careagain-webapp:latest
     env_file:
       - .env
