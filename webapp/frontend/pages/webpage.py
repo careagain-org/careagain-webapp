@@ -262,7 +262,7 @@ def render_menu():
         width="100%",
     )
 
-@rx.page(route=urls.HOME_URL, title = 'Home')
+@rx.page(route=urls.HOME_URL, title = 'Home',on_load=OrgState.get_orgs)
 def home_page() -> rx.Component:
     my_child = rx.box(
     rx.desktop_only(

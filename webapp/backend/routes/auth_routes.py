@@ -88,8 +88,8 @@ def login_with_cookie(form_data: security.OAuth2PasswordRequestForm = Depends())
                 content={"detail": "Login successful"},
                 status_code=200
             )
-            response.set_cookie(key="access_token", value=access_token, httponly=True)
-            response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
+            # response.set_cookie(key="access_token", value=access_token, httponly=True)
+            # response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
             return parsed_data["session"]
 
     except Exception as e:
@@ -161,9 +161,12 @@ def login_without_password(input:AuthCredentials):
 def current_user():
     try:
         response = supa.auth.get_user()
-        data = response.json() 
-        parsed_data = json.loads(data)
-        return {"detail": "User details retrieved", "data": parsed_data}
+        if response:
+            data = response.json() 
+            parsed_data = json.loads(data)
+            return {"detail": "User details retrieved", "data": parsed_data}
+        else:
+            raise HTTPException(status_code=401, detail="No user authorized")
     except Exception as e:
         raise HTTPException(status_code=400, detail=f": {str(e)}")
     

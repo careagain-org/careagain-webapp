@@ -12,6 +12,7 @@ from ..states.user_state import UserState
 from ..states.org_state import OrgState
 from ..states.project_state import ProjectState
 from ..states.auth_state import AuthState
+import logging
 
 editable_text = EditableText.create
 
@@ -120,10 +121,10 @@ def search_existing(text:str):
 
 
 @rx.page(route=urls.PROFILE_URL, on_load= [AuthState.check_session,
-                                           UserState.get_my_details,
                                            OrgState.get_my_orgs,OrgState.get_orgs,
                                            ProjectState.get_list_projects,ProjectState.get_my_projects])
 def profile() -> rx.Component:
+    logging.info(f"Rendering profile page: {AuthState.token}")
     profile = rx.vstack(
                 rx.heading('My profile', size="9"),
                 section_title("book-user",'My User',"Users", f"{urls.COMMUNITY_PLATFORM}/#users"),
