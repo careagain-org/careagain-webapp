@@ -46,11 +46,13 @@ class MapState(OrgState):
         # Only add markers if orgs is a non-empty list
         if orgs:
             for org in orgs:
+                
                 try:
+                    org_pop_up = self.pop_up_template(org)
                     if org["type"] == "Research & Development":
                         folium.Marker(
                             location=[float(org["latitude"]), float(org["longitude"])],
-                            popup=org["name"],
+                            popup=org_pop_up,
                             icon=folium.Icon(color="green",icon="cogs", prefix="fa") #atom
                         ).add_to(g1)
                     elif org["type"] == "Logistics & transport":
@@ -133,6 +135,80 @@ class MapState(OrgState):
     rx.event
     def hola(self):
         print("Hola")
+        
+    def pop_up_template(self, org) -> str:
+        """Create a pop-up template for the organization."""
+        
+        html = """
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>Tarjeta Empresa</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                }}
+                .card {{
+                    display: flex;
+                    align-items: center;
+                    gap: 20px;
+                    border: 1px solid #ccc;
+                    padding: 20px;
+                    max-width: 600px;
+                }}
+                .icon {{
+                    font-size: 60px;
+                }}
+                .content {{
+                    display: flex;
+                    flex-direction: column;
+                }}
+                .title a {{
+                    font-weight: bold;
+                    font-size: 24px;
+                    color: black;
+                    text-decoration: none;
+                }}
+                .title a:hover {{
+                    text-decoration: underline;
+                }}
+                .subtitle {{
+                    font-size: 18px;
+                    margin-top: 5px;
+                }}
+                .link {{
+                    font-size: 16px;
+                    color: #555;
+                    margin-top: 5px;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <div class="icon">
+                    <img src={image} style="width: 60px; height: 60px;">
+                </div>
+                <div class="content">
+                    <div class="title">
+                        <a href={org_link} target="_top">{org_name}</a>
+                    </div>
+                    <div class="subtitle">{description}</div>
+                </div>
+            </div>
+        </body>
+        </html>
+        """.format(
+            image=org["logo"],
+            org_name=org["name"],
+            org_link=f"/{urls.IND_ORG_URL}/{org['org_id']}",
+            description=org["email"],
+            link=org["website"]
+        )
+        return html
+
+
+
 
 
 def create_map() -> rx.Component:
