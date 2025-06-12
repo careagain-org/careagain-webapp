@@ -38,7 +38,7 @@ def filters_panel():
         ),
 
 
-@rx.page(route=urls.COMMUNITY_PLATFORM,on_load=[OrgState.get_location,OrgState.get_orgs])
+@rx.page(route=urls.COMMUNITY_PLATFORM,on_load=[OrgState.get_location,OrgState.get_orgs,UserState.get_users])
 def community_page() -> rx.Component:
     my_child = rx.vstack(
                     rx.hstack(

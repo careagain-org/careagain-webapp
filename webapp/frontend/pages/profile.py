@@ -120,7 +120,8 @@ def search_existing(text:str):
     )
 
 
-@rx.page(route=urls.PROFILE_URL, on_load= [AuthState.check_session,
+@rx.page(route=urls.PROFILE_URL, on_load= [UserState.get_my_details,
+                                            AuthState.check_session,
                                            OrgState.get_my_orgs,OrgState.get_orgs,
                                            ProjectState.get_list_projects,ProjectState.get_my_projects])
 def profile() -> rx.Component:
