@@ -126,7 +126,7 @@ def org_card_horizontal(org)-> rx.Component:
             size="5",
             height='220px',
             width='180px',
-            padding ="5%",
+            padding ="2%",
             align="start",
         ),
         height = 'auto',
@@ -143,7 +143,9 @@ def org_scroll_horizontal(orgs)-> rx.Component:
             rx.foreach(orgs, lambda value, i: 
                         org_card_horizontal(value)),
             rx.text("No orgs available")
-        ),   
+        ),  
+        justify= "start",
+        align="start", 
     ),
         spacing="2",
         flex_wrap="wrap",
