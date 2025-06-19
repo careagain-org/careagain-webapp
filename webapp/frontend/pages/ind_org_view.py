@@ -12,13 +12,20 @@ from ..components.user_card import users_grid_horizontal
 def view_organization() -> rx.Component:
     my_child = rx.vstack(
         # rx.link(rx.icon('arrow_left'),href=urls.COMMUNITY_PLATFORM),
-        rx.hstack(
+        rx.flex(
             rx.heading(OrgState.selected_org['name'], size="9"),
             rx.cond(OrgState.selected_org['verified'],
                     rx.badge("Verified",variant="surface",color_scheme="teal"),
                     rx.badge("Non-Verified",variant="surface",color_scheme="amber")),
+            justify="between",
+            direction="row",
             align="center",
+            width="90%",
+            
         ),
+        rx.cond(OrgState.selected_org['verified'],
+                    rx.badge("Verified",variant="surface",color_scheme="teal"),
+                    rx.badge("Non-Verified",variant="surface",color_scheme="amber")),
         rx.hstack(
             rx.icon("globe"),
             rx.link(OrgState.selected_org['website'],href=OrgState.selected_org['website'],is_external=True)

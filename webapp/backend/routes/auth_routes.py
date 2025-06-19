@@ -88,8 +88,8 @@ def login_with_cookie(form_data: security.OAuth2PasswordRequestForm = Depends())
                 content={"detail": "Login successful"},
                 status_code=200
             )
-            # response.set_cookie(key="access_token", value=access_token, httponly=True)
-            # response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
+            response.set_cookie(key="access_token", value=access_token, httponly=True)
+            response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
             return parsed_data["session"]
 
     except Exception as e:
@@ -143,6 +143,7 @@ def update_password(input:AuthCredentialsToken):
                     })
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Reset password error:{str(e)}")
+    
     
 @auth_route.post("/login_without_password",tags = ['auth'])
 def login_without_password(input:AuthCredentials):

@@ -201,7 +201,7 @@ class MapState(OrgState):
         """.format(
             image=org["logo"],
             org_name=org["name"],
-            org_link=f"/{urls.IND_ORG_URL}/{org['org_id']}",
+            org_link=f"{urls.WEB_URL}/{urls.IND_ORG_URL}/{org['org_id']}",
             description=org["email"],
             link=org["website"]
         )
@@ -238,7 +238,7 @@ def interactive_map():
             # rx.text(MapState.lat),
             rx.el.iframe(
                 src_doc=MapState.interactive_map_html,
-                class_name="w-full h-full border-none rounded-lg shadow-md",
+                # class_name="w-full h-full border-none rounded-lg shadow-md",
                 width = "100%",
                 heigth = "100%",
             ),
@@ -253,11 +253,11 @@ def map_org()-> rx.Component:
     return rx.el.div(
         rx.el.iframe(
             src_doc=MapState.individual_folium_map_html,
-            class_name="w-full h-[calc(40vh-50px)] border-none rounded-lg shadow-md",
+            # class_name="w-full h-[calc(40vh-50px)] border-none rounded-lg shadow-md",
             width = "100%",
             heigth = "100%",
         ),
-        class_name="p-1 bg-gray-50 rounded-lg shadow-inner",
+        # class_name="p-1 bg-gray-50 rounded-lg shadow-inner",
         width = "100%",
     )
 

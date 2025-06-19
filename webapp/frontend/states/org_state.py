@@ -263,6 +263,7 @@ class OrgState(AuthState):
     def to_org_view(self,org_id:str):
         self.org_id = org_id
         self.selected_org = [d for d in self.orgs if d['org_id']==org_id][0]
+        self.load_org_page()
         return rx.redirect(f"/{urls.IND_ORG_URL}/{org_id}")
     
     
