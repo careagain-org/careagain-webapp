@@ -8,6 +8,7 @@ from ..states.project_state import ProjectState
 from ..states.question_state import QuestionState
 from ..states.org_state import OrgState
 from ..states.user_state import UserState
+from ..states.auth_state import AuthState
 
 def section_title(section_icon:str,section_title:str, section_link:str): # type: ignore
     return rx.hstack(
@@ -18,7 +19,7 @@ def section_title(section_icon:str,section_title:str, section_link:str): # type:
         color = "accent",
     )
 
-@rx.page(route=urls.PLATFORM_URL)
+@rx.page(route=urls.PLATFORM_URL,on_load=AuthState.check_session)
 def platform_home() -> rx.Component:
     home = rx.vstack(
                 rx.heading('Most recent', size="5"),
@@ -34,6 +35,6 @@ def platform_home() -> rx.Component:
                 justify="start",
                 # width ="80vw",
                 spacing="2",
-                on_mount=[ProjectState.get_list_projects,UserState.get_users,OrgState.get_orgs]
-    )
+                on_mount=[UserState.get_my_details,
+                        ProjectState.get_list_projects,UserState.get_users,OrgState.get_orgs])
     return platform_base(home)

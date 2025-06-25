@@ -18,10 +18,15 @@ class AuthState(rx.State):
                 secure=True,
             ) 
     
-    @rx.var(cache=True)
+    @rx.var(cache=True,initial_value=False)
     def is_authenticated(self) -> bool:
         """Check if the user is authenticated."""
         return self.token is not None
+    
+    @rx.event
+    def check_auth(self):
+        if not self.is_authenticated:
+            return rx.redirect([rx.redirect(urls.LOGIN_URL),rx.toast.warning(f"Auth error: Not authenticated")])
 
     def set_email(self, value: str):
         self.email = value

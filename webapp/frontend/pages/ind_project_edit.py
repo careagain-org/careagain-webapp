@@ -23,8 +23,7 @@ def title_section(title:str, icon:str):
             ),
     
 
-@rx.page(route=f"{urls.IND_EDIT_PROJECT_URL}/[pr_id]",on_load=[ProjectState.load_project_page,
-                                                               ProjectState.find_members_project])
+@rx.page(route=f"{urls.IND_EDIT_PROJECT_URL}/[pr_id]")
 def edit_project() -> rx.Component:
     project=ProjectState.selected_project
     my_child = rx.vstack(
@@ -90,7 +89,9 @@ def edit_project() -> rx.Component:
             align="start",
             spacing="4",
         ),
-        table_pagination(ProjectState.project_members,"project")
+        table_pagination(ProjectState.project_members,"project"),
+        on_mount=[ProjectState.load_project_page,
+                ProjectState.find_members_project]
     )
 
     return platform_base(my_child)

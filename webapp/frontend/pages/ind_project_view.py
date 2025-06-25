@@ -7,8 +7,7 @@ from typing import Dict
 from ..components.user_card import users_grid_horizontal
 
 
-@rx.page(route=f"{urls.IND_PROJECT_URL}/[pr_id]",on_load=[ProjectState.load_project_page,
-                                                        ProjectState.find_members_project])
+@rx.page(route=f"{urls.IND_PROJECT_URL}/[pr_id]")
 def view_project() -> rx.Component:
     my_child = rx.vstack(
         # rx.link(rx.icon('arrow_left'),href=urls.PROJECTS_URL),
@@ -93,7 +92,8 @@ def view_project() -> rx.Component:
         ),
         users_grid_horizontal(ProjectState.project_members),
         width ="100%",
-        spacing="3"
+        spacing="3",
+        on_mount=[ProjectState.load_project_page, ProjectState.find_members_project]
     )
 
     return platform_base(my_child)
