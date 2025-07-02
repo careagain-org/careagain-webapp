@@ -47,7 +47,6 @@ def platform_base(child: rx.Component ,*args,**kwargs) -> rx.Component:
                 ),
             ),
             render_menu(),
-            on_mount=AuthState.check_auth,
             width="100%",
         )
     return rx.cond(

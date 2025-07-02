@@ -152,6 +152,10 @@ class UserState(AuthState):
         self.selected_user_id = user_id
         self.selected_user = [d for d in self.users if d['user_id']==(user_id)][0]
         
+        
+    def is_user_member(self, org_id: str) -> bool:
+        return any(d['org_id'] == org_id for d in self.user_orgs)
+        
     
     async def search_user(self,form_data):
         if form_data["search"]=="":
@@ -202,4 +206,6 @@ class UserState(AuthState):
                 print(f"Failed to get orgs: {response.status_code}, {response.text}")
         except Exception as e:
             print(f"An error occurred: {e}")
+            
+    
 

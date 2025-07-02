@@ -2,12 +2,16 @@ import reflex as rx
 from .platform_base import platform_base
 from ..constants import urls
 from ..states.project_state import ProjectState
+from ..states.user_state import UserState
 from ..states.auth_state import AuthState
 from typing import Dict
 from ..components.user_card import users_grid_horizontal
 
 
-@rx.page(route=f"{urls.IND_PROJECT_URL}/[pr_id]")
+@rx.page(route=f"{urls.IND_PROJECT_URL}/[pr_id]",on_load=[UserState.get_my_details,
+                                                        ProjectState.load_project_page,
+                                                        ProjectState.find_members_project,
+                                                        ProjectState.get_my_projects])
 def view_project() -> rx.Component:
     my_child = rx.vstack(
         # rx.link(rx.icon('arrow_left'),href=urls.PROJECTS_URL),
@@ -15,9 +19,26 @@ def view_project() -> rx.Component:
             rx.vstack(
                 rx.hstack(
                     rx.heading(ProjectState.selected_project['name'], size="9"),
+                    rx.cond(ProjectState.is_project_member,
+                            rx.button("Unfollow",variant="outline",type="button",
+                                      on_click = lambda: ProjectState.user_unfollow_project(UserState.my_details["user_id"]),
+                                      ),
+                            rx.button("Follow",variant="solid",
+                                on_click = lambda: ProjectState.user_follow_project(UserState.my_details["user_id"]),
+                                type="button"),
+                ),align="center",
+                    padding="5",),
+                rx.hstack(
+                    rx.text("Status: ",color="accent"),
                     rx.cond(ProjectState.selected_project['verified'],
-                        rx.badge("Verified",variant="surface",color_scheme="teal"),
-                        rx.badge("Non-Verified",variant="surface",color_scheme="amber")),
+                            rx.badge("Verified",variant="surface",color_scheme="teal"),
+                            rx.badge("Non-Verified",variant="surface",color_scheme="amber")),
+                    rx.match(ProjectState.selected_project["status"],
+                     ("Regulatory body approval",rx.badge("RB Approved",variant="surface",color_scheme="grass")),
+                     ("Clinically tested",rx.badge("Clinically tested",variant="surface",color_scheme="violet")),
+                     ("Technically tested",rx.badge("Technically tested",variant="surface",color_scheme="cyan")),
+                     ("Prototype",rx.badge("Prototype",variant="surface",color_scheme="bronze")),
+                     rx.badge("Not defined",variant="surface",color_scheme="gray")),
                     align="center",
                 ),
                 rx.hstack(
@@ -93,7 +114,6 @@ def view_project() -> rx.Component:
         users_grid_horizontal(ProjectState.project_members),
         width ="100%",
         spacing="3",
-        on_mount=[ProjectState.load_project_page, ProjectState.find_members_project]
     )
 
     return platform_base(my_child)

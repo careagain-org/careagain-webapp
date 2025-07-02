@@ -26,6 +26,7 @@ def show_project(project,role:str):
                      (True,rx.table.cell(rx.badge("Verified",variant="surface",color_scheme="teal"))),
                      (False,rx.table.cell(rx.badge("Non-Verified",variant="surface",color_scheme="amber"))),
             ),
+            rx.table.cell(project["member_type"]),
             rx.match(role,
                      ("admin", rx.table.cell(rx.hstack(
                             button_view(project["project_id"]),
@@ -62,6 +63,7 @@ def table_pagination(all_projects,my_role="viewer"):
                     rx.table.column_header_cell("Status"),
                     rx.table.column_header_cell("Website"),
                     rx.table.column_header_cell("Verified"),
+                    rx.table.column_header_cell("Role"),
                     rx.table.column_header_cell("Actions"),
                 ),
             ),

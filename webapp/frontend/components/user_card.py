@@ -65,8 +65,9 @@ def users_grid_horizontal(users)-> rx.Component:
     return rx.flex(
         rx.cond(
             users != [],
-            rx.foreach(users, lambda value, i: 
-                        user_card_horizontal(value)),
+            rx.foreach(users, lambda value, i:
+                        rx.cond( value["member_type"] != "follower",
+                        user_card_horizontal(value))),
             rx.text("No projects available")
             ),  
         spacing="2",

@@ -64,13 +64,18 @@ def edit_organization() -> rx.Component:
             update_coordinates_form(),
         ),
         rx.hstack(
-            map_org(),
+            rx.box(
+                map_org(),
+                width="30%",
+                align="start",
+            ),
             rx.vstack(
                 rx.heading("Address",size="3"),
                 editable_textarea(value = org["address"],key = "address"),
             ),
             align="center",
-            justify="center",
+            justify="start",
+            width="100%",
         ),
         rx.divider(width='90%'),
         rx.hstack(
@@ -88,7 +93,9 @@ def edit_organization() -> rx.Component:
             align="start",
             spacing="4",
         ),
-        table_pagination(OrgState.org_members,"organization")
+        table_pagination(OrgState.org_members,"organization"),
+        with_="100%",
+        id="organization-edit",
     )
 
     return platform_base(my_child)

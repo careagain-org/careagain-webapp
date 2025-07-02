@@ -21,6 +21,7 @@ class ProjectState(AuthState):
     selected_project: Dict[str, Any] = {}
     logo: str =None
     image: str = None
+    is_project_member: bool = False
     
     def reset_project(self):
         self.logo =None
@@ -250,6 +251,8 @@ class ProjectState(AuthState):
         
         if response.status_code == 200:
             self.my_projects = response.json()
+            self.is_project_member = any(d['project_id'] == self.selected_project.get("project_id") for d in self.my_projects)
+        
         else:
             print(f"Failed to get projects: {response.status_code}, {response.text}")
             
@@ -265,7 +268,7 @@ class ProjectState(AuthState):
         self.selected_project = [d for d in self.projects if d['project_id']==project_id][0]
         return rx.redirect(f"{urls.IND_EDIT_PROJECT_URL}/{project_id}")
     
-    
+
     async def user_dettached_project(self,user_id:str):
 
         async with httpx.AsyncClient() as client:
@@ -278,9 +281,9 @@ class ProjectState(AuthState):
             await self.find_members_project()
             return rx.toast.success(detail)
         else:
-            return rx.toast.error(f"Failed to dettached project: {response.status_code}, {response.text}")
-        
-        
+            return rx.toast.error(f"Failed to detached project: {response.status_code}, {response.text}")
+
+
     async def user_join_project(self,user_id:str):
 
         async with httpx.AsyncClient() as client:
@@ -309,6 +312,36 @@ class ProjectState(AuthState):
         except Exception as e:
             print(f"An error occurred: {e}")
             
+            
+    async def user_unfollow_project(self,user_id:str):
+
+        async with httpx.AsyncClient() as client:
+            response = await client.put(
+                f"{urls.API_URL}/api/projects/user_unfollow_project?project_id={self.project_id}&user_id={user_id}",
+            )
+        
+        if response.status_code == 200:
+            detail = response.json()["detail"]
+            await self.get_my_projects()
+            self.is_project_member = any(d['project_id'] == self.project_id for d in self.my_projects)
+            return rx.toast.success(detail)
+        else:
+            return rx.toast.error(f"Failed to unfollow project: {response.status_code}, {response.text}")
+    
+    async def user_follow_project(self,user_id:str):
+
+        async with httpx.AsyncClient() as client:
+            response = await client.put(
+                f"{urls.API_URL}/api/projects/user_follow_project?project_id={self.project_id}&user_id={user_id}",
+            )
+        
+        if response.status_code == 200:
+            detail = response.json()["detail"]
+            await self.get_my_projects()
+            self.is_project_member = any(d['project_id'] == self.project_id for d in self.my_projects)
+            return rx.toast.success(detail)
+        else:
+            return rx.toast.error(f"Failed to follow project: {response.status_code}, {response.text}")
     
     async def change_member(self,user_id:str,role:str):
 

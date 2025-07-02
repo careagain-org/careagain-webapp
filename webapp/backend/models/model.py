@@ -95,6 +95,18 @@ class User_Project(Base):
     user_id = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.users.user_id"))
     project_id = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.projects.project_id"))
     member_type = Column(String(255))
+    
+
+class Action(Base):
+    __tablename__= 'actions'
+    __table_args__ = {'schema': supabase_schema}
+    action_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
+    performed_by = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.users.user_id"))
+    received_by = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.projects.project_id"),ForeignKey(f"{supabase_schema}.organizations.org_id"),ForeignKey(f"{supabase_schema}.users.user_id"))
+    action_type = Column(String(255))  
+    receiver_type = Column(String(255))  # 'project', 'organization', 'user'
+    description = Column(Text)
+    action_date = Column(DATE)
 
 
 class Video(Base):

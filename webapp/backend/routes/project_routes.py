@@ -259,6 +259,37 @@ async def update_project(key: str,
 
     return project
 
+@project_route.put("/user_follow_project",tags = ['projects'])
+async def follow_project(project_id:str,
+                       user_id:str,
+                       db:Session=Depends(get_db)):
+    
+    try:
+        rel_obj = model.User_Project(user_id = user_id,
+                                            project_id = project_id,
+                                            member_type = "follower")
+        db.add(rel_obj)
+        db.commit()
+    
+        return {"detail": "You are now following the project"} 
+    except Exception as err:
+        raise HTTPException(status_code=422, detail=str(err))
+    
+
+@project_route.put("/user_unfollow_project",tags = ['projects'])
+async def unfollow_project(project_id:str,
+                       user_id:str,
+                       db:Session=Depends(get_db)):
+    (db.query(model.User_Project).filter(model.User_Project.project_id == project_id,
+                                              model.User_Project.user_id == user_id,
+                                              model.User_Project.member_type == "follower").delete(synchronize_session='fetch'))
+
+    db.commit()
+
+    return {"detail": "Unfollowing project"}
+
+
+
 
 @project_route.put("/change_member_type",tags = ['projects'])
 async def change_member_type(project_id:str,

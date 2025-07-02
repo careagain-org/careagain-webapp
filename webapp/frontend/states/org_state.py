@@ -29,7 +29,9 @@ class OrgState(AuthState):
     logo: str =""
     visible: bool =False
     org_type: str=None
-
+    is_org_member: bool=False
+    
+    
     @rx.event
     def update_location(self):
         try:
@@ -69,7 +71,6 @@ class OrgState(AuthState):
         except Exception as err:
             return rx.toast(err)
     
-
     async def supabase_upload(self,org_id):
         try:
             outfile = rx.get_upload_dir() / self.logo 
@@ -146,6 +147,8 @@ class OrgState(AuthState):
         
         if response.status_code == 200:
             self.my_orgs = response.json()
+            self.is_org_member = any(d['org_id'] == self.selected_org.get("org_id") for d in self.my_orgs)
+        
         else:
             print(f"Failed to get orgs: {response.status_code}, {response.text}")
             
@@ -243,6 +246,8 @@ class OrgState(AuthState):
                 )
             if response.status_code == 200:
                 self.org_members = response.json()
+                self.is_org_member = any(d['org_id'] == self.selected_org.get("org_id") for d in self.my_orgs)
+        
             else:
                 print(f"Failed to get orgs: {response.status_code}, {response.text}")
         except Exception as e:
@@ -263,7 +268,6 @@ class OrgState(AuthState):
     def to_org_view(self,org_id:str):
         self.org_id = org_id
         self.selected_org = [d for d in self.orgs if d['org_id']==org_id][0]
-        self.load_org_page()
         return rx.redirect(f"/{urls.IND_ORG_URL}/{org_id}")
     
     
@@ -326,8 +330,42 @@ class OrgState(AuthState):
             return rx.toast.success(detail)
         else:
             return rx.toast.error(f"Failed to remove user: {response.status_code}, {response.text}")
+      
+        
+    async def user_follow_org(self,user_id:str):
+
+        async with httpx.AsyncClient() as client:
+            response = await client.put(
+                f"{urls.API_URL}/api/orgs/user_follow_org?org_id={self.org_id}&user_id={user_id}",
+            )
+        
+        if response.status_code == 200:
+            detail = response.json()["detail"]
+            await self.get_my_orgs()
+            await self.find_members_org()
+            self.is_org_member = any(d['org_id'] == self.selected_org.get("org_id") for d in self.my_orgs)
+            return rx.toast.success(detail)
+        else:
+            return rx.toast.error(f"Failed to follow org: {response.status_code}, {response.text}")
         
     
+    async def user_unfollow_org(self,user_id:str):
+
+        async with httpx.AsyncClient() as client:
+            response = await client.put(
+                f"{urls.API_URL}/api/orgs/user_unfollow_org?org_id={self.org_id}&user_id={user_id}",
+            )
+        
+        if response.status_code == 200:
+            detail = response.json()["detail"]
+            await self.get_my_orgs()
+            await self.find_members_org()
+            self.is_org_member = any(d['org_id'] == self.selected_org.get("org_id") for d in self.my_orgs)
+            return rx.toast.success(detail)
+        else:
+            return rx.toast.error(f"Failed to unfollow org: {response.status_code}, {response.text}")
+        
+        
     async def change_member(self,user_id:str,role:str):
 
         async with httpx.AsyncClient() as client:

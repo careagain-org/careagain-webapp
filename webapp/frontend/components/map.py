@@ -215,7 +215,7 @@ def create_map() -> rx.Component:
     """Create a map component using Folium."""
     return rx.el.iframe(
             src_doc=MapState.folium_map_html,
-            class_name="w-full h-[calc(100vh-200px)]",
+            class_name="w-full aspect-[4/2]",
             width = "100%",
         )
 
@@ -238,7 +238,7 @@ def interactive_map():
             # rx.text(MapState.lat),
             rx.el.iframe(
                 src_doc=MapState.interactive_map_html,
-                # class_name="w-full h-full border-none rounded-lg shadow-md",
+                class_name="w-full aspect-[5/3] border-none rounded-lg shadow-md",
                 width = "100%",
                 heigth = "100%",
             ),
@@ -253,9 +253,8 @@ def map_org()-> rx.Component:
     return rx.el.div(
         rx.el.iframe(
             src_doc=MapState.individual_folium_map_html,
-            # class_name="w-full h-[calc(40vh-50px)] border-none rounded-lg shadow-md",
+            class_name="w-full aspect-[5/3] border-none rounded-lg shadow-md",
             width = "100%",
-            heigth = "100%",
         ),
         # class_name="p-1 bg-gray-50 rounded-lg shadow-inner",
         width = "100%",

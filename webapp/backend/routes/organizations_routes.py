@@ -254,6 +254,36 @@ async def join_org(org_id:str,
         raise HTTPException(status_code=422, detail="User is already a member of this organization")
     
 
+@organization_route.put("/user_follow_org",tags = ['organizations'])
+async def follow_org(org_id:str,
+                       user_id:str,
+                       db:Session=Depends(get_db)):
+    
+    try:
+        rel_obj = model.User_Organization(user_id = user_id,
+                                            org_id = org_id,
+                                            member_type = "follower")
+        db.add(rel_obj)
+        db.commit()
+    
+        return {"detail": "You are now following the organization"} 
+    except Exception as err:
+        raise HTTPException(status_code=422, detail=str(err))
+    
+
+@organization_route.put("/user_unfollow_org",tags = ['organizations'])
+async def dettach_org(org_id:str,
+                       user_id:str,
+                       db:Session=Depends(get_db)):
+    (db.query(model.User_Organization).filter(model.User_Organization.org_id == org_id,
+                                              model.User_Organization.user_id == user_id,
+                                              model.User_Organization.member_type == "follower").delete(synchronize_session='fetch'))
+
+    db.commit()
+
+    return {"detail": "Unfollowing organization"}
+
+
 @organization_route.put("/user_dettached_org",tags = ['organizations'])
 async def dettach_org(org_id:str,
                        user_id:str,
@@ -263,7 +293,7 @@ async def dettach_org(org_id:str,
 
     db.commit()
 
-    return {"detail": "User removedfrom organization"} 
+    return {"detail": "User removed from organization"}
 
 
 @organization_route.put("/change_member_type",tags = ['organizations'])

@@ -3,23 +3,35 @@ from .platform_base import platform_base
 from ..constants import urls
 from ..states.org_state import OrgState
 from ..states.auth_state import AuthState
+from ..states.user_state import UserState
 from typing import Dict
 from ..components.map import interactive_map,map_org
 from ..components.user_card import users_grid_horizontal
+from ..components.button_follow import FollowButton
 
+orgs_following = []
 
-@rx.page(route=f"{urls.IND_ORG_URL}/[or_id]", on_load=OrgState.load_org_page)
+@rx.page(route=f"{urls.IND_ORG_URL}/[or_id]", on_load=[UserState.get_user_orgs,
+                                                       OrgState.load_org_page,
+                                                        OrgState.find_members_org,
+                                                        OrgState.get_orgs])
 def view_organization() -> rx.Component:
     my_child = rx.vstack(
         # rx.link(rx.icon('arrow_left'),href=urls.COMMUNITY_PLATFORM),
         rx.flex(
             rx.heading(OrgState.selected_org['name'], size="9"),
-            rx.cond(OrgState.selected_org['verified'],
-                    rx.badge("Verified",variant="surface",color_scheme="teal"),
-                    rx.badge("Non-Verified",variant="surface",color_scheme="amber")),
-            justify="between",
+            rx.cond(OrgState.is_org_member,
+                        rx.button("Unfollow",variant="outline",type="button",
+                                  on_click = lambda: OrgState.user_unfollow_org(UserState.my_details["user_id"]),
+                                  ),
+                        rx.button("Follow",variant="solid",
+                            on_click = lambda: OrgState.user_follow_org(UserState.my_details["user_id"]),
+                            type="button"),
+                        ),
+            justify="start",
             direction="row",
             align="center",
+            spacing="5",
             width="90%",
             
         ),
@@ -61,7 +73,8 @@ def view_organization() -> rx.Component:
         rx.hstack(
             rx.box(
                 map_org(),
-                width="30%"
+                width="30%",
+                min_height="200px",
             ),
             rx.vstack(
                 rx.heading("Address",size="3"),
@@ -78,8 +91,9 @@ def view_organization() -> rx.Component:
             rx.icon("circle-user-round"),
             rx.heading("Members",size="5"),
         ),
-        users_grid_horizontal(OrgState.org_members)
-        
+        users_grid_horizontal(OrgState.org_members),
+        width="100%",
+        align="start",
     )
 
     return platform_base(my_child)
