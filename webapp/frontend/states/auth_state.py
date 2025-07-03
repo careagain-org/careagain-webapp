@@ -7,6 +7,7 @@ import threading
 from urllib.parse import urlparse, parse_qs
 import json
 import asyncio
+import jwt
 # from ..states.user_state import UserState
 
 class AuthState(rx.State):
@@ -65,6 +66,7 @@ class AuthState(rx.State):
                     # lambda: UserState.get_token(self.token)
                     return [rx.redirect(urls.PLATFORM_URL),rx.toast.success(f'Successfully sign in!')]    
                 else:
+                    self.token=None
                     return rx.toast.error("No access token in response")
             else:
                 response_detail = response.json().get("detail")
@@ -198,11 +200,11 @@ class AuthState(rx.State):
                     self.is_authenticated = True
             else:
                 response_detail = response.json().get("detail")
-                self.is_authenticated = False
+                self.token = None
                 return [rx.redirect(urls.LOGIN_URL),rx.toast.warning(f"Auth error {response_detail}")]
         
         except Exception as err:
-            self.is_authenticated = False
+            self.token = None
             return rx.toast.warning(err)
         
 

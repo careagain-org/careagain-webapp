@@ -3,6 +3,7 @@ import httpx
 from ..constants import urls
 from typing import List, Dict, Any
 from .auth_state import AuthState
+from gotrue.errors import AuthApiError
 
 token=AuthState.token
 
@@ -58,17 +59,22 @@ class UserState(AuthState):
     async def get_my_details(self):
         await self.user_whipeout()
         async with httpx.AsyncClient() as client:
-            response = await client.get(
-                f"{urls.API_URL}/api/users/me",
-                headers={"Authorization": f"Bearer {self.token}"}
-            )
-        
-        if response.status_code == 200:
-            self.my_details = response.json()
+            try:
+                response = await client.get(
+                    f"{urls.API_URL}/api/users/me",
+                    headers={"Authorization": f"Bearer {self.token}"}
+                )
+            
+                if response.status_code == 200:
+                    self.my_details = response.json()
 
-            print(f"Successfull get user")
-        else:
-            print(f"Failed to get user: {response.status_code} ")
+                    print(f"Successfull get user")
+                else:
+                    self.token=None  # Clear the invalid token
+                    print(f"Failed to get user: {response.status_code} ")
+            except Exception as e:
+                self.token = None  # Clear the invalid token
+                print(f"Failed to get user: {e}")
 
 
     async def update_user(self,key:str,value:str):
@@ -85,7 +91,8 @@ class UserState(AuthState):
             else:
                 detail = response.json()["detail"]
                 return rx.toast(f"User update error: {detail}")
-        except:
+        except AuthApiError as e:
+            self.token = None
             return rx.toast("Unexpected error")
         
         
@@ -155,7 +162,8 @@ class UserState(AuthState):
         
     def is_user_member(self, org_id: str) -> bool:
         return any(d['org_id'] == org_id for d in self.user_orgs)
-        
+    
+    
     
     async def search_user(self,form_data):
         if form_data["search"]=="":
