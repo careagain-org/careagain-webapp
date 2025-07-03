@@ -54,6 +54,24 @@ jobs:
           REFLEX_BACKEND_PORT=${{ secrets.REFLEX_BACKEND_PORT }}
           EOF
 
+      # --- THIS IS THE CRUCIAL PART FOR Xvfb ---
+      - name: Install Xvfb and x11-utils (for xclip)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb x11-utils # x11-utils includes xclip
+
+      - name: Start Xvfb (Virtual Display)
+        run: |
+          # Start Xvfb on display :99
+          Xvfb :99 -screen 0 1280x1024x24 &
+          # Export the DISPLAY variable for subsequent steps
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+          # Allow any client to connect to the Xvfb display
+          xhost +
+        # Ensure DISPLAY is available for subsequent steps
+        env:
+          DISPLAY: :99
+
       - name: Build and push Docker image for linux/arm64
         run: |
           docker buildx build \
