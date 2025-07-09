@@ -1,5 +1,5 @@
 import reflex as rx 
-from .platform_base import platform_base
+from ..layout import platform_layout
 from ..constants import urls
 from ..states.user_state import UserState
 from ..states.auth_state import AuthState
@@ -70,4 +70,4 @@ def view_user() -> rx.Component:
             spacing="7",
         )
     )
-    return platform_base(my_child)
+    return platform_layout(my_child)

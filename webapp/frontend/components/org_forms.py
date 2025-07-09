@@ -69,15 +69,21 @@ def form_org() -> rx.Component:
                     rx.hstack(
                             upload_logo_org(title="Logo",my_image=rx.get_upload_url(OrgState.logo)),
                             rx.vstack(
-                                rx.hstack(rx.heading("Locate in the map",color="grey",size="3"),
-                                        rx.text(value=OrgState.longitude,name="location")),
+                                rx.hstack(rx.heading("Locate in the map",color="grey",size="3")),
                                 interactive_map(),
-                                rx.text("** one click to add a new pin, double-click to remove it",size="1"),
                                 rx.flex(
-                                    rx.text("Visibility in the community map"),
-                                    rx.switch(id="visibility",on_change=OrgState.update_location),
+                                    rx.heading("Lat:",size="3"),
+                                    rx.input(placeholder="",
+                                        name="latitude",width="100%"),
+                                    rx.heading("Lon:",size="3"),
+                                    rx.input(placeholder="",
+                                        name="longitude",width="100%"),
+                                    width="100%",
+                                    # rx.text("Visibility in the community map"),
+                                    # rx.switch(id="visibility",on_change=OrgState.update_location),
                                     spacing="5",
                                     ),
+                                rx.text("**Please, add latitude and longitude information, we are working to automate this step",size="1"),
                                 ),
                             ),
                     rx.heading("Address",size="3"),
@@ -176,31 +182,54 @@ def update_coordinates_form():
     return rx.dialog.root(
         rx.dialog.trigger(rx.button("Update coordenates")),
         rx.dialog.content(
-            rx.dialog.title("Update location"),
-            interactive_map(),
-            rx.text("** one click to add a new pin, double-click to remove it",size="1"),
-            rx.flex(
-                rx.dialog.close(
-                    rx.button(
-                        "Cancel",
-                        color_scheme="gray",
-                        variant="soft",
-                        justify="start",),
+            rx.form(
+                rx.dialog.title("Update location"),
+                interactive_map(),
+                rx.spacer(size="5"),
+                rx.container(
+                    rx.flex(
+                        rx.heading("Latitude:",size="3"),
+                        rx.input(placeholder="",
+                            name="latitude",width="100%"),
+                        rx.heading("Longitude:",size="3"),
+                        rx.input(placeholder="",
+                            name="longitude",width="100%"),
+                        width="100%",
+                        # rx.text("Visibility in the community map"),
+                        # rx.switch(id="visibility",on_change=OrgState.update_location),
+                        spacing="5",
+                        ),
+                    rx.text("* Please, add latitude and longitude information, we are working to automate this step",size="1"),
+                    rx.text("** one click to add a new pin, double-click to remove it",size="1"),
                 ),
-                rx.dialog.close(
-                    rx.button("Save",
-                        type ="submit",
-                        justify="end",
-                        color_scheme="teal",
-                        on_click=OrgState.update_coordinates),
+                rx.flex(
+                    rx.dialog.close(
+                        rx.button(
+                            "Cancel",
+                            color_scheme="gray",
+                            variant="soft",
+                            justify="start",
+                            type ="button",),
+                    ),
+                    rx.dialog.close(
+                        rx.button("Save",
+                            type ="submit",
+                            justify="end",
+                            color_scheme="teal"),
+                    ),
+                    
+                    spacing="5",
+                    margin_top="16px",
+                    justify="end",
+                    width="100%",
+                    min_height="100px",
                 ),
-                spacing="3",
-                margin_top="16px",
-                justify="end",
-                width="100%",
-                min_height="100px",
+                spacing="5",
+                align="center",
+                on_submit=OrgState.update_coordinates,
+                reset_on_submit=True,
             ),
-        ),
+        )
     ),
 
 # class OrganizationForm(rx.ComponentState):

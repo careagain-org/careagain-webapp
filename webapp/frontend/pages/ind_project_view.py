@@ -1,5 +1,5 @@
 import reflex as rx 
-from .platform_base import platform_base
+from ..layout import platform_layout
 from ..constants import urls
 from ..states.project_state import ProjectState
 from ..states.user_state import UserState
@@ -116,4 +116,4 @@ def view_project() -> rx.Component:
         spacing="3",
     )
 
-    return platform_base(my_child)
+    return platform_layout(my_child)

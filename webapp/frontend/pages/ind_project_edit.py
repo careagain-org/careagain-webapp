@@ -1,5 +1,5 @@
 import reflex as rx 
-from .platform_base import platform_base
+from ..layout import platform_layout
 from ..constants import urls
 from ..states.project_state import ProjectState
 from ..states.auth_state import AuthState
@@ -94,4 +94,4 @@ def edit_project() -> rx.Component:
                 ProjectState.find_members_project]
     )
 
-    return platform_base(my_child)
+    return platform_layout(my_child)

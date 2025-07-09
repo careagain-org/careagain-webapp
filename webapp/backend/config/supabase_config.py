@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker,Session
 from sqlalchemy.ext.declarative import declarative_base
 import os
-from supabase import create_client, Client
+from supabase import create_client, Client, ClientOptions
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -17,6 +17,13 @@ url_s3_object: str = f"{os.environ.get("SUPABASE_URL")}storage/v1/object/public/
 key: str = os.environ.get("SUPABASE_ANON_KEY")
 schema: str = os.environ.get("SUPABASE_DB_SCHEMA")
 supa_client: Client = create_client(url, key)
+
+async def get_supabase_client(token: str) -> Client:
+    """Get a Supabase client with the current session storage."""
+    client = create_client(
+        url, key, ClientOptions(storage=token)
+    )
+    return client
 
 # Connect to supabase DB using sqlalchemy
 uri_db: str = os.environ.get("SUPABASE_DB_URI")

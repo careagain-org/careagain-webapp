@@ -1,5 +1,5 @@
 import reflex as rx
-from .platform_base import platform_base
+from ..layout import platform_layout
 from ..constants import urls
 from ..components.project_card import project_scroll_horizontal
 from ..components.user_card import users_scroll_horizontal
@@ -19,8 +19,7 @@ def section_title(section_icon:str,section_title:str, section_link:str): # type:
         color = "accent",
     )
 
-@rx.page(route=urls.PLATFORM_URL, on_load=[UserState.get_my_details,
-                        ProjectState.get_list_projects,UserState.get_users,OrgState.get_orgs])
+@rx.page(route=urls.PLATFORM_URL, on_load=[UserState.get_my_details,ProjectState.get_list_projects,UserState.get_users,OrgState.get_orgs])
 def platform_home() -> rx.Component:
     home = rx.vstack(
                 rx.heading('Most recent', size="5"),
@@ -37,4 +36,4 @@ def platform_home() -> rx.Component:
                 # width ="80vw",
                 spacing="2",
                 )
-    return platform_base(home)
+    return platform_layout(home)

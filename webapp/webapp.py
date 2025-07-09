@@ -4,13 +4,16 @@
 import reflex as rx
 from webapp.frontend.pages import (ind_org_view, ind_org_edit, 
                                    ind_project_view, ind_project_edit, 
-                                   ind_user_view,
-                                   webpage,login, projects, signup,
+                                   ind_user_view,login,signup,
+                                   webpage, projects, 
                                    platform, projects, profile,
                                    videos,community, questions,
                                    reset_password) #contact,community,
 from webapp.frontend.constants import urls
 from rxconfig import config
+
+#clerk sdk
+from clerk_backend_api import Clerk
 
 # backend imports
 # import fastAPI modules
@@ -25,6 +28,7 @@ from webapp.backend.routes.video_routes import video_route
 from webapp.backend.routes.organizations_routes import organization_route
 from webapp.backend.routes.question_routes import question_route
 from webapp.backend.routes.auth_routes import auth_route
+from webapp.backend.routes.clerk_routes import clerk_route
 
 # import model and db
 from webapp.backend.models import model
@@ -43,7 +47,6 @@ load_dotenv(find_dotenv())
 #     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 # )
 
-
 ## ---------------- ADD BACKEND --------------------------- ##
 api_app = FastAPI()
 
@@ -59,6 +62,7 @@ api_app.include_router(video_route)
 api_app.include_router(organization_route)
 api_app.include_router(question_route)
 api_app.include_router(auth_route)
+api_app.include_router(clerk_route)
 
 # CORS middleware to allow communication between frontend and backend
 origins = [urls.WEB_URL,

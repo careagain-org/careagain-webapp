@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     unzip \
     xclip \
-    xsel \
+    libxkbcommon-x11-0 \
+    libgl1-mesa-glx \
     && curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION} | bash - \
     && apt-get install -y nodejs \
     && apt-get clean \
