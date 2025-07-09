@@ -24,7 +24,7 @@ class User(Base):
     __tablename__='users'
     __table_args__ = {'schema': supabase_schema}
 
-    user_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
+    user_id = Column(String(255),primary_key=True,index=True)
     username = Column(String(255),unique=True)
     first_name = Column(String(255))
     last_name = Column(String(255))
@@ -42,7 +42,7 @@ class User(Base):
 class Organization(Base):
     __tablename__='organizations'
     __table_args__ = {'schema': supabase_schema}
-    org_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
+    org_id = Column(String(255),primary_key=True,index=True,default=uuid.uuid4)
     name = Column(String(255))
     type = Column(String(255))
     description = Column(Text)
@@ -64,7 +64,7 @@ class User_Organization(Base):
     __table_args__ = {'schema': supabase_schema}
 
     rel_uo_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.users.user_id"))
+    user_id = Column(String(255),ForeignKey(f"{supabase_schema}.users.user_id"))
     org_id = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.organizations.org_id"))
     member_type = Column(String(255))
 
@@ -92,54 +92,54 @@ class User_Project(Base):
     __tablename__= 'users_projects'
     __table_args__ = {'schema': supabase_schema}
     rel_up_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.users.user_id"))
+    user_id = Column(String(255),ForeignKey(f"{supabase_schema}.users.user_id"))
     project_id = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.projects.project_id"))
     member_type = Column(String(255))
     
 
-class Action(Base):
-    __tablename__= 'actions'
-    __table_args__ = {'schema': supabase_schema}
-    action_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
-    performed_by = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.users.user_id"))
-    received_by = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.projects.project_id"),ForeignKey(f"{supabase_schema}.organizations.org_id"),ForeignKey(f"{supabase_schema}.users.user_id"))
-    action_type = Column(String(255))  
-    receiver_type = Column(String(255))  # 'project', 'organization', 'user'
-    description = Column(Text)
-    action_date = Column(DATE)
+# class Action(Base):
+#     __tablename__= 'actions'
+#     __table_args__ = {'schema': supabase_schema}
+#     action_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
+#     performed_by = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.users.user_id"))
+#     received_by = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.projects.project_id"),ForeignKey(f"{supabase_schema}.organizations.org_id"),ForeignKey(f"{supabase_schema}.users.user_id"))
+#     action_type = Column(String(255))  
+#     receiver_type = Column(String(255))  # 'project', 'organization', 'user'
+#     description = Column(Text)
+#     action_date = Column(DATE)
 
 
-class Video(Base):
-    __tablename__= 'videos'
-    __table_args__ = {'schema': supabase_schema}
-    video_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
-    name = Column(String(100))
-    description = Column(String(255))
-    youtube_link = Column(String(255))
-    created_by = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.users.user_id"))
-    deleted = Column(Boolean,default=False)
+# class Video(Base):
+#     __tablename__= 'videos'
+#     __table_args__ = {'schema': supabase_schema}
+#     video_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
+#     name = Column(String(100))
+#     description = Column(String(255))
+#     youtube_link = Column(String(255))
+#     created_by = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.users.user_id"))
+#     deleted = Column(Boolean,default=False)
 
 
-class Question(Base):
-    __tablename__= 'questions'
-    __table_args__ = {'schema': supabase_schema}
-    question_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
-    title = Column(String(255))
-    question = Column(String(255))
-    comments = Column(JSON)
-    created_by = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.users.user_id"))
-    deleted = Column(Boolean,default=False)
-    # file_link = Column(String(255))
+# class Question(Base):
+#     __tablename__= 'questions'
+#     __table_args__ = {'schema': supabase_schema}
+#     question_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
+#     title = Column(String(255))
+#     question = Column(String(255))
+#     comments = Column(JSON)
+#     created_by = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.users.user_id"))
+#     deleted = Column(Boolean,default=False)
+#     # file_link = Column(String(255))
 
-    @hybrid_property
-    def comments(self):
-        if self._comments:
-            return json.loads(self._comments)
-        return {}
+#     @hybrid_property
+#     def comments(self):
+#         if self._comments:
+#             return json.loads(self._comments)
+#         return {}
 
-    @comments.setter
-    def comments(self, value):
-        self._comments = json.dumps(value)
+#     @comments.setter
+#     def comments(self, value):
+#         self._comments = json.dumps(value)
 
 
 

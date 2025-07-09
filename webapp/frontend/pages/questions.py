@@ -1,5 +1,5 @@
 import reflex as rx 
-from .platform_base import platform_base
+from ..layout import platform_layout
 from ..constants import urls
 from ..components.question_card import question_grid_vertical
 from ..components.forms_popover import add_new_popover
@@ -23,5 +23,5 @@ def platform_questions() -> rx.Component:
         justify="start",
         width ="100%"
     )
-    return platform_base(my_child)
+    return platform_layout(my_child)
     

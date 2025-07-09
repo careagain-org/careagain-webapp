@@ -24,11 +24,7 @@ class OrgState(AuthState):
     
     org_members:List[Dict[str, Any]] = []
     org_id:str=""
-    latitude: float =None
-    longitude: float =None
     logo: str =""
-    visible: bool =False
-    org_type: str=None
     is_org_member: bool=False
     
     
@@ -36,18 +32,10 @@ class OrgState(AuthState):
     def update_location(self):
         try:
             self.visible = True
-            self.latitude = float(pyperclip.paste().split(",")[0])
-            self.longitude = float(pyperclip.paste().split(",")[-1])
+            # self.latitude = float(pyperclip.paste().split(",")[0])
+            # self.longitude = float(pyperclip.paste().split(",")[-1])
         except Exception as err:
             return rx.toast(err)
-
-    def reset_org(self):
-        self.org_id=None
-        self.latitude=None
-        self.longitude=None
-        self.logo =""
-        self.visible=False
-        self.org_type=False
 
         
     @rx.event
@@ -109,13 +97,13 @@ class OrgState(AuthState):
                 "name": form_data["name"],
                 "type": form_data["type"],
                 "description": form_data["description"],
-                "latitude": self.latitude,
-                "longitude": self.longitude,
+                "latitude": form_data["latitude"],
+                "longitude": form_data["longitude"],
                 "address": form_data["address"],
                 "logo": f"{self.logo}" if self.logo else "",
                 "website": form_data["website"],
                 "email":form_data["email"],
-                "visible": self.visible
+                "visible": True
             }
 
             headers = {"Authorization": f"Bearer {self.token}"}
@@ -126,7 +114,6 @@ class OrgState(AuthState):
 
             if response.status_code == 200:
                 self.org_details = response.json()["org_details"]
-                self.reset_org()
                 await self.get_my_orgs()
                 await self.get_orgs()
                 return rx.toast("New organization uploaded")
@@ -287,6 +274,7 @@ class OrgState(AuthState):
             
             if response.status_code == 200:
                 self.selected_org = response.json()
+                await self.get_orgs()
                 return rx.toast.success(f"{key} updated successfully")
             else:
                 detail = response.json()["detail"]
@@ -294,12 +282,20 @@ class OrgState(AuthState):
         except:
             return rx.toast("Unexpected error")
     
-    async def update_coordinates(self):
-        lat = float(pyperclip.paste().split(",")[0])
-        lon = float(pyperclip.paste().split(",")[-1])
+    async def update_coordinates(self,form_data: dict):
+
+        #[lat, lon] = await self.get_coordinates_from_map()
+        lat = form_data["latitude"]
+        lon = form_data["longitude"]
         
         await self.update_org(key="latitude",value=lat)
         await self.update_org(key="longitude",value=lon)
+    
+    async def get_coordinates_from_map(self):
+        lat = float(pyperclip.paste().split(",")[0])
+        lon = float(pyperclip.paste().split(",")[-1])
+        return lat, lon
+        
         
         
     async def user_join_org(self,user_id:str):

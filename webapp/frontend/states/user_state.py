@@ -1,13 +1,24 @@
 import reflex as rx
+import reflex_clerk_api as reclerk
+import clerk_backend_api as Clerk
 import httpx
+import http
+import urllib
 from ..constants import urls
-from typing import List, Dict, Any
 from .auth_state import AuthState
+from typing import List, Dict, Any, Optional
 from gotrue.errors import AuthApiError
+from starlette.requests import Request
+import os
+import dotenv
+import requests
 
-token=AuthState.token
+dotenv.load_dotenv()
 
-class UserState(AuthState):
+# clerk_sdk = Clerk(bearer_auth=os.getenv("CLERK_SECRET_KEY"))
+
+
+class UserState(rx.State):
     image_path: str 
     my_details: Dict[str, Any] = {}
     
@@ -19,6 +30,20 @@ class UserState(AuthState):
     
     user_projects: List[Dict[str, str]]=[]
     user_orgs: List[Dict[str, str]]=[]
+    
+    token:Optional[str]=rx.Cookie(
+                name="__session",
+            ) 
+    
+    # @rx.var
+    # def token(self)->str:
+    #     cookie_token=rx.Cookie(
+    #             name="__session",
+    #             path="/",
+    #             same_site="lax",
+    #             secure=True,
+    #         ) 
+    #     return cookie_token
     
     async def user_whipeout(self):
         self.image_path: str =""
@@ -33,20 +58,6 @@ class UserState(AuthState):
         self.user_projects: List[Dict[str, str]]=[]
         self.user_orgs: List[Dict[str, str]]=[]
 
-    async def get_image_path(self):
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
-                f"{urls.API_URL}/api/users/my_foto",
-                headers={"Authorization": f"Bearer {self.token}"}
-            )
-        
-        if response.status_code == 200:
-            self.image_path = response.json()
-
-            print(f"Successfull get user")
-        else:
-            print(f"Failed to get user: {response.status_code} ")
-
 
     async def load_user_page(self):
         current_page_route = self.router.page.raw_path
@@ -54,10 +65,9 @@ class UserState(AuthState):
         print(f"User ID: {user_id}")
         self.selected_user_id = user_id
         self.selected_user = [d for d in self.users if d['user_id']==(user_id)][0]
-
+    
 
     async def get_my_details(self):
-        await self.user_whipeout()
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.get(
@@ -67,13 +77,10 @@ class UserState(AuthState):
             
                 if response.status_code == 200:
                     self.my_details = response.json()
-
                     print(f"Successfull get user")
                 else:
-                    self.token=None  # Clear the invalid token
                     print(f"Failed to get user: {response.status_code} ")
             except Exception as e:
-                self.token = None  # Clear the invalid token
                 print(f"Failed to get user: {e}")
 
 
@@ -118,11 +125,13 @@ class UserState(AuthState):
                     files = {"file": ("image.jpg", image_file, "image/jpeg")}
                     data = {"description": "This is a sample image."}
                     headers = {"Authorization": f"Bearer {self.token}"}
+                    clerk_state = await self.get_state(reclerk.ClerkState)
 
                     # Send the POST request
                     async with httpx.AsyncClient() as client:
-                        response = await client.post(f"{urls.API_URL}/api/users/upload_image", 
-                                                    files=files, data=data, headers=headers)
+                        response = await client.post(f"{urls.API_URL}/api/users/upload_image?user_id={str(clerk_state.user_id)}", 
+                                                    files=files, data=data)
+                                                    # , headers=headers)
 
                     if response.status_code == 200:
                         self.my_details = response.json()["user_details"]

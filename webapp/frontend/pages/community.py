@@ -1,6 +1,6 @@
 import reflex as rx 
-
-from .platform_base import platform_base
+import reflex_clerk_api as reclerk
+from ..layout import platform_layout
 from ..constants import urls
 from ..components.map import create_map
 from ..components.org_table import table_pagination
@@ -44,9 +44,17 @@ def community_page() -> rx.Component:
                     rx.hstack(
                         rx.heading('Community', size="9"),
                         add_new_popover("organization"),
-                        rx.tooltip(
-                            rx.icon_button("file-cog",size="3",on_click=rx.redirect(urls.PROFILE_ORG_URL)),
-                            content="Manage your organizations.",
+                        rx.fragment(
+                            reclerk.signed_in(
+                                rx.tooltip(
+                                rx.icon_button("file-cog",size="3",on_click=rx.redirect(urls.PROFILE_PROJECT_URL)),
+                                content="Manage your projects.",
+                            ),),
+                            reclerk.signed_out(
+                                rx.tooltip(
+                                rx.icon_button("file-cog",size="3",on_click=rx.redirect(urls.LOGIN_URL)),
+                                content="Log in to Manage your projects.",)
+                            )
                         ),
                         align="end",
                         spacing="5"
@@ -100,4 +108,4 @@ def community_page() -> rx.Component:
                     align="start",
                     id='community_page',
                 )
-    return platform_base(my_child)
+    return platform_layout(my_child)

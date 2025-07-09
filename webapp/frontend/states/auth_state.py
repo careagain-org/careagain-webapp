@@ -8,26 +8,31 @@ from urllib.parse import urlparse, parse_qs
 import json
 import asyncio
 import jwt
+import http.cookiejar
+import urllib
 # from ..states.user_state import UserState
 
 class AuthState(rx.State):
     email: str = ""
     password: str = ""
-    token: Optional[str] = rx.Cookie(
-                name="token",
+    token: str = rx.Cookie(
+                name="__session",
                 # same_site="strict",
                 secure=True,
             ) 
+    
+    def print_cookie(self):
+        print(self.token)
     
     @rx.var(cache=True,initial_value=False)
     def is_authenticated(self) -> bool:
         """Check if the user is authenticated."""
         return self.token is not None
     
-    @rx.event
-    def check_auth(self):
-        if not self.is_authenticated:
-            return rx.redirect([rx.redirect(urls.LOGIN_URL),rx.toast.warning(f"Auth error: Not authenticated")])
+    # @rx.event
+    # def check_auth(self):
+    #     if not self.is_authenticated:
+    #         return rx.redirect([rx.redirect(urls.LOGIN_URL),rx.toast.warning(f"Auth error: Not authenticated")])
 
     def set_email(self, value: str):
         self.email = value
@@ -229,3 +234,37 @@ class AuthState(rx.State):
         except Exception as err:
             self.is_authenticated = False
             return rx.toast.error(f"There was an unexpected error: {err}")
+
+    
+    async def get_token(self):
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{urls.API_URL}/api/auth/auth_token",
+                    headers = {"Authorization": f"Bearer "},
+                )
+            if response.status_code == 200:
+                print(response.json())
+                self.token = response.json()
+                print(response.json())
+                return self.token
+            else:
+                response_detail = response.json().get("detail")
+                return rx.toast.error(f"Not authenticated or session expired: {response_detail}")
+        
+        except Exception as err:
+            return rx.toast.error(f"There was an unexpected error: {err}")
+        
+
+        
+    
+
+    def obtainCookies():
+        url=[urls.WEB_URL]
+        cookie_jar=http.cookiejar.CookieJar()
+        url_opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cookie_jar))
+        url_opener.open(url)
+        for cookie in cookie_jar:
+            print(cookie.name, cookie.value)
+            return {cookie.name: cookie.value for cookie in cookie_jar}
+    

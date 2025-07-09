@@ -1,5 +1,5 @@
 import reflex as rx 
-from .platform_base import platform_base
+from ..layout import platform_layout
 from ..constants import urls
 from ..states.org_state import OrgState
 from ..states.auth_state import AuthState
@@ -96,12 +96,5 @@ def view_organization() -> rx.Component:
         align="start",
     )
 
-    return platform_base(my_child)
+    return platform_layout(my_child)
 
-# @rx.page(route="/[urls.INDIVIDUAL_ORG_URL]/[OrgState.org_id]")
-# def view_organization() -> rx.Component:
-#     my_child = rx.vstack(
-#         rx.heading(OrgState.selected_org['org_name'], size="9"),
-#     )
-
-#     return platform_base(my_child)

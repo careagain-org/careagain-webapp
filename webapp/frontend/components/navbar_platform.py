@@ -1,4 +1,5 @@
 import reflex as rx
+import reflex_clerk_api as reclerk
 from ..components.notification_popover import notification_popover
 from ..components.navbar_profile import navbar_profile
 from ..constants import urls
@@ -25,8 +26,19 @@ def navbar_platform() -> rx.Component:
                 rx.menu.separator(),
                 rx.color_mode.button(color="teal",size="3"),
                 notification_popover(),
-                navbar_profile(),
-                spacing="5",
+                rx.fragment(
+                    reclerk.signed_out(
+                        reclerk.sign_in_button(rx.button("Sign In", size="3", color="teal",variant ="soft",on_click=nav_state.NavState.to_login)),
+                        reclerk.sign_up_button(rx.button("Sign Up", size="3", color="teal",variant ="outline",on_click=nav_state.NavState.to_signup)),
+                    ),
+                ),
+                rx.fragment(
+                    reclerk.signed_in(
+                        reclerk.user_button()
+                        # navbar_profile(),
+                    ),
+                ),
+                spacing="4",
                 justify="end",
                 align_items="center",
             ),
@@ -39,7 +51,7 @@ def navbar_platform() -> rx.Component:
                 rx.color_mode.button(color="teal"),
                 notification_popover(),
                 navbar_profile(),
-                spacing="5",
+                spacing="4",
                 justify="end",
                 align_items="center"
             ),

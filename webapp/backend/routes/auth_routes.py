@@ -1,6 +1,6 @@
-from fastapi import APIRouter,Depends,Response, HTTPException,security
+from fastapi import APIRouter,Depends,Response, HTTPException,security,Request,Cookie
 from fastapi.responses import JSONResponse
-from typing import List
+from typing import List,Annotated
 from ..schemas import user_schema as schema
 # from ..config.db_setup import get_db
 from ..models import model
@@ -197,3 +197,43 @@ def refresh_session(session = Depends(oauth2schema)):
             return {"detail": "No session open"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=f": {str(e)}")
+    
+
+
+# @auth_route.get("/clerk_token",tags = ['auth'])
+# def check_session(request: Request):
+    
+#     session_token = request.cookies.get("__session")
+#     print(session_token)
+#     if not session_token:
+#         return {"error": "No __session cookie found"}
+
+#     return session_token
+
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials,APIKeyCookie
+cookie_session = APIKeyCookie(name="__session")
+
+# @auth_route.get("/api/your_endpoint")
+# def secure_endpoint(cookie_session: HTTPAuthorizationCredentials = Depends(cookie_session)):
+#     return cookie_session
+    
+# from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials,APIKeyCookie
+# cookie_session = APIKeyCookie(name="__session")
+
+@auth_route.get("/api/auth/auth_token")
+def secure_endpoint(token: str = Depends(cookie_session)):
+    try:
+        return token
+    except Exception as err:
+        return err
+
+
+from fastapi import Request, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+security_token = HTTPBearer()
+
+@auth_route.get("/api/auth/protected")
+def secure_endpoint(token=str,
+    credentials: HTTPAuthorizationCredentials = Depends(security_token)):
+    return token

@@ -1,15 +1,17 @@
-from fastapi import APIRouter,Depends,UploadFile,File,HTTPException
+from fastapi import APIRouter,Depends,UploadFile,File,HTTPException,security
 from typing import List
 from ..schemas import project_schema, user_schema
 from ..models import model
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
-from ..config.supabase_config import get_db,supa_client,bucket_s3,url_s3_object
+from ..config.supabase_config import get_db,supa_client,bucket_s3,url_s3_object,get_supabase_client
 from ..services import user_functions
 import passlib.hash as hash
 import logging
 
 project_route = APIRouter(prefix="/api/projects")
+
+oauth2schema = security.OAuth2PasswordBearer("/api/auth/auth_token")
 
 @project_route.get("/",response_model=List[project_schema.Project],tags = ['projects'])
 def show_projects(db:Session=Depends(get_db)):
@@ -21,47 +23,50 @@ def show_projects(db:Session=Depends(get_db)):
 async def create_project(input:project_schema.CreateProject,
                      db:Session=Depends(get_db),
                      user:user_schema.User = Depends(user_functions.get_current_user)):
+    return("hola")
 
-    project_obj = model.Project(project_id=input.project_id,
-                                 name = input.name,
-                                 type = input.type,
-                                 description= input.description,
-                                 logo = f"{url_s3_object}projects/{input.project_id}/images/{input.logo}" if input.logo else "",
-                                 image = f"{url_s3_object}projects/{input.project_id}/images/{input.image}" if input.image else "",
-                                 website = input.website,
-                                 repo = input.repo,
-                                 guide = input.guide,
-                                 attachment = input.attachment,
-                                 status = input.status,
-                                 )
+    # project_obj = model.Project(project_id=input.project_id,
+    #                              name = input.name,
+    #                              type = input.type,
+    #                              description= input.description,
+    #                              logo = f"{url_s3_object}projects/{input.project_id}/images/{input.logo}" if input.logo else "",
+    #                              image = f"{url_s3_object}projects/{input.project_id}/images/{input.image}" if input.image else "",
+    #                              website = input.website,
+    #                              repo = input.repo,
+    #                              guide = input.guide,
+    #                              attachment = input.attachment,
+    #                              status = input.status,
+    #                              )
     
-    db.add(project_obj)
-    db.commit()
+    # db.add(project_obj)
+    # db.commit()
 
-    rel_obj = model.User_Project(user_id = user.user_id,
-                                      project_id = project_obj.project_id,
-                                      member_type = "admin")
-    db.add(rel_obj)
-    db.commit()
+    # rel_obj = model.User_Project(user_id = user.user_id,
+    #                                   project_id = project_obj.project_id,
+    #                                   member_type = "admin")
+    # db.add(rel_obj)
+    # db.commit()
 
-    db.refresh(project_obj)
+    # db.refresh(project_obj)
 
-    return {"detail": "New project uploaded","project_details":project_obj}
+    # return {"detail": "New project uploaded","project_details":project_obj}
 
 
 @project_route.post("/upload_image",tags = ['projects'])
 async def upload_image(project_id: str,
                         file: UploadFile= File(...),
-                        user: user_schema.User = Depends(user_functions.get_current_user),
+                        token: str = Depends(oauth2schema),
                         db: Session = Depends(get_db)):
     try:
         if not file:
             raise HTTPException(status_code=400, detail="No file uploaded")
         url_photo = f"projects/{project_id}/images/{file.filename}"
         contents = await file.read()
+        
+        supa_client = await get_supabase_client(token)
 
         # Upload with auth headers
-        response = supa_client.storage.from_(f"{bucket_s3}").upload(
+        supa_client.storage.from_(f"{bucket_s3}").upload(
             file=contents,
             path=url_photo,
             file_options={"content-type": file.content_type,

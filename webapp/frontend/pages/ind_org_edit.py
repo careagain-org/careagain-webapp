@@ -1,10 +1,10 @@
 import reflex as rx 
-from .platform_base import platform_base
+from ..layout import platform_layout
 from ..constants import urls
 from ..states.org_state import OrgState
 from ..states.auth_state import AuthState
 from typing import Dict
-from ..components.map import interactive_map,map_org
+from ..components.map import map_org
 from ..components.user_card import users_grid_horizontal
 from ..components.user_table import table_pagination
 from ..components.org_input_text import OrgEditableText,OrgEditableTextArea
@@ -98,4 +98,4 @@ def edit_organization() -> rx.Component:
         id="organization-edit",
     )
 
-    return platform_base(my_child)
+    return platform_layout(my_child)
