@@ -50,7 +50,16 @@ def navbar_platform() -> rx.Component:
                 rx.menu.separator(),
                 rx.color_mode.button(color="teal"),
                 notification_popover(),
-                navbar_profile(),
+                rx.fragment(
+                    reclerk.signed_out(
+                        reclerk.sign_in_button(rx.button("Sign In", size="3", color="teal",variant ="soft",on_click=nav_state.NavState.to_login)),
+                    ),
+                ),
+                rx.fragment(
+                    reclerk.signed_in(
+                        reclerk.user_button()
+                    ),
+                ),
                 spacing="4",
                 justify="end",
                 align_items="center"

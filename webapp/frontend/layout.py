@@ -39,12 +39,21 @@ def base_page(child: rx.Component ,*args,**kwargs) -> rx.Component:
 
 def non_user_layout(child:rx.Component)-> rx.Component:
 
-    return rx.container(
-            navbar(),
-            rx.fragment(child),
-            rx.logo(),
+    return rx.fragment(
+        rx.vstack(
+            navbar_platform(),
+            rx.box(
+                child,
+                id="box-content-area",
+                width="100vw",
+                height="100vh"
+            ), 
+            low_footer(),
             width="100%",
-            id='my-root-layout'
+            id='my-root-layout',),
+            render_menu(),
+            width="100%",
+            height="100%"
         )
 
 
@@ -55,7 +64,7 @@ def user_layout(child:rx.Component)-> rx.Component:
             rx.hstack(
                 sidebar(),
                 rx.desktop_only(
-                    rx.box(width="17em",),
+                    rx.box(width="17em",height="100vh"),
                 ),
                 rx.vstack(
                     navbar_platform(),
@@ -63,19 +72,22 @@ def user_layout(child:rx.Component)-> rx.Component:
                         rx.box(
                         child,
                         id="box-content-area",
-                        width="83vw"
+                        width="83vw",
+                        height="100vh"
                     ), ),
                     rx.mobile_and_tablet(
                         rx.box(
                         child,
                         id="box-content-area",
-                        width="100vw"
+                        width="100vw",
+                        height="100vh"
                     ), ),
                     low_footer(),
                 ),
             ),
             render_menu(),
             width="100%",
+            height="100%"
         )
 
 
@@ -93,7 +105,6 @@ def platform_layout(child:rx.Component, *args, **kwargs)-> rx.Component:
             ),
             reclerk.signed_out(
                 user_layout(child),
-                # non_user_layout(child)
             ),
         ),
     ),

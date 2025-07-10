@@ -113,12 +113,11 @@ def sidebar() -> rx.Component:
     return rx.box(
         rx.desktop_only(
             rx.vstack(
+                
                 brand_header(),
                 sidebar_items(),
                 rx.spacer(),
                 rx.vstack(
-                    # sidebar_item("Settings", "settings", "/#"),
-                    #sidebar_item("Log out", "log-out", "/#"),
                     rx.divider(),
                     reclerk.signed_in(
                         profile_button(),
@@ -157,7 +156,7 @@ def sidebar() -> rx.Component:
                             sidebar_items(),
                             rx.spacer(),
                             rx.vstack(
-                                sidebar_item("Settings","settings","/#",),
+                                # sidebar_item("Settings","settings","/#",),
                                 #sidebar_item("Log out","log-out","/#",),
                                 rx.divider(margin="0"),
                                 reclerk.signed_in(
@@ -171,7 +170,7 @@ def sidebar() -> rx.Component:
                         ),
                         top="auto",
                         right="auto",
-                        height="100%",
+                        height="100vh",
                         width="20em",
                         padding="1.5em",
                         bg=rx.color("accent", 2),
@@ -181,7 +180,7 @@ def sidebar() -> rx.Component:
                 direction="left",
             ),
             padding="1em",
-            height="100%",
+            height="100vh",
             position="fixed",
         ),
     )

@@ -208,16 +208,14 @@ class MapState(OrgState):
         return html
 
 
-
-
-
 def create_map() -> rx.Component:
     """Create a map component using Folium."""
-    return rx.el.iframe(
-            src_doc=MapState.folium_map_html,
-            class_name="w-full aspect-[4/2]",
-            width = "100%",
-        )
+    return  rx.el.iframe(
+                src_doc=MapState.folium_map_html,
+                class_name="w-full h-screen",
+                width = "90vw",
+                height ="90vh"
+            )
 
 
 

@@ -71,7 +71,7 @@ def community_page() -> rx.Component:
                                 create_map(),
                                 spacing="5",
                                 weight="100%",
-                                align="center"
+                                align="center",
                             ),
                             value="tab-map",
                         ),

@@ -1,5 +1,6 @@
 import reflex as rx 
 import reflex_clerk_api as reclerk
+from ..layout import platform_layout
 from .webpage_base import base_page
 from ..constants import urls
 from ..components.signup_card import signup_multiple_thirdparty
@@ -15,4 +16,4 @@ def signup_page() -> rx.Component:
                 min_height="90vh",
                 id='my-child',
             )
-    return base_page(my_child)
+    return platform_layout(my_child)
