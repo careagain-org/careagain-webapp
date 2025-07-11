@@ -1,6 +1,7 @@
 import reflex as rx
 from ..constants import urls
 import httpx
+from typing import List, Dict, Any, Optional
 from ..states.auth_state import AuthState
 import logging
 from pathlib import Path
@@ -12,6 +13,10 @@ class UploadState(AuthState):
     # The images to show.
     img: str
     upload_type: str
+    
+    token:Optional[str]=rx.Cookie(
+                name="__session",
+            ) 
 
     @rx.event
     async def handle_upload(self, my_files: list[rx.UploadFile]):

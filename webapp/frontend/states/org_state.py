@@ -11,7 +11,7 @@ import json
 import os
 
 
-class OrgState(AuthState):
+class OrgState(rx.State):
     org_types: list[str] = ["Hospital", "Logistics & transport",
                             "Research & Development","Manufacturer"]
     orgs: List[Dict[str, Any]] = []
@@ -26,6 +26,10 @@ class OrgState(AuthState):
     org_id:str=""
     logo: str =""
     is_org_member: bool=False
+    token:Optional[str]=rx.Cookie(
+                name="__session",
+                max_age =60,
+            ) 
     
     
     @rx.event
@@ -84,6 +88,12 @@ class OrgState(AuthState):
     async def filter_org(self,value:str=""):
         self.filtered_orgs = [d for d in self.orgs if (value.lower() in d['name'].lower()) and (value!="")]
 
+    def validate_float(self,my_string:str):
+        print(my_string)
+        try:
+            return float(my_string)
+        except:
+            return None
 
     async def create_new_org(self, form_data: dict):
         try:
@@ -97,8 +107,8 @@ class OrgState(AuthState):
                 "name": form_data["name"],
                 "type": form_data["type"],
                 "description": form_data["description"],
-                "latitude": form_data["latitude"],
-                "longitude": form_data["longitude"],
+                "latitude": self.validate_float(form_data["latitude"]),
+                "longitude": self.validate_float(form_data["longitude"]),
                 "address": form_data["address"],
                 "logo": f"{self.logo}" if self.logo else "",
                 "website": form_data["website"],

@@ -5,7 +5,7 @@ from ..schemas import user_schema as schema
 from ..models import model
 from sqlalchemy.orm import Session
 #from ..config.db_setup import get_db
-from ..config.supabase_config import get_db,supa_client,bucket_s3,url_s3_object
+from ..config.supabase_config import get_db,bucket_s3,url_s3_object,get_supabase_client
 from ..services import user_functions
 import numpy as np
 import datetime as dt
@@ -16,13 +16,15 @@ organization_route = APIRouter(prefix="/api/orgs")
 @organization_route.post("/upload_image",tags = ['organizations'])
 async def upload_image(org_id: str,
                        file: UploadFile= File(...),
-                        user: schema.User = Depends(user_functions.get_current_user),
+                        token: schema.User = Depends(user_functions.get_token),
                         db: Session = Depends(get_db)):
     try:
         if not file:
             raise HTTPException(status_code=400, detail="No file uploaded")
         url_photo = f"orgs/{org_id}/images/{file.filename}"
         contents = await file.read()
+        
+        supa_client = get_supabase_client(token)
 
         # Upload with auth headers
         response = supa_client.storage.from_(f"{bucket_s3}").upload(
@@ -37,20 +39,25 @@ async def upload_image(org_id: str,
     except Exception as err:
         raise HTTPException(status_code=500, detail=str(err))
 
-
+def validate_float(my_string:str):
+    print(my_string)
+    try:
+        return float(my_string)
+    except:
+        return None
 
 @organization_route.post("/create_org",tags = ['organizations'])
 async def create_org(input:org_schema.CreateOrganization,
                      db:Session=Depends(get_db),
                      user:schema.User = Depends(user_functions.get_current_user)):
-
+    
     org_obj = model.Organization(org_id=input.org_id,
                                  name = input.name,
                                  type = input.type,
                                  address = input.address,
                                  description= input.description,
-                                 latitude = input.latitude,
-                                 longitude = input.longitude,
+                                 latitude = validate_float(input.latitude),
+                                 longitude = validate_float(input.longitude),
                                  logo = f"{url_s3_object}orgs/{input.org_id}/images/{input.logo}" if input.logo else "",
                                  website = input.website,
                                  email = input.email,

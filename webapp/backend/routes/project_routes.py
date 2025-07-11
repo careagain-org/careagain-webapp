@@ -4,14 +4,13 @@ from ..schemas import project_schema, user_schema
 from ..models import model
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
-from ..config.supabase_config import get_db,supa_client,bucket_s3,url_s3_object,get_supabase_client
+from ..config.supabase_config import get_db,bucket_s3,url_s3_object,get_supabase_client
 from ..services import user_functions
 import passlib.hash as hash
 import logging
 
 project_route = APIRouter(prefix="/api/projects")
 
-oauth2schema = security.OAuth2PasswordBearer("/api/auth/auth_token")
 
 @project_route.get("/",response_model=List[project_schema.Project],tags = ['projects'])
 def show_projects(db:Session=Depends(get_db)):
@@ -55,7 +54,7 @@ async def create_project(input:project_schema.CreateProject,
 @project_route.post("/upload_image",tags = ['projects'])
 async def upload_image(project_id: str,
                         file: UploadFile= File(...),
-                        token: str = Depends(oauth2schema),
+                        token: str=Depends(user_functions.get_token),
                         db: Session = Depends(get_db)):
     try:
         if not file:

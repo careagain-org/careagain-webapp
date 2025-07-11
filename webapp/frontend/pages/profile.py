@@ -84,6 +84,8 @@ def user_section():
                         width="20%",
                         heigth="auto"),
                 rx.vstack(
+                    input_field_edit(title= "First name",key = 'first_name'),
+                    input_field_edit("Last Name",key='last_name'),
                     input_field_edit(title= "LinkedIn / Social media",key = 'linkedin'),
                     input_field_edit("Country",key='country'),
                     text_field_edit("Bio / Description", key = "description"),

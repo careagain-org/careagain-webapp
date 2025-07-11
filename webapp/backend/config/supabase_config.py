@@ -18,10 +18,10 @@ key: str = os.environ.get("SUPABASE_ANON_KEY")
 schema: str = os.environ.get("SUPABASE_DB_SCHEMA")
 supa_client: Client = create_client(url, key)
 
-async def get_supabase_client(token: str) -> Client:
+def get_supabase_client(token: str) -> Client:
     """Get a Supabase client with the current session storage."""
     client = create_client(
-        url, key, ClientOptions(storage=token)
+        url, key, ClientOptions(headers = {"Authorization": f"Bearer {token}"})
     )
     return client
 

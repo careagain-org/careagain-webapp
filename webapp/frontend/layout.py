@@ -46,7 +46,7 @@ def non_user_layout(child:rx.Component)-> rx.Component:
                 child,
                 id="box-content-area",
                 width="100vw",
-                height="100vh"
+                height="100%"
             ), 
             low_footer(),
             width="100%",
@@ -73,7 +73,7 @@ def user_layout(child:rx.Component)-> rx.Component:
                         child,
                         id="box-content-area",
                         width="83vw",
-                        height="100vh"
+                        height="100%"
                     ), ),
                     rx.mobile_and_tablet(
                         rx.box(

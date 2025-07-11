@@ -2,14 +2,14 @@ import reflex as rx
 import httpx
 import requests
 from ..constants import urls
-from typing import List, Dict,Any
+from typing import List, Dict,Any,Optional
 from .auth_state import AuthState 
 import logging
 import json 
 import uuid
 
 
-class ProjectState(AuthState):
+class ProjectState(rx.State):
     projects: List[Dict[str, str]] = []
     filtered_projects: List[Dict[str, str]] = []
     my_projects: List[Dict[str, str]] = []
@@ -22,6 +22,9 @@ class ProjectState(AuthState):
     logo: str =None
     image: str = None
     is_project_member: bool = False
+    token:Optional[str]=rx.Cookie(
+                name="__session",
+            ) 
     
     def reset_project(self):
         self.logo =None
@@ -153,13 +156,13 @@ class ProjectState(AuthState):
                 "name": form_data["name"],
                 "type": form_data["type"],
                 "status": form_data["status"],
-                "description": form_data["description"],
+                "description": form_data["description"] if form_data["description"] else "",
                 "logo": f"{self.logo}" if self.logo else "",
                 "image": f"{self.image}" if self.image else "",
-                "website": form_data["website"],
-                "attachment": form_data["attachment"],
-                "guide": form_data["guide"],
-                "repo": form_data["repo"],
+                "website": form_data["website"]if form_data["website"] else "",
+                "attachment": form_data["attachment"] if form_data["attachment"] else "",
+                "guide": form_data["guide"] if form_data["guide"] else "",
+                "repo": form_data["repo"] if form_data["repo"] else "",
             }
 
             headers = {"Authorization": f"Bearer {self.token}"}

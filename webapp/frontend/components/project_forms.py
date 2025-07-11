@@ -134,7 +134,7 @@ def form_project() -> rx.Component:
 def search_project() -> rx.Component:
 
     return rx.dialog.content(
-        rx.dialog.title(f"Search existing organization"),
+        rx.dialog.title(f"Search existing project"),
         rx.form(
             rx.flex(
             rx.input(rx.icon("search"),

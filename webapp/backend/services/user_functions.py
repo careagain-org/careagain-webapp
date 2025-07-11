@@ -33,6 +33,17 @@ async def get_user_by_username(username:str,db:Session,):
     user = db.query(model.User).filter(model.User.username == username).first()
     return user 
 
+def get_token(token:str=Depends(oauth2schema)):
+    return token
+
+def get_cookie_dict(token:str=Depends(oauth2schema)):
+    '''Get info from the cookie'''
+    try:
+        data = jwt.decode(token,os.getenv("JWT_KEY"), algorithms=["RS256"])
+        return data
+    except JWTError:
+        raise credential_exception
+
 
 def get_current_user(token:str=Depends(oauth2schema),
                             db:Session=Depends(get_db)):
