@@ -59,6 +59,11 @@ def form_project() -> rx.Component:
                         ),
                         width="100%",
                     ),
+                    rx.heading("Organization of the project",size="3"),
+                    rx.select(OrgState.my_org_names,
+                                placeholder="Select your Organization / Institution /group participating in the project",
+                                name="org_name",
+                                width="100%"),
                     rx.heading("Project Device Description",size="3"),
                     rx.text_area(
                         placeholder="Type here...",
@@ -189,4 +194,83 @@ def discover_project():
             width="100%",
             spacing="2"
         ),
+    
+
+def update_logo_form() -> rx.Component:
+    return rx.dialog.root(
+        rx.dialog.trigger(rx.button("Update project logo")),
+        rx.dialog.content(
+            rx.form(
+                rx.dialog.title("Update location"),
+                upload_logo_project(title="Logo",my_image=rx.get_upload_url(ProjectState.logo)),
+                rx.spacer(size="5"),
+                rx.flex(
+                    rx.dialog.close(
+                        rx.button(
+                            "Cancel",
+                            color_scheme="gray",
+                            variant="soft",
+                            justify="start",
+                            type ="button",),
+                    ),
+                    rx.dialog.close(
+                        rx.button("Save",
+                            type ="submit",
+                            justify="end",
+                            color_scheme="teal"),
+                    ),
+                    
+                    spacing="5",
+                    margin_top="16px",
+                    justify="end",
+                    width="100%",
+                    min_height="100px",
+                ),
+                spacing="5",
+                align="center",
+                on_submit=ProjectState.supabase_upload_logo(ProjectState.project_id),
+                reset_on_submit=True,
+            ),
+        )
+    ),
+    
+
+def update_image_form() -> rx.Component:
+    return rx.dialog.root(
+        rx.dialog.trigger(rx.button("Update image")),
+        rx.dialog.content(
+            rx.form(
+                rx.dialog.title("Update location"),
+                upload_image_project(title="Logo",my_image=rx.get_upload_url(ProjectState.image)),
+                rx.spacer(size="5"),
+                rx.flex(
+                    rx.dialog.close(
+                        rx.button(
+                            "Cancel",
+                            color_scheme="gray",
+                            variant="soft",
+                            justify="start",
+                            type ="button",),
+                    ),
+                    rx.dialog.close(
+                        rx.button("Save",
+                            type ="submit",
+                            justify="end",
+                            color_scheme="teal"),
+                    ),
+                    
+                    spacing="5",
+                    margin_top="16px",
+                    justify="end",
+                    width="100%",
+                    min_height="100px",
+                ),
+                spacing="5",
+                align="center",
+                on_submit=ProjectState.supabase_upload_image(ProjectState.project_id),
+                reset_on_submit=True,
+            ),
+        )
+    ),
+
 

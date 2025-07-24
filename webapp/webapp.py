@@ -29,6 +29,7 @@ from webapp.backend.routes.organizations_routes import organization_route
 from webapp.backend.routes.question_routes import question_route
 from webapp.backend.routes.auth_routes import auth_route
 from webapp.backend.routes.clerk_routes import clerk_route
+from webapp.backend.routes.action_routes import action_route
 
 # import model and db
 from webapp.backend.models import model
@@ -63,6 +64,7 @@ api_app.include_router(organization_route)
 api_app.include_router(question_route)
 api_app.include_router(auth_route)
 api_app.include_router(clerk_route)
+api_app.include_router(action_route)
 
 # CORS middleware to allow communication between frontend and backend
 origins = [urls.WEB_URL,

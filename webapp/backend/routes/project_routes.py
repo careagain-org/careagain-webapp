@@ -3,8 +3,8 @@ from typing import List
 from ..schemas import project_schema, user_schema
 from ..models import model
 from sqlalchemy.orm import Session
-from sqlalchemy import desc
-from ..config.supabase_config import get_db,bucket_s3,url_s3_object,get_supabase_client
+from sqlalchemy import desc,asc
+from ..config.supabase_config import get_db,bucket_s3,url_s3_object,supa_client
 from ..services import user_functions
 import passlib.hash as hash
 import logging
@@ -14,7 +14,7 @@ project_route = APIRouter(prefix="/api/projects")
 
 @project_route.get("/",response_model=List[project_schema.Project],tags = ['projects'])
 def show_projects(db:Session=Depends(get_db)):
-    projects = db.query(model.Project).order_by(desc(model.Project.project_id)).all()
+    projects = db.query(model.Project).order_by(asc(model.Project.creation_date)).all()
     return projects
 
 
@@ -22,33 +22,47 @@ def show_projects(db:Session=Depends(get_db)):
 async def create_project(input:project_schema.CreateProject,
                      db:Session=Depends(get_db),
                      user:user_schema.User = Depends(user_functions.get_current_user)):
-    return("hola")
-
-    # project_obj = model.Project(project_id=input.project_id,
-    #                              name = input.name,
-    #                              type = input.type,
-    #                              description= input.description,
-    #                              logo = f"{url_s3_object}projects/{input.project_id}/images/{input.logo}" if input.logo else "",
-    #                              image = f"{url_s3_object}projects/{input.project_id}/images/{input.image}" if input.image else "",
-    #                              website = input.website,
-    #                              repo = input.repo,
-    #                              guide = input.guide,
-    #                              attachment = input.attachment,
-    #                              status = input.status,
-    #                              )
+    project_obj = model.Project(project_id=input.project_id,
+                                 name = input.name,
+                                 type = input.type,
+                                 description= input.description,
+                                 logo = f"{url_s3_object}projects/{input.project_id}/images/{input.logo}" if input.logo else "",
+                                 image = f"{url_s3_object}projects/{input.project_id}/images/{input.image}" if input.image else "",
+                                 website = input.website,
+                                 repo = input.repo,
+                                 guide = input.guide,
+                                 attachment = input.attachment,
+                                 status = input.status,
+                                 )
     
-    # db.add(project_obj)
-    # db.commit()
+    db.add(project_obj)
+    db.commit()
 
-    # rel_obj = model.User_Project(user_id = user.user_id,
-    #                                   project_id = project_obj.project_id,
-    #                                   member_type = "admin")
-    # db.add(rel_obj)
-    # db.commit()
+    rel_obj = model.User_Project(user_id = user.user_id,
+                                      project_id = project_obj.project_id,
+                                      member_type = "admin")
+    db.add(rel_obj)
+    db.commit()
 
-    # db.refresh(project_obj)
+    if input.org_name != "":
 
-    # return {"detail": "New project uploaded","project_details":project_obj}
+        org_rel_obj = model.Project_Organization(org_id = input.org_name.split("[")[1].replace("]",""),
+                                        project_id = project_obj.project_id)
+        db.add(org_rel_obj )
+        db.commit()
+    
+    action_obj = model.Action(performed_by = user.user_id,
+                              received_by = project_obj.project_id,
+                              action_type = "creation",
+                              receiver_type = "project",
+                              description = f"{project_obj.name} - has been created")
+    
+    db.add(action_obj)
+    db.commit()
+
+    db.refresh(project_obj)
+
+    return {"detail": "New project uploaded","project_details":project_obj}
 
 
 @project_route.post("/upload_image",tags = ['projects'])
@@ -62,7 +76,7 @@ async def upload_image(project_id: str,
         url_photo = f"projects/{project_id}/images/{file.filename}"
         contents = await file.read()
         
-        supa_client = await get_supabase_client(token)
+        supa_client.storage._client.headers["Authorization"] = f"Bearer {token}"
 
         # Upload with auth headers
         supa_client.storage.from_(f"{bucket_s3}").upload(
@@ -81,10 +95,21 @@ async def upload_image(project_id: str,
 
 @project_route.delete("/delete_project",tags = ['projects'])
 async def delete_project(project_id:str,
+                         user: user_schema.User = Depends(user_functions.get_current_user),
                             db:Session=Depends(get_db)):
+    
+    project_obj= db.query(model.Project).filter(model.Project.project_id == project_id).first()
+    (db.query(model.Project_Organization).filter(model.Project_Organization.project_id == project_id).delete(synchronize_session='fetch'))
     (db.query(model.User_Project).filter(model.User_Project.project_id == project_id).delete(synchronize_session='fetch'))
-    (db.query(model.Project).filter(model.Project.project_id == project_id).delete())
-
+    (db.query(model.Project).filter(model.Project.project_id == project_id).delete())   
+    
+    action_obj = model.Action(performed_by = user.user_id,
+                              received_by = project_obj.project_id,
+                              action_type = "deletion",
+                              receiver_type = "project",
+                              description = f"{project_obj.name} - has been deleted")
+    
+    db.add(action_obj)
     db.commit()
 
     return {"detail": "Project deleted"} 
@@ -105,6 +130,8 @@ async def leave_project(project_id:str,
 async def join_project(project_id:str,
                             user:user_schema.User = Depends(user_functions.get_current_user),
                             db:Session=Depends(get_db)):
+    project = db.query(model.Project).filter(model.Project.project_id == project_id).first()
+    
     admin_roles = db.query(model.User_Project).filter(model.User_Project.project_id == project_id,
                                               model.User_Project.member_type == "admin").all()
     
@@ -117,11 +144,31 @@ async def join_project(project_id:str,
                                         member_type = "admin")
             db.add(rel_obj)
             db.commit()
+            
+            
+            action_obj = model.Action(performed_by = user.user_id,
+                                    received_by = project_id,
+                                    action_type = "modification",
+                                    receiver_type = "project",
+                                    description = f"{project.name} - has a new admin")
+            
+            db.add(action_obj)
+            db.commit()
+            
         else:
             rel_obj = model.User_Project(user_id = user.user_id,
                                         project_id = project_id,
                                         member_type = "user")
             db.add(rel_obj)
+            db.commit()
+            
+            action_obj = model.Action(performed_by = user.user_id,
+                                    received_by = project_id,
+                                    action_type = "modification",
+                                    receiver_type = "project",
+                                    description = f"{project.name} - has a new member")
+            
+            db.add(action_obj)
             db.commit()
         
         return {"detail": "Project attached"} 
@@ -153,6 +200,17 @@ async def get_members(project_id:str,
             merged_list.append(merged_dict)
         
     return merged_list
+
+
+@project_route.get("/orgs",tags = ['projects'])
+async def get_orgs(project_id:str,
+                            db:Session=Depends(get_db)):
+    orgs = db.query(model.Organization).join(
+            model.Project_Organization,
+            model.Project_Organization.org_id == model.Organization.org_id
+        ).filter(model.User_Project.project_id == project_id).all()
+        
+    return orgs
 
 
 @project_route.get("/my_projects" ,tags = ['projects']) 
@@ -202,6 +260,7 @@ async def show_projects(
 async def join_project(project_id:str,
                        user_id:str,
                        db:Session=Depends(get_db)):
+    project = db.query(model.Project).filter(model.Project.project_id == project_id).first()
     admin_roles = db.query(model.User_Project).filter(model.User_Project.project_id == project_id,
                                               model.User_Project.member_type == "admin").all()
     
@@ -214,11 +273,30 @@ async def join_project(project_id:str,
                                         member_type = "admin")
             db.add(rel_obj)
             db.commit()
+            
+            action_obj = model.Action(performed_by = user_id,
+                                    received_by = project_id,
+                                    action_type = "modification",
+                                    receiver_type = "project",
+                                    description = f"{project.name} - has a new admin")
+            
+            db.add(action_obj)
+            db.commit()
         else:
             rel_obj = model.User_Project(user_id = user_id,
                                         project_id = project_id,
                                         member_type = "user")
             db.add(rel_obj)
+            db.commit()
+            
+            
+            action_obj = model.Action(performed_by = user_id,
+                                    received_by = project_id,
+                                    action_type = "modification",
+                                    receiver_type = "project",
+                                    description = f"{project.name} - has a new member")
+            
+            db.add(action_obj)
             db.commit()
         
         return {"detail": "User joined the Project"} 
@@ -242,7 +320,8 @@ async def dettach_project(project_id:str,
 async def update_project(key: str, 
                       value: str, 
                       project_id: str,
-                      db: Session = Depends(get_db)):
+                      db: Session = Depends(get_db),
+                      user: user_schema.User = Depends(user_functions.get_current_user)):
     
     project= (db.query(model.Project).filter(model.Project.project_id == project_id)).first()
 
@@ -260,6 +339,15 @@ async def update_project(key: str,
     db.add(project)
     db.commit()
     db.refresh(project)
+    
+    action_obj = model.Action(performed_by = user.user_id,
+                              received_by = project.project_id,
+                              action_type = "modification",
+                              receiver_type = "project",
+                              description = f"{project.name} - has been modified")
+    
+    db.add(action_obj)
+    db.commit()
 
     return project
 

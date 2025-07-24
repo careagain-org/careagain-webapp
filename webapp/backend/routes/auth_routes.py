@@ -12,6 +12,8 @@ from pydantic import BaseModel
 from typing import Optional
 from urllib.parse import unquote
 import json
+import os
+import jwt
 
 
 auth_route = APIRouter(prefix="/api/auth")
@@ -211,7 +213,7 @@ def refresh_session(session = Depends(oauth2schema)):
 #     return session_token
 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials,APIKeyCookie
-cookie_session = APIKeyCookie(name="__session")
+cookie_session = APIKeyCookie(name="__session_x5BkYaXO")
 
 # @auth_route.get("/api/your_endpoint")
 # def secure_endpoint(cookie_session: HTTPAuthorizationCredentials = Depends(cookie_session)):
@@ -220,16 +222,24 @@ cookie_session = APIKeyCookie(name="__session")
 # from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials,APIKeyCookie
 # cookie_session = APIKeyCookie(name="__session")
 
-@auth_route.get("/api/auth/auth_token")
+@auth_route.get("auth_token")
 def secure_endpoint(token: str = Depends(cookie_session)):
     try:
         return token
     except Exception as err:
         return err
+    
+@auth_route.get("auth_user")
+def secure_user(token: str = Depends(cookie_session)):
+    try:
+        data = jwt.decode(token,os.getenv("JWT_KEY"), algorithms=["RS256"])
+        return data['sub']
+    except Exception as err:
+        return err
 
 
 from fastapi import Request, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPBearer
 
 security_token = HTTPBearer()
 

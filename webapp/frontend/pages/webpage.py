@@ -111,8 +111,7 @@ def community_section() -> rx.Component:
         padding="1%",
         color_scheme="teal",
         width="100%",
-        id="community_section",
-        on_mount=OrgState.get_location
+        id="community_section"
     )
 
 def support_section(direction:str) -> rx.Component:

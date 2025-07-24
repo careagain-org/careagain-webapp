@@ -9,7 +9,10 @@ import clipboard
 import pyperclip
 import json
 import os
+import dotenv
+import glob
 
+CLERK_COOKIE_CODE =os.environ["CLERK_PUBLIC_KEY"]
 
 class OrgState(rx.State):
     org_types: list[str] = ["Hospital", "Logistics & transport",
@@ -23,14 +26,23 @@ class OrgState(rx.State):
     org_details: Dict[str, Any] = {}
     
     org_members:List[Dict[str, Any]] = []
+    org_projects:List[Dict[str, Any]] =[]
     org_id:str=""
     logo: str =""
     is_org_member: bool=False
     token:Optional[str]=rx.Cookie(
-                name="__session",
-                max_age =60,
+                name=f"__session",
             ) 
     
+    @rx.var(cache=True)
+    def my_org_names(self) -> list[str]:
+        return [f"{org["name"]} [{org["org_id"]}]" for org in self.my_orgs]
+        
+    
+    async def get_token(self):
+        return rx.Cookie(
+                name=f"__session",
+            ) 
     
     @rx.event
     def update_location(self):
@@ -63,7 +75,13 @@ class OrgState(rx.State):
         except Exception as err:
             return rx.toast(err)
     
+    async def remove_uploaded_files(self):
+        files = glob.glob(f"{rx.get_upload_dir()}/*")
+        for f in files:
+            os.remove(f)
+    
     async def supabase_upload(self,org_id):
+        await self.get_token()
         try:
             outfile = rx.get_upload_dir() / self.logo 
 
@@ -77,11 +95,19 @@ class OrgState(rx.State):
                                                 files=files, data=data, headers=headers)
 
                 if response.status_code == 200:
-                    return response.json()["org_id"]
+                    try:
+                        logo  = f"{os.environ.get("SUPABASE_URL")}storage/v1/object/public/{os.environ.get("SUPABASE_S3_BUCKET")}/orgs/{self.org_id}/images/{self.logo}"
+                        await self.update_org("logo",logo)
+                    except:
+                        print("org doesn't exist")
+                    await self.remove_uploaded_files()
+                    return rx.toast(f"File uploaded")
                 else:
                     detail = response.json()["detail"]
+                    await self.remove_uploaded_files()
                     return rx.toast(f"User update error: {response.status_code}, {detail}")
         except Exception as e:
+            await self.remove_uploaded_files()
             return rx.toast(f"File upload error: {str(e)}")
         
     
@@ -89,13 +115,13 @@ class OrgState(rx.State):
         self.filtered_orgs = [d for d in self.orgs if (value.lower() in d['name'].lower()) and (value!="")]
 
     def validate_float(self,my_string:str):
-        print(my_string)
         try:
             return float(my_string)
         except:
             return None
 
     async def create_new_org(self, form_data: dict):
+        await self.get_token()
         try:
             org_id = str(uuid.uuid4())
 
@@ -129,13 +155,13 @@ class OrgState(rx.State):
                 return rx.toast("New organization uploaded")
             else:
                 detail = response.json()["detail"]
-                return rx.toast(f"Organization update error: {response.status_code}, {detail}")
+                return rx.toast(f"Organization creation error: {response.status_code}, {detail}")
         except Exception as err:
             return rx.toast(f"Organization creation error: {str(err)}")
 
 
     async def get_my_orgs(self):
-
+        await self.get_token()
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"{urls.API_URL}/api/orgs/my_organizations",
@@ -155,7 +181,7 @@ class OrgState(rx.State):
         async with httpx.AsyncClient() as client:
             response = await client.delete(
                 f"{urls.API_URL}/api/orgs/delete_org?org_id={org_id}",
-                # headers = {"Authorization": f"Bearer {self.token}"},
+                headers = {"Authorization": f"Bearer {self.token}"},
             )
         
         if response.status_code == 200:
@@ -167,7 +193,7 @@ class OrgState(rx.State):
         
     
     async def leave_my_org(self,org_id):
-
+        self.get_token()
         async with httpx.AsyncClient() as client:
             response = await client.delete(
                 f"{urls.API_URL}/api/orgs/leave_org?org_id={org_id}",
@@ -183,7 +209,7 @@ class OrgState(rx.State):
         
 
     async def join_org(self):
-
+        self.get_token()
         async with httpx.AsyncClient() as client:
             response = await client.put(
                 f"{urls.API_URL}/api/orgs/join_org?org_id={self.org_id}",
@@ -221,20 +247,6 @@ class OrgState(rx.State):
                                       and (form_data["search"]!="")]
 
 
-    async def get_location(self):
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(
-                    f"{urls.API_URL}/api/orgs/locations",
-                )
-            if response.status_code == 200:
-                self.orgs_locations = response.json()
-            else:
-                print(f"Failed to get orgs: {response.status_code}, {response.text}")
-        except Exception as e:
-            print(f"An error occurred: {e}")
-
-
     async def find_members_org(self):
         try:
             async with httpx.AsyncClient() as client:
@@ -250,10 +262,29 @@ class OrgState(rx.State):
         except Exception as e:
             print(f"An error occurred: {e}")
             
+            
+    async def find_projects_org(self):
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{urls.API_URL}/api/orgs/projects?org_id={self.org_id}",
+                )
+            if response.status_code == 200:
+                self.org_projects = response.json()
+                # self.is_org_member = any(d['org_id'] == self.selected_org.get("org_id") for d in self.my_orgs)
+        
+            else:
+                print(f"Failed to get orgs: {response.status_code}, {response.text}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            
+            
     async def load_org_page(self):
+        await self.get_orgs()
         current_page_route = self.router.page.raw_path
         org_id =current_page_route.split("/")[-2]
         self.select_org(org_id)
+        await self.find_projects_org()
         await self.find_members_org()
         
 
@@ -275,6 +306,7 @@ class OrgState(rx.State):
     
     
     async def update_org(self,key:str,value:str):
+        self.get_token()
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.put(
@@ -284,7 +316,7 @@ class OrgState(rx.State):
             
             if response.status_code == 200:
                 self.selected_org = response.json()
-                await self.get_orgs()
+                await self.load_org_page()
                 return rx.toast.success(f"{key} updated successfully")
             else:
                 detail = response.json()["detail"]

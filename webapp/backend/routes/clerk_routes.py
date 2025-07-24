@@ -5,10 +5,10 @@ from ..services.user_functions import create_user,delete_user,update_user
 import os
 import json
 
-clerk_route = APIRouter()
+clerk_route = APIRouter(prefix="/api/clerk")
 webhook_secret = os.getenv("CLERK_WEBHOOK_SECRET")
 
-@clerk_route.post("/create_user",tags=["clerk"])
+@clerk_route.post("/webhooks",tags=["clerk"])
 async def handle_user_created(request: Request, db = Depends(get_db)):
 
     if not webhook_secret:

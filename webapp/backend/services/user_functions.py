@@ -22,10 +22,11 @@ from dotenv import load_dotenv,find_dotenv
 
 load_dotenv(find_dotenv())
 # oauth2schema = security.APIKeyCookie(name="__session")
+cookie2schema = security.APIKeyCookie(name="__session")
 oauth2schema = security.OAuth2PasswordBearer("/api/auth/auth_token")
 
 credential_exception = HTTPException(status_code = status.HTTP_401_UNAUTHORIZED,
-                                         detail = "Could not validate credentials",
+                                         detail = "User not authenticated ",
                                          headers = {"WWW-Authenticate": "Bearer"})
 
 async def get_user_by_username(username:str,db:Session,):
@@ -52,6 +53,7 @@ def get_current_user(token:str=Depends(oauth2schema),
 
     try:
         data = jwt.decode(token,os.getenv("JWT_KEY"), algorithms=["RS256"])
+        print(data)
         if data['role']=='authenticated':
             user_id = data["sub"]
             user = db.query(model.User).filter(model.User.user_id == user_id).first()
@@ -83,7 +85,8 @@ def get_current_user(token:str=Depends(oauth2schema),
 
 
 def create_user(input:dict,
-                    db:Session=Depends(get_db)):
+                token:str=Depends(cookie2schema),
+                db:Session=Depends(get_db)):
     
     try:
         user = db.query(model.User).filter(model.User.user_id == input["user_id"]).first()
@@ -128,8 +131,8 @@ def create_user(input:dict,
     
     
 def delete_user(input:dict,
-                      token:str=Depends(oauth2schema),
-                      db:Session=Depends(get_db)):
+                token:str=Depends(cookie2schema),
+                db:Session=Depends(get_db)):
     try:
         response = jwt.decode(token,os.getenv("JWT_KEY"), algorithms=["RS256"])
         
@@ -147,7 +150,7 @@ def delete_user(input:dict,
     
 
 def update_user(input:dict,
-                      token:str=Depends(oauth2schema),
+                      token:str=Depends(cookie2schema),
                       db:Session=Depends(get_db)):
     try:
         response = jwt.decode(token,os.getenv("JWT_KEY"), algorithms=["RS256"])

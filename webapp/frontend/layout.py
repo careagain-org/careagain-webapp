@@ -72,7 +72,7 @@ def user_layout(child:rx.Component)-> rx.Component:
                         rx.box(
                         child,
                         id="box-content-area",
-                        width="83vw",
+                        width="80vw",
                         height="100%"
                     ), ),
                     rx.mobile_and_tablet(
@@ -96,16 +96,13 @@ def platform_layout(child:rx.Component, *args, **kwargs)-> rx.Component:
     return my_clerk_provider(
         rx.fragment(
         reclerk.clerk_loading(
-            rx.spinner(),
+            user_layout(rx.center(rx.spinner())),
         ),
         reclerk.clerk_loaded(
-            reclerk.signed_in(
-                user_layout(child)
-                
-            ),
-            reclerk.signed_out(
-                user_layout(child),
+            rx.cond(child is None,
+                    user_layout(rx.spinner()),
+                    user_layout(child) 
+                    )
             ),
         ),
-    ),
     )

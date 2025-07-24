@@ -15,7 +15,10 @@ import urllib
 class AuthState(rx.State):
     email: str = ""
     password: str = ""
-    token: str = rx.Cookie(
+    
+    @rx.var(cache=True)
+    def token(self) -> Optional[str]:
+        return  rx.Cookie(
                 name="__session",
                 # same_site="strict",
                 secure=True,

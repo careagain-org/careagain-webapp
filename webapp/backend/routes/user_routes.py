@@ -20,8 +20,11 @@ user_route = APIRouter(prefix="/api/users")
 
 @user_route.get("/",response_model=List[schema.User],tags = ['users'])
 def show_users(db:Session=Depends(get_db)):
-    users = db.query(model.User).all()
-    return users
+    try:
+        users = db.query(model.User).order_by(desc(model.User.creation_date)).all()
+        return users
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching users: {str(e)}")
 
 @user_route.get("/me",tags = ['users'])
 async def get_user(user:schema.User = Depends(user_functions.get_current_user)):
@@ -82,12 +85,6 @@ async def update_user(key: str,
     db.refresh(user)
 
     return user
-
-
-@user_route.get("/",response_model=List[schema.User],tags = ['users'])
-def show_projects(db:Session=Depends(get_db)):
-    users = db.query(model.User).order_by(desc(model.User.user_id)).all()
-    return users
 
 
 @user_route.post("/invite_user",tags = ['users']) 

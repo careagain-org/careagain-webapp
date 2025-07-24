@@ -1,3 +1,4 @@
+from fileinput import filename
 import reflex as rx
 import httpx
 import requests
@@ -7,6 +8,9 @@ from .auth_state import AuthState
 import logging
 import json 
 import uuid
+import os
+import glob
+
 
 
 class ProjectState(rx.State):
@@ -17,13 +21,15 @@ class ProjectState(rx.State):
     
     project_details: Dict[str, Any] = {}
     project_members: List[Dict[str, Any]] = []
+    project_orgs : List[Dict[str, Any]] = []
     project_id:str=""
     selected_project: Dict[str, Any] = {}
-    logo: str =None
+    logo: str = None
     image: str = None
     is_project_member: bool = False
     token:Optional[str]=rx.Cookie(
                 name="__session",
+                same_site="lax",
             ) 
     
     def reset_project(self):
@@ -35,6 +41,7 @@ class ProjectState(rx.State):
         project_id =current_page_url.split("/")[-2]
         self.select_project(project_id)
         await self.find_members_project()
+        await self.find_orgs_project()
         
 
     async def get_list_projects(self):
@@ -118,14 +125,18 @@ class ProjectState(rx.State):
 
         except Exception as err:
             return rx.toast(err)
+    
+    async def remove_uploaded_files(self):
+        files = glob.glob(f"{rx.get_upload_dir()}/*")
+        for f in files:
+            os.remove(f)
         
-        
-    async def supabase_upload(self,project_id,filename):
+    async def supabase_upload_logo(self,project_id):
         try:
-            outfile = rx.get_upload_dir() / filename
+            outfile = rx.get_upload_dir() / self.logo
 
             with open(outfile, "rb") as image_file:
-                files = {"file": (filename, image_file, "image/png")}
+                files = {"file": (self.logo, image_file, "image/png")}
                 data = {"project_id": project_id}
                 headers = {"Authorization": f"Bearer {self.token}"}
 
@@ -134,11 +145,56 @@ class ProjectState(rx.State):
                                                 files=files, data=data, headers=headers)
 
                 if response.status_code == 200:
-                    return response.json()["project_id"]
+                    try:
+                        logo  = f"{os.environ.get('SUPABASE_URL')}storage/v1/object/public/{os.environ.get('SUPABASE_S3_BUCKET')}/projects/{self.project_id}/images/{self.logo}"
+                        await self.update_project("logo",logo)
+                        await self.remove_uploaded_files()
+                    except Exception as e:
+                        await self.remove_uploaded_files()
+                        return rx.toast(f"Logo upload error: {str(e)}")
+                    self.logo = None
+                    self.project_details = response.json()["project_id"]
                 else:
                     detail = response.json()["detail"]
-                    return rx.toast(f"User update error: {response.status_code}, {detail}")
+                    self.logo = None
+                    return rx.toast(f"Project update error: {response.status_code}, {detail}")
         except Exception as e:
+            self.logo = None
+            return rx.toast(f"File upload error: {str(e)}")
+        
+        
+    async def supabase_upload_image(self,project_id):
+        try:
+            outfile = rx.get_upload_dir() / self.image
+
+            with open(outfile, "rb") as image_file:
+                files = {"file": (self.image, image_file, "image/png")}
+                data = {"project_id": project_id}
+                headers = {"Authorization": f"Bearer {self.token}"}
+
+                async with httpx.AsyncClient() as client:
+                    response = await client.post(f"{urls.API_URL}/api/projects/upload_image?project_id={project_id}", 
+                                                files=files, data=data, headers=headers)
+
+                if response.status_code == 200:
+                    try:
+                        image  = f"{os.environ.get('SUPABASE_URL')}storage/v1/object/public/{os.environ.get('SUPABASE_S3_BUCKET')}/projects/{self.project_id}/images/{self.image}"
+                        await self.update_project("image",image)
+                        await self.remove_uploaded_files()
+                        self.image = None
+                        self.project_details = response.json()["project_id"]
+                    except Exception as e:
+                        self.image = None
+                        await self.remove_uploaded_files()
+                        return rx.toast(f"Image upload error: {str(e)}")
+                else:
+                    detail = response.json()["detail"]
+                    self.image = None
+                    await self.remove_uploaded_files()
+                    return rx.toast(f"Project update error: {response.status_code}, {detail}")
+        except Exception as e:
+            self.image = None
+            await self.remove_uploaded_files()
             return rx.toast(f"File upload error: {str(e)}")
         
         
@@ -147,9 +203,9 @@ class ProjectState(rx.State):
             project_id = str(uuid.uuid4())
 
             if self.logo:
-                await self.supabase_upload(project_id,self.logo)
+                await self.supabase_upload_logo(project_id)
             if self.image:
-                await self.supabase_upload(project_id,self.image)
+                await self.supabase_upload_image(project_id)
 
             input_data = {
                 "project_id": project_id, 
@@ -163,6 +219,7 @@ class ProjectState(rx.State):
                 "attachment": form_data["attachment"] if form_data["attachment"] else "",
                 "guide": form_data["guide"] if form_data["guide"] else "",
                 "repo": form_data["repo"] if form_data["repo"] else "",
+                "org_name": form_data["org_name"] if form_data["org_name"] else "",
             }
 
             headers = {"Authorization": f"Bearer {self.token}"}
@@ -189,7 +246,7 @@ class ProjectState(rx.State):
         async with httpx.AsyncClient() as client:
             response = await client.delete(
                 f"{urls.API_URL}/api/projects/delete_project?project_id={project_id}",
-                # headers = {"Authorization": f"Bearer {self.token}"},
+                headers = {"Authorization": f"Bearer {self.token}"},
             )
         
         if response.status_code == 200:
@@ -315,6 +372,20 @@ class ProjectState(rx.State):
         except Exception as e:
             print(f"An error occurred: {e}")
             
+    
+    async def find_orgs_project(self):
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{urls.API_URL}/api/projects/orgs?project_id={self.project_id}",
+                )
+            if response.status_code == 200:
+                self.project_orgs = response.json()
+            else:
+                print(f"Failed to get projects: {response.status_code}, {response.text}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            
             
     async def user_unfollow_project(self,user_id:str):
 
@@ -371,6 +442,8 @@ class ProjectState(rx.State):
             
             if response.status_code == 200:
                 self.selected_project = response.json()
+                await self.get_list_projects()
+                await self.load_project_page()
                 return rx.toast.success(f"{key} updated successfully")
             else:
                 detail = response.json()["detail"]

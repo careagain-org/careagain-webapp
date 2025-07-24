@@ -36,6 +36,7 @@ class CreateProject(BaseModel):
     guide: Optional[str]
     attachment: Optional[str]
     status: Optional[str]
+    org_name: Optional[str]
     
     class Config:
         from_attributes = True

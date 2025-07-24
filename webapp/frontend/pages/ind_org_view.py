@@ -8,6 +8,7 @@ from typing import Dict
 from ..components.map import interactive_map,map_org
 from ..components.user_card import users_grid_horizontal
 from ..components.button_follow import FollowButton
+from ..components.project_table import table_pagination
 
 orgs_following = []
 
@@ -92,6 +93,11 @@ def view_organization() -> rx.Component:
             rx.heading("Members",size="5"),
         ),
         users_grid_horizontal(OrgState.org_members),
+        rx.hstack(
+            rx.icon("square-library"),
+            rx.heading("Projects",size="5"),
+        ),
+        table_pagination(OrgState.org_projects,"organization"),
         width="100%",
         align="start",
     )

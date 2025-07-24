@@ -5,6 +5,7 @@ from ..states.project_state import ProjectState
 from ..states.user_state import UserState
 from ..states.auth_state import AuthState
 from typing import Dict
+from ..components.org_table import table_pagination as org_table
 from ..components.user_card import users_grid_horizontal
 
 
@@ -101,11 +102,17 @@ def view_project() -> rx.Component:
                     id="download_button_attachment",
                 ),
         ),
+        # rx.divider(width='90%'),
+        # rx.hstack(
+        #     rx.icon("newspaper"),
+        #     rx.heading("News and Publications",size="5"),
+        # ),
         rx.divider(width='90%'),
         rx.hstack(
-            rx.icon("newspaper"),
-            rx.heading("News and Publications",size="5"),
+            rx.icon("building-2"),
+            rx.heading("Organizations involved",size="5"),
         ),
+        org_table(ProjectState.project_orgs),
         rx.divider(width='90%'),
         rx.hstack(
             rx.icon("circle-user-round"),

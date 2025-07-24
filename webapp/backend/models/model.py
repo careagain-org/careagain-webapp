@@ -37,12 +37,14 @@ class User(Base):
     verified = Column(Boolean, default=False)
     visible = Column(Boolean, default=True)
     deactivation_date = Column(DATE)
+    creation_date = Column(DATE,default=dt.date.today)
+    modification_date = Column(DATE,default=dt.date.today)
 
 
 class Organization(Base):
     __tablename__='organizations'
     __table_args__ = {'schema': supabase_schema}
-    org_id = Column(String(255),primary_key=True,index=True,default=uuid.uuid4)
+    org_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
     name = Column(String(255))
     type = Column(String(255))
     description = Column(Text)
@@ -57,6 +59,8 @@ class Organization(Base):
     verified = Column(Boolean, default=False)
     visible = Column(Boolean)
     storage_path  = Column(String(255))
+    creation_date = Column(DATE,default=dt.date.today)
+    modification_date = Column(DATE,default=dt.date.today)
     
 
 class User_Organization(Base):
@@ -67,6 +71,16 @@ class User_Organization(Base):
     user_id = Column(String(255),ForeignKey(f"{supabase_schema}.users.user_id"))
     org_id = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.organizations.org_id"))
     member_type = Column(String(255))
+    
+    
+class Project_Organization(Base):
+    __tablename__='projects_orgs'
+    __table_args__ = {'schema': supabase_schema}
+
+    rel_uo_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
+    project_id = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.projects.project_id"))
+    org_id = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.organizations.org_id"))
+    # member_type = Column(String(255))
 
 
 class Project(Base):
@@ -85,6 +99,8 @@ class Project(Base):
     attachment = Column(Text)
     status = Column(String(255))
     verified = Column(Boolean,default=False)
+    creation_date = Column(DATE,default=dt.date.today)
+    modification_date = Column(DATE,default=dt.date.today)
 
 
 
@@ -97,16 +113,16 @@ class User_Project(Base):
     member_type = Column(String(255))
     
 
-# class Action(Base):
-#     __tablename__= 'actions'
-#     __table_args__ = {'schema': supabase_schema}
-#     action_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
-#     performed_by = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.users.user_id"))
-#     received_by = Column(UUID(as_uuid=True),ForeignKey(f"{supabase_schema}.projects.project_id"),ForeignKey(f"{supabase_schema}.organizations.org_id"),ForeignKey(f"{supabase_schema}.users.user_id"))
-#     action_type = Column(String(255))  
-#     receiver_type = Column(String(255))  # 'project', 'organization', 'user'
-#     description = Column(Text)
-#     action_date = Column(DATE)
+class Action(Base):
+    __tablename__= 'actions'
+    __table_args__ = {'schema': supabase_schema}
+    action_id = Column(UUID(as_uuid=True),primary_key=True,index=True,default=uuid.uuid4)
+    performed_by = Column(String(255),ForeignKey(f"{supabase_schema}.users.user_id"))
+    received_by = Column(UUID(as_uuid=True))
+    action_type = Column(String(255))  
+    receiver_type = Column(String(255))  # 'project', 'organization', 'user'
+    description = Column(Text)
+    action_date = Column(DATE,default=dt.date.today)
 
 
 # class Video(Base):

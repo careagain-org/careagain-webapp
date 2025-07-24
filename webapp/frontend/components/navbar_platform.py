@@ -25,7 +25,6 @@ def navbar_platform() -> rx.Component:
                 #     ),
                 rx.menu.separator(),
                 rx.color_mode.button(color="teal",size="3"),
-                notification_popover(),
                 rx.fragment(
                     reclerk.signed_out(
                         reclerk.sign_in_button(rx.button("Sign In", size="3", color="teal",variant ="soft",on_click=nav_state.NavState.to_login)),
@@ -34,6 +33,7 @@ def navbar_platform() -> rx.Component:
                 ),
                 rx.fragment(
                     reclerk.signed_in(
+                        notification_popover(),
                         reclerk.user_button()
                         # navbar_profile(),
                     ),
@@ -49,14 +49,15 @@ def navbar_platform() -> rx.Component:
                 # navbar_icon("search", urls.HOME_URL),
                 rx.menu.separator(),
                 rx.color_mode.button(color="teal"),
-                notification_popover(),
                 rx.fragment(
                     reclerk.signed_out(
                         reclerk.sign_in_button(rx.button("Sign In", size="3", color="teal",variant ="soft",on_click=nav_state.NavState.to_login)),
+                        reclerk.sign_up_button(rx.button("Sign Up", size="3", color="teal",variant ="outline",on_click=nav_state.NavState.to_signup)),
                     ),
                 ),
                 rx.fragment(
                     reclerk.signed_in(
+                        notification_popover(),
                         reclerk.user_button()
                     ),
                 ),

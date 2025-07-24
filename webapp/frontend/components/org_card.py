@@ -109,9 +109,14 @@ def org_card_horizontal(org)-> rx.Component:
         rx.card(
             rx.link(
                 rx.flex(
-                    rx.avatar(src=f"{org["logo"]}",
+                    rx.center(
+                        rx.image(src=f"{org["logo"]}",
                             width="140px",
-                            height="140px"),
+                            max_height="140px",
+                            align="center"),
+                        height="140px",
+                        align="center",
+                    ),
                     rx.heading(org["name"],align="center"),
                     spacing="2",
                     direction="column",
@@ -120,14 +125,14 @@ def org_card_horizontal(org)-> rx.Component:
                 ),
                 href=f"{urls.IND_ORG_URL}/{org['org_id']}",
                 on_click=OrgState.to_org_view(org["org_id"]),
-                align="start"
+                align="center"
             ),
             # as_child=True,
             size="5",
             height='220px',
             width='180px',
             padding ="2%",
-            align="start",
+            align="center"
         ),
         height = 'auto',
         align='start',

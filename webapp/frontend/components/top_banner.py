@@ -1,4 +1,5 @@
 import reflex as rx
+from ..states import nav_state
 
 class TopBannerSignup(rx.ComponentState):
     hide: bool = False
@@ -26,6 +27,7 @@ class TopBannerSignup(rx.ComponentState):
                         "Sign up",
                         cursor="pointer",
                         radius="large",
+                        on_click =nav_state.NavState.to_login
                     ),
                     rx.icon(
                         "x",

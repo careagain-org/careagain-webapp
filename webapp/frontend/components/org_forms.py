@@ -13,8 +13,8 @@ from ..components.org_card import org_grid_vertical
 
 
 def form_org() -> rx.Component:
-    all_organization: list[str] = ["Hospital", "Logistics & transport",
-                                    "Research & Development","Manufacturer"]
+    all_organization: list[str] = ["Hospital", "Logistics and Transport",
+                                    "Research and Development","Manufacturer"]
 
     return rx.dialog.content(
         rx.dialog.title(f"Add new organization"),
@@ -227,6 +227,45 @@ def update_coordinates_form():
                 spacing="5",
                 align="center",
                 on_submit=OrgState.update_coordinates,
+                reset_on_submit=True,
+            ),
+        )
+    ),
+    
+
+def update_image_form():
+    return rx.dialog.root(
+        rx.dialog.trigger(rx.button("Update image"), on_click=OrgState.remove_uploaded_files),
+        rx.dialog.content(
+            rx.form(
+                rx.dialog.title("Update location"),
+                upload_logo_org(title="Logo",my_image=rx.get_upload_url(OrgState.logo)),
+                rx.spacer(size="5"),
+                rx.flex(
+                    rx.dialog.close(
+                        rx.button(
+                            "Cancel",
+                            color_scheme="gray",
+                            variant="soft",
+                            justify="start",
+                            type ="button",),
+                    ),
+                    rx.dialog.close(
+                        rx.button("Save",
+                            type ="submit",
+                            justify="end",
+                            color_scheme="teal"),
+                    ),
+                    
+                    spacing="5",
+                    margin_top="16px",
+                    justify="end",
+                    width="100%",
+                    min_height="100px",
+                ),
+                spacing="5",
+                align="center",
+                on_submit=OrgState.supabase_upload(OrgState.org_id),
                 reset_on_submit=True,
             ),
         )

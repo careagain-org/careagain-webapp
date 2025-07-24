@@ -7,47 +7,83 @@ from typing import Dict
 from ..components.map import interactive_map
 from ..components.user_card import users_grid_horizontal
 from ..components.user_table import table_pagination
+from ..components.org_table import table_pagination as org_table
 from ..components.project_input_text import ProjectEditableText,ProjectEditableTextArea
 from ..components.project_upload import upload_logo_project,upload_image_project
 from ..components.forms_popover import add_new,search_user
+from ..components.project_forms import update_logo_form,update_image_form
 
 editable_text = ProjectEditableText.create
 editable_textarea = ProjectEditableTextArea.create
+status: list[str] = ["Prototype","Technically tested","Clinically tested",
+                             "Regulatory body approval"]
 
 
-def title_section(title:str, icon:str):
+def title_section(title:str, icon:str, text:str = "") -> rx.Component:
     return rx.hstack(
                 rx.icon(icon),
                 rx.heading(title,size="5"),
+                rx.text(text),
                 align="start",
             ),
     
 
-@rx.page(route=f"{urls.IND_EDIT_PROJECT_URL}/[pr_id]")
+@rx.page(route=f"{urls.IND_EDIT_PROJECT_URL}/[pr_id]", on_load= [ProjectState.load_project_page,
+                                                            ProjectState.find_members_project,
+                                                            ProjectState.find_orgs_project])
 def edit_project() -> rx.Component:
     project=ProjectState.selected_project
     my_child = rx.vstack(
         rx.link(rx.icon('arrow_left'),href=urls.PROFILE_URL),
-        rx.hstack(
-            rx.heading(project['name'], size="9"),
-            rx.cond(project['verified'],
-                    rx.badge("Verified",variant="surface",color_scheme="teal"),
-                    rx.badge("Non-Verified",variant="surface",color_scheme="amber")),
-            align="center",
-        ),
-        rx.hstack(
-            rx.icon("globe"),
-            editable_text(value = project["website"],key = "website"),
-        ),
-        rx.hstack(
-            rx.icon("github"),
-            editable_text(value = project["repo"],key = "repo"),
-            # rx.text(projectState.selected_project['email'])
+        rx.flex(
+            rx.vstack(
+                rx.heading(project['name'], size="9"),
+                rx.cond(project['verified'],
+                        rx.badge("Verified",variant="surface",color_scheme="teal"),
+                        rx.badge("Non-Verified",variant="surface",color_scheme="amber")),
+                rx.hstack(
+                    rx.text("Status: "),
+                    rx.select(status, 
+                              value=project["status"],
+                              placeholder="Select Project Status",
+                              name="status",
+                              on_change= lambda value: ProjectState.update_project("status",value)),
+                ),
+                rx.hstack(
+                    rx.icon("globe"),
+                    editable_text(value = project["website"],key = "website"),
+                ),
+                rx.hstack(
+                    rx.icon("github"),
+                    editable_text(value = project["repo"],key = "repo"),
+                    # rx.text(projectState.selected_project['email'])
+                ),   
+                justify="between",      
+            ),
+            rx.vstack(
+                rx.image(src=project["logo"],
+                            border_radius="15px 15px 15px 15px",
+                            height="100px"),
+                update_logo_form(),
+                width="20vw",
+                justify="center",
+                align="center"
+            ),
+            justify="between",
+            spacing="5",  
+            direction="row",
+            width="100%",
         ),
         rx.divider(width='90%'),
         rx.flex(
-            upload_image_project(title="Logo",my_image=project["logo"]),
-            upload_image_project(title="Representative image",my_image=project["image"]),
+            rx.vstack(
+                title_section("Representative Image","image"),
+                rx.image(src=project["image"],
+                            border_radius="15px 15px 15px 15px",
+                            height="auto",),
+                update_image_form(),
+                width="30vw",
+            ),
             rx.vstack(
                 title_section("Description","file_text"),
                 editable_textarea(value = project["description"],key = "description"),
@@ -58,7 +94,7 @@ def edit_project() -> rx.Component:
         ),
         rx.divider(width='90%'),
         rx.hstack(
-            title_section("Downloads","file_text"),
+            title_section("Downloads","file_text",text="*(include https:// or http:// in the urls)"),
             id="download_section",
             width='90%',
             align="start",
@@ -73,6 +109,23 @@ def edit_project() -> rx.Component:
             editable_textarea(value = project["attachment"],key = "attachment"),
             width="60%"
         ),
+        rx.divider(width='90%'),
+        rx.hstack(
+            rx.icon("building-2"),
+            rx.heading("Organizations involved",size="5"),
+        ),
+        # rx.hstack(
+        #     # add_new("user"), #commented because I cannot invite without admin permissions
+        #     rx.container(
+        #         rx.hstack(
+        #         search_user("project"),
+        #         rx.text(f"Click to search an existing user"),
+        #         align="center",
+        #     ),),
+        #     align="start",
+        #     spacing="4",
+        # ),
+        org_table(ProjectState.project_orgs),
         rx.divider(width='90%'),
         rx.hstack(
             rx.icon("circle-user-round"),
@@ -90,8 +143,6 @@ def edit_project() -> rx.Component:
             spacing="4",
         ),
         table_pagination(ProjectState.project_members,"project"),
-        on_mount=[ProjectState.load_project_page,
-                ProjectState.find_members_project]
     )
 
     return platform_layout(my_child)

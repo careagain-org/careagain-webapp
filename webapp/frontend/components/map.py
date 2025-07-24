@@ -49,29 +49,35 @@ class MapState(OrgState):
                 
                 try:
                     org_pop_up = self.pop_up_template(org)
-                    if org["type"] == "Research & Development":
+                    if org["type"] == "Research and Development":
                         folium.Marker(
                             location=[float(org["latitude"]), float(org["longitude"])],
                             popup=org_pop_up,
                             icon=folium.Icon(color="green",icon="cogs", prefix="fa") #atom
                         ).add_to(g1)
-                    elif org["type"] == "Logistics & transport":
+                    elif org["type"] == "Logistics and Transport":
                         folium.Marker(
                             location=[float(org["latitude"]), float(org["longitude"])],
-                            popup=org["name"],
+                            popup=org_pop_up,
                             icon=folium.Icon(color="blue",icon="truck", prefix="fa") #route
                         ).add_to(g2)
                     elif org["type"] == "Hospital":
                         folium.Marker(
                             location=[float(org["latitude"]), float(org["longitude"])],
-                            popup=org["name"],
+                            popup=org_pop_up,
                             icon=folium.Icon(color="red",icon="medkit", prefix="fa")
                         ).add_to(g3)
                     elif org["type"] == "Manufacturer":
                         folium.Marker(
                             location=[float(org["latitude"]), float(org["longitude"])],
-                            popup=org["name"],
+                            popup=org_pop_up,
                             icon=folium.Icon(color="beige",icon="wrench")
+                        ).add_to(g4)
+                    else:
+                        folium.Marker(
+                            location=[float(org["latitude"]), float(org["longitude"])],
+                            popup=org_pop_up,
+                            icon=folium.Icon(color="grey",icon="atom")
                         ).add_to(g4)
                 except Exception as err:
                     print(err)
@@ -151,11 +157,13 @@ class MapState(OrgState):
                 }}
                 .card {{
                     display: flex;
+                    flex-direction: row;
                     align-items: center;
                     gap: 20px;
                     border: 1px solid #ccc;
                     padding: 20px;
                     max-width: 600px;
+                    min-width: 300px;
                 }}
                 .icon {{
                     font-size: 60px;
@@ -187,13 +195,13 @@ class MapState(OrgState):
         <body>
             <div class="card">
                 <div class="icon">
-                    <img src={image} style="width: 60px; height: 60px;">
+                    <img src={image} style="width: 100px;" alt="Logo" />
                 </div>
                 <div class="content">
                     <div class="title">
                         <a href={org_link} target="_top">{org_name}</a>
                     </div>
-                    <div class="subtitle">{description}</div>
+                    <div class="subtitle">{type}</div>
                 </div>
             </div>
         </body>
@@ -201,8 +209,8 @@ class MapState(OrgState):
         """.format(
             image=org["logo"],
             org_name=org["name"],
-            org_link=f"{urls.WEB_URL}/{urls.IND_ORG_URL}/{org['org_id']}",
-            description=org["email"],
+            org_link=f"{urls.WEB_URL}{urls.IND_ORG_URL}/{org['org_id']}",
+            type=org["type"],
             link=org["website"]
         )
         return html
