@@ -1,4 +1,5 @@
 import reflex as rx 
+import reflex_clerk_api as reclerk
 from ..layout import platform_layout
 from ..constants import urls
 from ..states.project_state import ProjectState
@@ -9,10 +10,9 @@ from ..components.org_table import table_pagination as org_table
 from ..components.user_card import users_grid_horizontal
 
 
-@rx.page(route=f"{urls.IND_PROJECT_URL}/[pr_id]",on_load=[UserState.get_my_details,
-                                                        ProjectState.load_project_page,
-                                                        ProjectState.find_members_project,
-                                                        ProjectState.get_my_projects])
+@rx.page(route=f"{urls.IND_PROJECT_URL}/[pr_id]",on_load=[AuthState.set_user_cookie,
+                                                          ProjectState.load_project_page,
+                                                        ProjectState.find_members_project])
 def view_project() -> rx.Component:
     my_child = rx.vstack(
         # rx.link(rx.icon('arrow_left'),href=urls.PROJECTS_URL),
@@ -20,14 +20,18 @@ def view_project() -> rx.Component:
             rx.vstack(
                 rx.hstack(
                     rx.heading(ProjectState.selected_project['name'], size="9"),
-                    rx.cond(ProjectState.is_project_member,
-                            rx.button("Unfollow",variant="outline",type="button",
-                                      on_click = lambda: ProjectState.user_unfollow_project(UserState.my_details["user_id"]),
-                                      ),
-                            rx.button("Follow",variant="solid",
-                                on_click = lambda: ProjectState.user_follow_project(UserState.my_details["user_id"]),
-                                type="button"),
-                ),align="center",
+                    reclerk.signed_in(
+                        rx.cond(ProjectState.is_project_member,
+                                rx.button("Unfollow",variant="outline",type="button",
+                                          on_mount=[ProjectState.get_my_projects,UserState.get_my_details],
+                                        on_click = lambda: ProjectState.user_unfollow_project(UserState.my_details["user_id"]),
+                                        ),
+                                rx.button("Follow",variant="solid",
+                                    on_click = lambda: ProjectState.user_follow_project(UserState.my_details["user_id"]),
+                                    on_mount=[ProjectState.get_my_projects,UserState.get_my_details],
+                                    type="button"),
+                    ),),
+                    align="center",
                     padding="5",),
                 rx.hstack(
                     rx.text("Status: ",color="accent"),
@@ -121,6 +125,7 @@ def view_project() -> rx.Component:
         users_grid_horizontal(ProjectState.project_members),
         width ="100%",
         spacing="3",
+            
     )
 
     return platform_layout(my_child)

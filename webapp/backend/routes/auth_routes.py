@@ -213,14 +213,8 @@ def refresh_session(session = Depends(oauth2schema)):
 #     return session_token
 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials,APIKeyCookie
-cookie_session = APIKeyCookie(name="__session_x5BkYaXO")
+cookie_session = APIKeyCookie(name="auth_token")
 
-# @auth_route.get("/api/your_endpoint")
-# def secure_endpoint(cookie_session: HTTPAuthorizationCredentials = Depends(cookie_session)):
-#     return cookie_session
-    
-# from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials,APIKeyCookie
-# cookie_session = APIKeyCookie(name="__session")
 
 @auth_route.get("auth_token")
 def secure_endpoint(token: str = Depends(cookie_session)):
@@ -228,6 +222,7 @@ def secure_endpoint(token: str = Depends(cookie_session)):
         return token
     except Exception as err:
         return err
+    
     
 @auth_route.get("auth_user")
 def secure_user(token: str = Depends(cookie_session)):

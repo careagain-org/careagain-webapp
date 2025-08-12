@@ -1,4 +1,5 @@
 import reflex as rx 
+import reflex_clerk_api as reclerk
 from ..layout import platform_layout
 from ..constants import urls
 from ..states.org_state import OrgState
@@ -21,14 +22,16 @@ def view_organization() -> rx.Component:
         # rx.link(rx.icon('arrow_left'),href=urls.COMMUNITY_PLATFORM),
         rx.flex(
             rx.heading(OrgState.selected_org['name'], size="9"),
-            rx.cond(OrgState.is_org_member,
-                        rx.button("Unfollow",variant="outline",type="button",
-                                  on_click = lambda: OrgState.user_unfollow_org(UserState.my_details["user_id"]),
-                                  ),
-                        rx.button("Follow",variant="solid",
-                            on_click = lambda: OrgState.user_follow_org(UserState.my_details["user_id"]),
-                            type="button"),
-                        ),
+            reclerk.signed_in(
+                rx.cond(OrgState.is_org_member,
+                            rx.button("Unfollow",variant="outline",type="button",
+                                    on_click = lambda: OrgState.user_unfollow_org(UserState.my_details["user_id"]),
+                                    ),
+                            rx.button("Follow",variant="solid",
+                                on_click = lambda: OrgState.user_follow_org(UserState.my_details["user_id"]),
+                                type="button"),
+                            ),
+            ),
             justify="start",
             direction="row",
             align="center",
@@ -36,12 +39,23 @@ def view_organization() -> rx.Component:
             width="90%",
             
         ),
-        rx.cond(OrgState.selected_org['verified'],
-                    rx.badge("Verified",variant="surface",color_scheme="teal"),
-                    rx.badge("Non-Verified",variant="surface",color_scheme="amber")),
+        rx.hstack(
+                    rx.text("Status: ",color="accent"),
+                    rx.cond(OrgState.selected_org['verified'],
+                        rx.badge("Verified",variant="surface",color_scheme="teal"),
+                        rx.badge("Non-Verified",variant="surface",color_scheme="amber")),
+                    rx.text("Type: ",color="accent"),
+                    rx.match(OrgState.selected_org["type"],
+                     ("Research and Development",rx.badge("R&D",variant="surface",color_scheme="grass")),
+                     ("Manufacturer",rx.badge("Manufacturer",variant="surface",color_scheme="brown")),
+                     ("Logistics and Transport",rx.badge("Logistics and Transport",variant="surface",color_scheme="cyan")),
+                     ("Hospital",rx.badge("Hospital or Health center",variant="surface",color_scheme="ruby")),
+                     rx.badge("Not defined",variant="surface",color_scheme="gray")),
+                    align="center",
+                ),
         rx.hstack(
             rx.icon("globe"),
-            rx.link(OrgState.selected_org['website'],href=OrgState.selected_org['website'],is_external=True)
+            rx.link(OrgState.selected_org['website'],href=str(OrgState.selected_org['website']),is_external=True)
         ),
         rx.hstack(
             rx.icon("mail"),

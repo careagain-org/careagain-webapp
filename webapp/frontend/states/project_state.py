@@ -1,4 +1,7 @@
 from fileinput import filename
+from datetime import datetime, timedelta, timezone
+import reflex_clerk_api as reclerk
+import jwt
 import reflex as rx
 import httpx
 import requests
@@ -11,7 +14,7 @@ import uuid
 import os
 import glob
 
-
+secret_key = os.getenv("CLERK_SECRET_KEY")
 
 class ProjectState(rx.State):
     projects: List[Dict[str, str]] = []
@@ -28,9 +31,34 @@ class ProjectState(rx.State):
     image: str = None
     is_project_member: bool = False
     token:Optional[str]=rx.Cookie(
-                name="__session",
+                name="auth_token", max_age=30,
+                path="/",
                 same_site="lax",
+                secure=True,
             ) 
+    
+    
+    async def set_auth_token(self) -> Optional[str]:
+        clerk_state = await self.get_state(reclerk.ClerkState)
+        clerk_user = await self.get_state(reclerk.ClerkUser)
+        
+        if clerk_state.is_signed_in:
+            payload = {
+                "role": "authenticated",
+                'id': clerk_state.user_id,
+                'username': clerk_user.username,
+                'first_name': clerk_user.first_name,
+                'last_name': clerk_user.last_name,
+                'profile_image_url': clerk_user.image_url,
+                'sub': clerk_state.user_id,
+                'exp': datetime.now(timezone.utc) + timedelta(seconds=60)  # Token expiration time
+            }
+            auth_token = jwt.encode(payload, secret_key, algorithm='HS256')
+            self.token = auth_token
+            return auth_token
+        else:
+            self.token = None
+            return None
     
     def reset_project(self):
         self.logo =None
@@ -45,7 +73,8 @@ class ProjectState(rx.State):
         
 
     async def get_list_projects(self):
-
+        self.token = await self.set_auth_token()
+        
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"{urls.API_URL}/api/projects/",
@@ -69,6 +98,7 @@ class ProjectState(rx.State):
             files: The uploaded files.
         """
         try:
+            self.token = await self.set_auth_token()
 
             file=my_files[0]
             upload_data = await file.read()
@@ -91,6 +121,7 @@ class ProjectState(rx.State):
             files: The uploaded files.
         """
         try:
+            self.token = await self.set_auth_token()
 
             file=my_files[0]
             upload_data = await file.read()
@@ -113,7 +144,7 @@ class ProjectState(rx.State):
             files: The uploaded files.
         """
         try:
-
+            self.token = await self.set_auth_token()
             file=my_files[0]
             upload_data = await file.read()
             self.image = f"{uuid.uuid4()}.png"
@@ -133,6 +164,7 @@ class ProjectState(rx.State):
         
     async def supabase_upload_logo(self,project_id):
         try:
+            self.token = await self.set_auth_token()
             outfile = rx.get_upload_dir() / self.logo
 
             with open(outfile, "rb") as image_file:
@@ -165,6 +197,7 @@ class ProjectState(rx.State):
         
     async def supabase_upload_image(self,project_id):
         try:
+            self.token = await self.set_auth_token()
             outfile = rx.get_upload_dir() / self.image
 
             with open(outfile, "rb") as image_file:
@@ -200,6 +233,7 @@ class ProjectState(rx.State):
         
     async def create_new_project(self, form_data: dict):
         try:
+            self.token = await self.set_auth_token()
             project_id = str(uuid.uuid4())
 
             if self.logo:
@@ -242,7 +276,7 @@ class ProjectState(rx.State):
         
         
     async def delete_project(self,project_id):
-
+        self.token = await self.set_auth_token()
         async with httpx.AsyncClient() as client:
             response = await client.delete(
                 f"{urls.API_URL}/api/projects/delete_project?project_id={project_id}",
@@ -258,7 +292,7 @@ class ProjectState(rx.State):
         
     
     async def leave_project(self,project_id):
-
+        self.token = await self.set_auth_token()
         async with httpx.AsyncClient() as client:
             response = await client.delete(
                 f"{urls.API_URL}/api/projects/leave_project?project_id={project_id}",
@@ -274,7 +308,7 @@ class ProjectState(rx.State):
         
 
     async def join_project(self):
-
+        self.token = await self.set_auth_token()
         async with httpx.AsyncClient() as client:
             response = await client.put(
                 f"{urls.API_URL}/api/projects/join_project?project_id={self.project_id}",
@@ -302,7 +336,8 @@ class ProjectState(rx.State):
         
         
     async def get_my_projects(self):
-
+        """Get the list of projects the user is a member of."""
+        self.token = await self.set_auth_token()
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"{urls.API_URL}/api/projects/my_projects",
@@ -330,10 +365,13 @@ class ProjectState(rx.State):
     
 
     async def user_dettached_project(self,user_id:str):
-
+        """Detach a user from the project."""
+        
+        self.token = await self.set_auth_token()
         async with httpx.AsyncClient() as client:
             response = await client.put(
                 f"{urls.API_URL}/api/projects/user_dettached_project?project_id={self.project_id}&user_id={user_id}",
+                headers = {"Authorization": f"Bearer {self.token}"},
             )
         
         if response.status_code == 200:
@@ -345,10 +383,13 @@ class ProjectState(rx.State):
 
 
     async def user_join_project(self,user_id:str):
-
+        """Join a user to the project."""
+        
+        self.token = await self.set_auth_token()
         async with httpx.AsyncClient() as client:
             response = await client.put(
                 f"{urls.API_URL}/api/projects/user_join_project?project_id={self.project_id}&user_id={user_id}",
+                headers = {"Authorization": f"Bearer {self.token}"},
             )
         
         if response.status_code == 200:
@@ -434,6 +475,7 @@ class ProjectState(rx.State):
     
     async def update_project(self,key:str,value:str):
         try:
+            self.token = await self.set_auth_token()
             async with httpx.AsyncClient() as client:
                 response = await client.put(
                     f"{urls.API_URL}/api/projects/update_project?key={key}&value={value}&project_id={self.project_id}",

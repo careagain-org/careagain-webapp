@@ -45,11 +45,14 @@ async def create_project(input:project_schema.CreateProject,
     db.commit()
 
     if input.org_name != "":
+        try:
 
-        org_rel_obj = model.Project_Organization(org_id = input.org_name.split("[")[1].replace("]",""),
-                                        project_id = project_obj.project_id)
-        db.add(org_rel_obj )
-        db.commit()
+            org_rel_obj = model.Project_Organization(org_id = input.org_name.split("[")[1].replace("]",""),
+                                            project_id = project_obj.project_id)
+            db.add(org_rel_obj )
+            db.commit()
+        except Exception as err:
+            logging.error(f"Error adding organization to project: {err}")
     
     action_obj = model.Action(performed_by = user.user_id,
                               received_by = project_obj.project_id,
@@ -75,8 +78,6 @@ async def upload_image(project_id: str,
             raise HTTPException(status_code=400, detail="No file uploaded")
         url_photo = f"projects/{project_id}/images/{file.filename}"
         contents = await file.read()
-        
-        supa_client.storage._client.headers["Authorization"] = f"Bearer {token}"
 
         # Upload with auth headers
         supa_client.storage.from_(f"{bucket_s3}").upload(
@@ -208,7 +209,7 @@ async def get_orgs(project_id:str,
     orgs = db.query(model.Organization).join(
             model.Project_Organization,
             model.Project_Organization.org_id == model.Organization.org_id
-        ).filter(model.User_Project.project_id == project_id).all()
+        ).filter(model.Project_Organization.project_id == project_id).all()
         
     return orgs
 

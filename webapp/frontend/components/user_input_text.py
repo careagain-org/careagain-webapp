@@ -4,7 +4,7 @@ from ..states.user_state import UserState
 
 class EditableText(rx.ComponentState):
     text: str = ""
-    original_text: str
+    original_text: str =""
     editing: bool = False
     key: str = None
 

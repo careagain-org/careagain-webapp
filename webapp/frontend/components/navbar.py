@@ -6,7 +6,7 @@ from .navbar_profile import navbar_profile
 
 def navbar_link(text: str, url: str) -> rx.Component:
     return rx.link(
-        rx.text(text, size="4", weight="medium",color="teal"), href=url
+        rx.text(text, size="4", weight="medium",color="teal"), href=str(url)
     )
 
 def sign_in_buttons() ->rx.Component:

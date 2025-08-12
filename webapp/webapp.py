@@ -7,8 +7,7 @@ from webapp.frontend.pages import (ind_org_view, ind_org_edit,
                                    ind_user_view,login,signup,
                                    webpage, projects, 
                                    platform, projects, profile,
-                                   videos,community, questions,
-                                   reset_password) #contact,community,
+                                   videos,community, questions) #contact,community,
 from webapp.frontend.constants import urls
 from rxconfig import config
 

@@ -54,7 +54,7 @@ def section_title(section_icon:str,section_title:str, go_to_section:str,section_
     return rx.hstack(
         rx.icon(section_icon,color = "teal"),
         rx.heading(section_title,size="5", color = "teal"),
-        rx.link(f"Go to {go_to_section}",href=section_link),
+        rx.link(f"Go to {go_to_section}",href=str(section_link)),
         spacing = "5",
         color = "accent"
     )
@@ -130,10 +130,12 @@ def search_existing(text:str):
 
 
 @rx.page(route=urls.PROFILE_URL, on_load= [UserState.get_my_details,
-                                           OrgState.get_my_orgs,OrgState.get_orgs,
-                                           ProjectState.get_list_projects,ProjectState.get_my_projects])
+                                            OrgState.get_my_orgs,
+                                            OrgState.get_orgs,
+                                            ProjectState.get_list_projects,
+                                            ProjectState.get_my_projects
+                                            ])
 def profile() -> rx.Component:
-    logging.info(f"Rendering profile page: {AuthState.token}")
     profile = rx.vstack(
                 rx.heading('My profile', size="9"),
                 section_title("book-user",'My User',"Users", f"{urls.COMMUNITY_PLATFORM}/#users"),

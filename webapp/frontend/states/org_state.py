@@ -1,18 +1,19 @@
 import reflex as rx
+import reflex_clerk_api as reclerk
 import httpx
 from ..constants import urls
 from typing import List, Dict, Any, Optional
 from .auth_state import AuthState
 import uuid
-import datetime as dt
+from datetime import datetime, timedelta, timezone
 import clipboard
 import pyperclip
-import json
+import jwt
 import os
 import dotenv
 import glob
 
-CLERK_COOKIE_CODE =os.environ["CLERK_PUBLIC_KEY"]
+secret_key = os.getenv("CLERK_SECRET_KEY")
 
 class OrgState(rx.State):
     org_types: list[str] = ["Hospital", "Logistics & transport",
@@ -31,18 +32,39 @@ class OrgState(rx.State):
     logo: str =""
     is_org_member: bool=False
     token:Optional[str]=rx.Cookie(
-                name=f"__session",
+                name="auth_token", max_age=30,
+                path="/",
+                same_site="lax",
+                secure=True,
             ) 
+    
+    
+    async def set_auth_token(self) -> Optional[str]:
+        clerk_state = await self.get_state(reclerk.ClerkState)
+        clerk_user = await self.get_state(reclerk.ClerkUser)
+        
+        if clerk_state.is_signed_in:
+            payload = {
+                "role": "authenticated",
+                'id': clerk_state.user_id,
+                'username': clerk_user.username,
+                'first_name': clerk_user.first_name,
+                'last_name': clerk_user.last_name,
+                'profile_image_url': clerk_user.image_url,
+                'sub': clerk_state.user_id,
+                'exp': datetime.now(timezone.utc) + timedelta(seconds=60)  # Token expiration time
+            }
+            auth_token = jwt.encode(payload, secret_key, algorithm='HS256')
+            self.token = auth_token
+            return auth_token
+        else:
+            self.token = None
+            return None
     
     @rx.var(cache=True)
     def my_org_names(self) -> list[str]:
         return [f"{org["name"]} [{org["org_id"]}]" for org in self.my_orgs]
-        
-    
-    async def get_token(self):
-        return rx.Cookie(
-                name=f"__session",
-            ) 
+
     
     @rx.event
     def update_location(self):
@@ -75,19 +97,23 @@ class OrgState(rx.State):
         except Exception as err:
             return rx.toast(err)
     
+    
     async def remove_uploaded_files(self):
+        self.logo =""
         files = glob.glob(f"{rx.get_upload_dir()}/*")
         for f in files:
             os.remove(f)
-    
+            
+
     async def supabase_upload(self,org_id):
-        await self.get_token()
+        """Upload the logo to Supabase storage and update the organization details."""
+        self.token = await self.set_auth_token()
         try:
             outfile = rx.get_upload_dir() / self.logo 
 
             with open(outfile, "rb") as image_file:
                 files = {"file": (self.logo, image_file, "image/png")}
-                data = {"org_id": self.org_id}
+                data = {"org_id": org_id}
                 headers = {"Authorization": f"Bearer {self.token}"}
 
                 async with httpx.AsyncClient() as client:
@@ -96,7 +122,7 @@ class OrgState(rx.State):
 
                 if response.status_code == 200:
                     try:
-                        logo  = f"{os.environ.get("SUPABASE_URL")}storage/v1/object/public/{os.environ.get("SUPABASE_S3_BUCKET")}/orgs/{self.org_id}/images/{self.logo}"
+                        logo  = f"{os.environ.get("SUPABASE_URL")}storage/v1/object/public/{os.environ.get("SUPABASE_S3_BUCKET")}/orgs/{org_id}/images/{self.logo}"
                         await self.update_org("logo",logo)
                     except:
                         print("org doesn't exist")
@@ -121,12 +147,10 @@ class OrgState(rx.State):
             return None
 
     async def create_new_org(self, form_data: dict):
-        await self.get_token()
+        """Create a new organization with the provided form data."""
+        self.token= await self.set_auth_token()
         try:
             org_id = str(uuid.uuid4())
-
-            if self.logo:
-                await self.supabase_upload(org_id)
 
             input_data = {
                 "org_id": org_id, 
@@ -147,6 +171,9 @@ class OrgState(rx.State):
             async with httpx.AsyncClient() as client:
                 response = await client.post(f"{urls.API_URL}/api/orgs/create_org", 
                                             json=input_data, headers=headers)
+                
+            if self.logo:
+                await self.supabase_upload(org_id)
 
             if response.status_code == 200:
                 self.org_details = response.json()["org_details"]
@@ -161,7 +188,7 @@ class OrgState(rx.State):
 
 
     async def get_my_orgs(self):
-        await self.get_token()
+        self.token = await self.set_auth_token()
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"{urls.API_URL}/api/orgs/my_organizations",
@@ -177,7 +204,7 @@ class OrgState(rx.State):
             
 
     async def delete_my_org(self,org_id):
-
+        self.token = await self.set_auth_token()
         async with httpx.AsyncClient() as client:
             response = await client.delete(
                 f"{urls.API_URL}/api/orgs/delete_org?org_id={org_id}",
@@ -193,7 +220,7 @@ class OrgState(rx.State):
         
     
     async def leave_my_org(self,org_id):
-        self.get_token()
+        self.token = await self.set_auth_token()
         async with httpx.AsyncClient() as client:
             response = await client.delete(
                 f"{urls.API_URL}/api/orgs/leave_org?org_id={org_id}",
@@ -209,7 +236,7 @@ class OrgState(rx.State):
         
 
     async def join_org(self):
-        self.get_token()
+        self.token = await self.set_auth_token()
         async with httpx.AsyncClient() as client:
             response = await client.put(
                 f"{urls.API_URL}/api/orgs/join_org?org_id={self.org_id}",
@@ -306,7 +333,7 @@ class OrgState(rx.State):
     
     
     async def update_org(self,key:str,value:str):
-        self.get_token()
+        self.token = await self.set_auth_token()
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.put(
@@ -316,6 +343,7 @@ class OrgState(rx.State):
             
             if response.status_code == 200:
                 self.selected_org = response.json()
+                await self.get_my_orgs()
                 await self.load_org_page()
                 return rx.toast.success(f"{key} updated successfully")
             else:

@@ -10,7 +10,8 @@ from ..components.org_table import table_pagination as orgs_tables
 from ..components.project_table import table_pagination as projects_tables
 
 
-@rx.page(route=f"{urls.IND_USER_URL}/[us_id]", on_load=[UserState.load_user_page,
+@rx.page(route=f"{urls.IND_USER_URL}/[us_id]", on_load=[AuthState.set_user_cookie,
+                                                        UserState.load_user_page,
                                                         UserState.get_user_projects,
                                                         UserState.get_user_orgs])
 def view_user() -> rx.Component:

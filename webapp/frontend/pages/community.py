@@ -10,6 +10,7 @@ from ..components.org_forms import discover_org
 from ..components.user_forms import discover_user
 from ..states.org_state import OrgState
 from ..states.user_state import UserState
+from ..states.auth_state import AuthState
 from ..components.forms_popover import add_new_popover
 #from ..components.dropdown import selectors,SelectorsState
 
@@ -38,7 +39,7 @@ def filters_panel():
         ),
 
 
-@rx.page(route=urls.COMMUNITY_PLATFORM,on_load=[OrgState.get_orgs,UserState.get_users])
+@rx.page(route=urls.COMMUNITY_PLATFORM,on_load=[AuthState.set_user_cookie,OrgState.get_orgs,UserState.get_users])
 def community_page() -> rx.Component:
     my_child = rx.vstack(
                     rx.hstack(

@@ -14,12 +14,12 @@ def section_title(section_icon:str,section_title:str, section_link:str): # type:
     return rx.hstack(
         rx.icon(section_icon,color = "teal"),
         rx.heading(section_title,size="5", color = "teal"),
-        rx.link(f"Go to {section_title}",href=section_link),
+        rx.link(f"Go to {section_title}",href=str(section_link)),
         spacing = "5",
         color = "accent",
     )
 
-@rx.page(route=urls.PLATFORM_URL, on_load=[UserState.get_my_details,ProjectState.get_list_projects,UserState.get_users,OrgState.get_orgs])
+@rx.page(route=urls.PLATFORM_URL, on_load=[AuthState.set_user_cookie,UserState.get_my_details,ProjectState.get_list_projects,UserState.get_users,OrgState.get_orgs])
 def platform_home() -> rx.Component:
     home = rx.vstack(
                 rx.heading('Most recent', size="5"),

@@ -5,10 +5,7 @@ from ..schemas import user_schema as schema
 from ..config.supabase_config import engine,Base,Session,get_db,supa_client
 #from ..config.db_setup import engine,Base,Session,get_db
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 import os
-import json
-from typing import Annotated
 from clerk_backend_api import Clerk, AuthenticateRequestOptions
 import os
 from dotenv import load_dotenv
@@ -16,14 +13,13 @@ import random as rn
 
 load_dotenv()
 
-clerk_sdk = Clerk(bearer_auth=os.getenv("CLERK_SECRET_KEY"))
-
 from dotenv import load_dotenv,find_dotenv
 
 load_dotenv(find_dotenv())
-# oauth2schema = security.APIKeyCookie(name="__session")
+clerk_sdk = Clerk(bearer_auth=os.getenv("CLERK_SECRET_KEY"))
 cookie2schema = security.APIKeyCookie(name="__session")
 oauth2schema = security.OAuth2PasswordBearer("/api/auth/auth_token")
+# oauth2schema = security.APIKeyCookie(name="auth_token")
 
 credential_exception = HTTPException(status_code = status.HTTP_401_UNAUTHORIZED,
                                          detail = "User not authenticated ",
@@ -46,16 +42,16 @@ def get_cookie_dict(token:str=Depends(oauth2schema)):
         raise credential_exception
 
 
-def get_current_user(token:str=Depends(oauth2schema),
-                            db:Session=Depends(get_db)):
+def get_current_user(token:str= Depends(oauth2schema),
+                    db:Session=Depends(get_db)):
                         #    token:str = Depends(oauth2schema)):
     '''Get current user logged in'''
 
     try:
-        data = jwt.decode(token,os.getenv("JWT_KEY"), algorithms=["RS256"])
-        print(data)
+        data = jwt.decode(token,os.getenv("CLERK_SECRET_KEY"), algorithms=["HS256"])
+
         if data['role']=='authenticated':
-            user_id = data["sub"]
+            user_id = data["id"]
             user = db.query(model.User).filter(model.User.user_id == user_id).first()
             if user is None:
                 user_obj = model.User(user_id = data["id"],

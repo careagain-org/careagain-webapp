@@ -12,10 +12,13 @@ from starlette.requests import Request
 import os
 import dotenv
 import requests
+import jwt
+from datetime import datetime, timedelta, timezone
 
 dotenv.load_dotenv()
 
 # clerk_sdk = Clerk(bearer_auth=os.getenv("CLERK_SECRET_KEY"))
+secret_key = os.getenv("CLERK_SECRET_KEY")
 
 
 class UserState(rx.State):
@@ -32,18 +35,34 @@ class UserState(rx.State):
     user_orgs: List[Dict[str, str]]=[]
     
     token:Optional[str]=rx.Cookie(
-                name="__session",
+                name="auth_token", max_age=30,
+                path="/",
+                same_site="lax",
+                secure=True,
             ) 
     
-    # @rx.var
-    # def token(self)->str:
-    #     cookie_token=rx.Cookie(
-    #             name="__session",
-    #             path="/",
-    #             same_site="lax",
-    #             secure=True,
-    #         ) 
-    #     return cookie_token
+    
+    async def set_auth_token(self) -> Optional[str]:
+        clerk_state = await self.get_state(reclerk.ClerkState)
+        clerk_user = await self.get_state(reclerk.ClerkUser)
+        
+        if clerk_state.is_signed_in:
+            payload = {
+                "role": "authenticated",
+                'id': clerk_state.user_id,
+                'username': clerk_user.username,
+                'first_name': clerk_user.first_name,
+                'last_name': clerk_user.last_name,
+                'profile_image_url': clerk_user.image_url,
+                'sub': clerk_state.user_id,
+                'exp': datetime.now(timezone.utc) + timedelta(seconds=60)  # Token expiration time
+            }
+            auth_token = jwt.encode(payload, secret_key, algorithm='HS256')
+            self.token = auth_token
+            return auth_token
+        else:
+            self.token = None
+            return None
     
     async def user_whipeout(self):
         self.image_path: str =""
@@ -62,12 +81,15 @@ class UserState(rx.State):
     async def load_user_page(self):
         current_page_route = self.router.page.raw_path
         user_id =current_page_route.split("/")[-2]
-        print(f"User ID: {user_id}")
+        # print(f"User ID: {user_id}")
         self.selected_user_id = user_id
         self.selected_user = [d for d in self.users if d['user_id']==(user_id)][0]
     
 
     async def get_my_details(self):
+        """Get the details of the current user."""
+        self.token = await self.set_auth_token()
+
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.get(
@@ -86,6 +108,7 @@ class UserState(rx.State):
 
     async def update_user(self,key:str,value:str):
         try:
+            self.token = await self.set_auth_token()
             async with httpx.AsyncClient() as client:
                 response = await client.put(
                     f"{urls.API_URL}/api/users/update_user?key={key}&value={value}",
@@ -111,6 +134,7 @@ class UserState(rx.State):
             files: The uploaded files.
         """
         try:
+            self.token = await self.set_auth_token()
             for file in my_files:
                 file=my_files[0]
                 upload_data = await file.read()
@@ -184,6 +208,7 @@ class UserState(rx.State):
     
     async def invite_user(self,form_data: dict):
 
+        self.token = await self.set_auth_token()
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 f"{urls.API_URL}/api/users/invite_user?email={form_data["email"]}",
@@ -198,6 +223,7 @@ class UserState(rx.State):
         
 
     async def get_user_projects(self):
+        """Get the projects of the selected user."""
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(

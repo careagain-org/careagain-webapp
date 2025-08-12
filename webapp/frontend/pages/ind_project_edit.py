@@ -28,7 +28,8 @@ def title_section(title:str, icon:str, text:str = "") -> rx.Component:
             ),
     
 
-@rx.page(route=f"{urls.IND_EDIT_PROJECT_URL}/[pr_id]", on_load= [ProjectState.load_project_page,
+@rx.page(route=f"{urls.IND_EDIT_PROJECT_URL}/[pr_id]", on_load= [AuthState.set_user_cookie,      
+                                                            ProjectState.load_project_page,
                                                             ProjectState.find_members_project,
                                                             ProjectState.find_orgs_project])
 def edit_project() -> rx.Component:

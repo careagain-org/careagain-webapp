@@ -25,11 +25,10 @@ async def upload_image(org_id: str,
         url_photo = f"orgs/{org_id}/images/{file.filename}"
         contents = await file.read()
         
-        supa_client.storage._client.headers["Authorization"] = f"Bearer {token}"
-        # _create_auth_header(headers = {"Authorization": f"Bearer {token}"})
+        # supa_client.storage._client.headers["Authorization"] = f"Bearer {token}"
 
         # Upload with auth headers
-        response = supa_client.storage.from_(f"{bucket_s3}").upload(
+        supa_client.storage.from_(f"{bucket_s3}").upload(
             file=contents,
             path=url_photo,
             file_options={"content-type": file.content_type,

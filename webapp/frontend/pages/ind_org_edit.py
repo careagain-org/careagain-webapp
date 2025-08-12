@@ -1,4 +1,5 @@
 import reflex as rx 
+import reflex_clerk_api as reclerk
 from ..layout import platform_layout
 from ..constants import urls
 from ..states.org_state import OrgState
@@ -26,7 +27,8 @@ def title_section(title:str, icon:str):
             ),
     
 
-@rx.page(route=f"{urls.IND_EDIT_ORG_URL}/[or_id]",on_load=[OrgState.load_org_page,
+@rx.page(route=f"{urls.IND_EDIT_ORG_URL}/[or_id]",on_load=[AuthState.set_user_cookie,
+                                                           OrgState.load_org_page,
                                                             OrgState.find_members_org,
                                                             OrgState.find_projects_org])
 def edit_organization() -> rx.Component:

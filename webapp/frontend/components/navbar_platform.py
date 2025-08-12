@@ -8,7 +8,7 @@ from ..states import nav_state, auth_state
 def navbar_icon(icon: str, url: str) -> rx.Component:
     return rx.link(
         rx.icon(icon, weight="medium",color="teal"), 
-        href=url,
+        href=str(url),
         justify="center",
     )
 

@@ -23,7 +23,7 @@ def sidebar_item(
                 "border-radius": "0.5em",
             },
         ),
-        href=href,
+        href=str(href),
         underline="none",
         weight="medium",
         width="100%",
