@@ -48,11 +48,11 @@ def view_project() -> rx.Component:
                 ),
                 rx.hstack(
                     rx.icon("globe"),
-                    rx.link(f"{ProjectState.selected_project['website']}",href=f"{ProjectState.selected_project['website']}",is_external=True)
+                    rx.link(f"{ProjectState.selected_project['website']}",href=str({ProjectState.selected_project['website']}),is_external=True)
                 ),
                 rx.hstack(
                     rx.icon("github"),
-                    rx.link(f"{ProjectState.selected_project['repo']}",href=f"{ProjectState.selected_project['repo']}",is_external=True)
+                    rx.link(f"{ProjectState.selected_project['repo']}",href=str({ProjectState.selected_project['repo']}),is_external=True)
                 ),
                 justify="start",
             ),
@@ -90,21 +90,32 @@ def view_project() -> rx.Component:
         ),
         rx.hstack(
             rx.text("Manual guide (.pdf): "),
-            rx.button("Download",
-                    on_click=rx.download(
-                        url={ProjectState.selected_project['guide']},
-                        filename=f"{ProjectState.selected_project['guide']}_guide",
+            rx.cond(ProjectState.selected_project['guide']=="",
+                rx.button("Not available yet",
+                            disabled=True,
+                        id="download_button_guide",
                     ),
+                rx.button("Download",
+                    on_click=rx.download(
+                                url={ProjectState.selected_project['guide']},
+                                filename=f"{ProjectState.selected_project['guide']}_guide",
+                            ),
                     id="download_button_guide",
-                ),
+                ),),
             rx.text("Attachment - Project files (.zip): "),
-            rx.button("Download",
+            rx.cond(ProjectState.selected_project['attachment']=="",
+                rx.button("Not available yet",
+                    disabled=True,
+                    id="download_button_attachment",
+                ),
+                rx.button("Download",
                     on_click=rx.download(
                         url={ProjectState.selected_project['attachment']},
                         filename=f"{ProjectState.selected_project['guide']}_attachment",
                     ),
                     id="download_button_attachment",
                 ),
+            )
         ),
         # rx.divider(width='90%'),
         # rx.hstack(

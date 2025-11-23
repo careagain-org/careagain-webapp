@@ -67,6 +67,7 @@ class ProjectState(rx.State):
     async def load_project_page(self):
         current_page_url = self.router.page.raw_path
         project_id =current_page_url.split("/")[-2]
+        await self.get_list_projects()
         self.select_project(project_id)
         await self.find_members_project()
         await self.find_orgs_project()
