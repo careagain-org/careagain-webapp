@@ -81,11 +81,11 @@ def get_current_user(token:str= Depends(oauth2schema),
 
 
 def create_user(input:dict,
-                token:str=Depends(cookie2schema),
-                db:Session=Depends(get_db)):
+                db:Session=Depends(get_db),
+                token:str=Depends(cookie2schema),):
     
     try:
-        user = db.query(model.User).filter(model.User.user_id == input["user_id"]).first()
+        user = db.query(model.User).filter(model.User.user_id == input["id"]).first()
 
         if user != []:
             return {"detail": "User details retrieved","user_details":user}
@@ -124,137 +124,46 @@ def create_user(input:dict,
             return {"detail": "User details retrieved","user_details":user_obj}
     except JWTError:
         raise credential_exception
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     
     
 def delete_user(input:dict,
-                token:str=Depends(cookie2schema),
                 db:Session=Depends(get_db)):
     try:
-        response = jwt.decode(token,os.getenv("JWT_KEY"), algorithms=["RS256"])
         
-        if response['role']=='authenticated':
-            if input["deleted"]:
-                (db.query(model.User_Organization).filter(model.User_Organization.user_id == input["id"]).delete(synchronize_session='fetch'))
-                (db.query(model.User_Project).filter(model.User_Project.user_id == input["id"]).delete(synchronize_session='fetch'))
-                (db.query(model.User).filter(model.User.user_id == input["id"]).delete())
+        if input["deleted"]:
+            (db.query(model.User_Organization).filter(model.User_Organization.user_id == input["id"]).delete(synchronize_session='fetch'))
+            (db.query(model.User_Project).filter(model.User_Project.user_id == input["id"]).delete(synchronize_session='fetch'))
+            (db.query(model.Action).filter(model.Action.performed_by == input["id"]).delete(synchronize_session='fetch'))
+            (db.query(model.User).filter(model.User.user_id == input["id"]).delete())
 
-            db.commit()
+        db.commit()
 
-            return {"detail": "User deleted"}
+        return {"detail": "User deleted"}
     except JWTError:
         raise credential_exception
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     
 
 def update_user(input:dict,
-                      token:str=Depends(cookie2schema),
                       db:Session=Depends(get_db)):
     try:
-        response = jwt.decode(token,os.getenv("JWT_KEY"), algorithms=["RS256"])
-        
-        if response.get('role')=='authenticated':
             
-            user = db.query(model.User).filter(model.User.user_id == input["id"]).first()
-            # Set the attribute dynamically
-            setattr(user, "username", input["username"])
-            setattr(user, "first_name", input["first_name"])
-            setattr(user, "last_name", input["last_name"])
-            setattr(user, "profile_image_url", input["profile_image"])
-            setattr(user, "username", input["username"])
+        user = db.query(model.User).filter(model.User.user_id == input["id"]).first()
+        # Set the attribute dynamically
+        user.username = input.get("username")
+        user.first_name = input.get("first_name")
+        user.last_name = input.get("last_name")
+        user.profile_image = input.get("profile_image_url")
 
-            # Commit the changes to the database
-            db.add(user)
-            db.commit()
-            db.refresh(user)
+        db.commit()
+        db.refresh(user)
 
-            return {"detail": "User updated","user_details":user}
+        return {"detail": "User updated","user_details":user}
     except JWTError:
         raise credential_exception
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     
-    
-    # try:
-    #     response = supa_client.auth.sign_in_with_id_token(
-    #         {
-    #             "provider": "clerk",
-    #             "token": f"{token}",
-    #         }
-    #     )
-    #     # get_user(token)
-    #     data = response.json() 
-    #     parsed_data = json.loads(data)
-    #     user_id = parsed_data.get("user").get("id")
-
-    #     if user_id is None:
-    #         raise credential_exception
-
-    # except JWTError:
-    #     token = None
-    #     raise credential_exception
-    
-    # user = db.query(model.User).filter(model.User.user_id == user_id).first()
-
-    # if user is None:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_404_NOT_FOUND,
-    #         detail="User not found"
-    #     )
-
-    # return user
-
-
-
-
-
-# async def get_current_active_user(current_user: UserInDB = Depends(get_current_user)):
-#     if current_user.disabled:
-#         raise HTTPException(status_code=400,detail = "Inactive user")
-#     return current_user
-
-# async def get_current_user(db:Session=Depends(get_db),token:str = Depends(oauth2schema)):
-#     '''Get current user logged in'''
-#     credential_exception = HTTPException(status_code = status.HTTP_401_UNAUTHORIZED,
-#                                          detail = "Could not validate credentials",
-#                                          headers = {"WWW-Authenticate": "Bearer"})
-
-#     try:
-#         payload = jwt.decode(token,SECRET_KEY,algorithms = [ALGORITHM])
-#         user_id: int = payload.get("user_id")
-#         if user_id is None:
-#             raise credential_exception
-
-#         #token_data = schema.User(user_id=user_id)
-
-#     except JWTError:
-#         raise credential_exception
-    
-#     user = db.query(model.User).filter(model.User.user_id == user_id).first()
-
-#     if user is None:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail="User not found"
-#         )
-
-#     return user
-
-
-# async def create_token(user:model.User): #expires_delta = ACCESS_TOKEN_EXPIRE_MINUTES):
-#     '''Create a token for each user when opening session'''
-#     user_obj =  {"user_id":user.user_id}
-#     # if expires_delta:
-#     #     expire = datetime.utcnow + expires_delta
-    
-#     token = jwt.encode(user_obj,SECRET_KEY,algorithm=ALGORITHM)
-
-#     # Set token in cookie (HTTP-only and secure)
-#     # response.set_cookie(
-#     #     key="access_token",  # Name of the cookie
-#     #     value=token,  # The token itself
-#     #     httponly=True,       # Prevents JavaScript access to the cookie (for security)
-#     #     secure=True,         # Ensures the cookie is only sent over HTTPS
-#     #     samesite="lax"       # Protects against CSRF
-#     # )
-
-#     # Return a success response (or return any data you need)
-#     print("message Token set in cookie")
-
-    # return token#dict(access_token = token, token_type="bearer")
