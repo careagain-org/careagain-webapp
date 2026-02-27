@@ -22,6 +22,13 @@ def render_menu():
 def base_page(child: rx.Component ,*args,**kwargs) -> rx.Component:
     return my_clerk_provider(
         rx.fragment(
+            rx.script(src="https://www.googletagmanager.com/gtag/js?id=G-WPYCNF1BFB"),
+            rx.script("""
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-WPYCNF1BFB');
+            """),
             navbar(),
             rx.box(
                 # text_align="center", 
@@ -95,14 +102,21 @@ def platform_layout(child:rx.Component, *args, **kwargs)-> rx.Component:
 
     return my_clerk_provider(
         rx.fragment(
-        reclerk.clerk_loading(
-            user_layout(rx.center(rx.spinner())),
-        ),
-        reclerk.clerk_loaded(
-            rx.cond(child is None,
-                    user_layout(rx.spinner()),
-                    user_layout(child) 
-                    )
+            rx.script(src="https://www.googletagmanager.com/gtag/js?id=G-WPYCNF1BFB"),
+            rx.script("""
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-WPYCNF1BFB');
+            """),
+            reclerk.clerk_loading(
+                user_layout(rx.center(rx.spinner())),
             ),
-        ),
-    )
+            reclerk.clerk_loaded(
+                rx.cond(child is None,
+                        user_layout(rx.spinner()),
+                        user_layout(child) 
+                        )
+                ),
+            ),
+        )
