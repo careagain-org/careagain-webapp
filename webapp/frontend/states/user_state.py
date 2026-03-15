@@ -109,10 +109,13 @@ class UserState(rx.State):
     async def update_user(self,key:str,value:str):
         try:
             self.token = await self.set_auth_token()
+            value = value.strip()
+    
             async with httpx.AsyncClient() as client:
                 response = await client.put(
-                    f"{urls.API_URL}/api/users/update_user?key={key}&value={value}",
-                    headers = {"Authorization": f"Bearer {self.token}"}
+                    f"{urls.API_URL}/api/users/update_user",
+                    params={"key": key, "value": value},  # httpx handles encoding automatically
+                    headers={"Authorization": f"Bearer {self.token}"}
                 )
             
             if response.status_code == 200:
@@ -123,7 +126,7 @@ class UserState(rx.State):
                 return rx.toast(f"User update error: {detail}")
         except AuthApiError as e:
             self.token = None
-            return rx.toast("Unexpected error")
+            return rx.toast(f"Unexpected error: {str(e)}")
         
         
     @rx.event

@@ -1,7 +1,6 @@
 import reflex as rx
 import uuid
 from typing import List,Dict
-from .user_input_text import SimpleTextInput
 from ..states.project_state import ProjectState
 from ..states.user_state import UserState
 from ..states.org_state import OrgState

@@ -8,12 +8,12 @@ from ..components.map import interactive_map
 from ..components.user_card import users_grid_horizontal
 from ..components.user_table import table_pagination
 from ..components.org_table import table_pagination as org_table
-from ..components.project_input_text import ProjectEditableText,ProjectEditableTextArea
 from ..components.forms_popover import add_new,search_user
 from ..components.project_forms import update_logo_form,update_image_form
+from ..components.input_text import EditableText, EditableTextArea
 
-editable_text = ProjectEditableText.create
-editable_textarea = ProjectEditableTextArea.create
+editable_text = EditableText.create
+editable_textarea = EditableTextArea.create
 status: list[str] = ["Prototype","Technically tested","Clinically tested",
                              "Regulatory body approval"]
 
@@ -47,16 +47,21 @@ def edit_project() -> rx.Component:
                               value=project["status"],
                               placeholder="Select Project Status",
                               name="status",
-                              on_change= lambda value: ProjectState.update_project("status",value)),
+                              on_change= lambda value: ProjectState.update_project("status",value,project["project_id"])),
                 ),
                 rx.hstack(
                     rx.icon("globe"),
-                    editable_text(value = project["website"],key = "website"),
+                    editable_text(
+                        value = project["website"],
+                        on_save=lambda text: ProjectState.update_project("website", text, project["project_id"]),
+                    ),
                 ),
                 rx.hstack(
                     rx.icon("github"),
-                    editable_text(value = project["repo"],key = "repo"),
-                    # rx.text(projectState.selected_project['email'])
+                    editable_text(
+                        value = project["repo"],
+                        on_save=lambda text: ProjectState.update_project("repo", text, project["project_id"]),
+                    ),
                 ),   
                 justify="between",      
             ),
@@ -86,7 +91,10 @@ def edit_project() -> rx.Component:
             ),
             rx.vstack(
                 title_section("Description","file_text"),
-                editable_textarea(value = project["description"],key = "description"),
+                editable_textarea(
+                    value = project["description"],
+                    on_save=lambda text: ProjectState.update_project("description", text, project["project_id"]),
+                ),
                 width="60%"
             ),
             align='start',
@@ -101,12 +109,18 @@ def edit_project() -> rx.Component:
         ),
         rx.vstack(
             title_section("Manual Guide","scroll-text"),
-            editable_textarea(value = project["guide"],key = "guide"),
+            editable_textarea(
+                value = project["guide"],
+                on_save=lambda text: ProjectState.update_project("guide", text, project["project_id"]),
+            ),
             width="60%"
         ),
         rx.vstack(
             title_section("Attachment url","package"),
-            editable_textarea(value = project["attachment"],key = "attachment"),
+            editable_textarea(
+                value = project["attachment"],
+                on_save=lambda text: ProjectState.update_project("attachment", text, project["project_id"]),
+            ),
             width="60%"
         ),
         rx.divider(width='90%'),

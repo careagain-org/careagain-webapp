@@ -412,10 +412,12 @@ class ProjectState(rx.State):
     async def update_project(self,key:str,value:str,project_id:str):
         try:
             self.token = await self.set_auth_token()
+            value = value.strip()
             async with httpx.AsyncClient() as client:
                 response = await client.put(
-                    f"{urls.API_URL}/api/projects/update_project?key={key}&value={value}&project_id={project_id}",
-                    headers = {"Authorization": f"Bearer {self.token}"}
+                    f"{urls.API_URL}/api/projects/update_project",
+                    params={"key": key, "value": value,"project_id": project_id},  # in the body, no encoding issues
+                    headers={"Authorization": f"Bearer {self.token}"}
                 )
             
             if response.status_code == 200:

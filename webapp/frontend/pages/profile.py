@@ -4,7 +4,6 @@ from pathlib import Path
 from ..layout import platform_layout
 from ..constants import urls
 from ..components.forms_popover import add_new_popover,search_popover
-from ..components.user_input_text import EditableText,EditableTextArea
 from ..components.org_table import table_pagination as org_table
 from ..components.project_table import table_pagination as project_table
 from ..components.list_institution import list_org_vertical
@@ -12,7 +11,7 @@ from ..states.user_state import UserState
 from ..states.org_state import OrgState
 from ..states.project_state import ProjectState
 from ..states.auth_state import AuthState
-import logging
+from ..components.input_text import EditableText, EditableTextArea
 
 editable_text = EditableText.create
 editable_textarea = EditableTextArea.create
@@ -62,14 +61,20 @@ def input_field_edit(title:str,key:str):
     default_value =UserState.my_details[f"{key}"]
     return rx.vstack(
             rx.heading(title,size="3", color = "grey"),
-            editable_text(value = default_value,key = key),
+            editable_text(
+                value = default_value,
+                on_save=lambda text: UserState.update_user(value = text, key = key),
+            ),
         ),
 
 def text_field_edit(title:str,key:str):
     default_value =UserState.my_details[f"{key}"]
     return rx.vstack(
             rx.heading(title,size="3", color = "grey"),
-            editable_textarea(value = default_value,key = key),
+            editable_textarea(
+                value = default_value,
+                on_save=lambda text: UserState.update_user(value = text, key = key),
+            ),
         ),
 
 
@@ -78,10 +83,16 @@ def user_section():
     return rx.container(
         rx.tablet_and_desktop(
             rx.hstack(
-                rx.image(src=f"{reclerk.ClerkUser.image_url}",
-                        border_radius="15px 15px 15px 15px",
-                        width="20%",
-                        heigth="auto"),
+                rx.image(
+                    src=f"{reclerk.ClerkUser.image_url}",
+                    border_radius="15px 15px 15px 15px",
+                    width="20%",
+                    heigth="auto",
+                    object_fit="cover",
+                    cursor="pointer",
+                    on_click=rx.call_script("window.Clerk.openUserProfile()"),
+                    _hover={"opacity": 0.7},
+                ),
                 rx.vstack(
                     input_field_edit(title= "LinkedIn / Social media",key = 'linkedin'),
                     input_field_edit("Country",key='country'),

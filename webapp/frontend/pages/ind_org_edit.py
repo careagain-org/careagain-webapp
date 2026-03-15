@@ -9,12 +9,12 @@ from ..components.map import map_org
 from ..components.user_card import users_grid_horizontal
 from ..components.user_table import table_pagination
 from ..components.project_table import table_pagination as project_table_pagination
-from ..components.org_input_text import OrgEditableText,OrgEditableTextArea
 from ..components.org_forms import update_coordinates_form,update_image_form
 from ..components.forms_popover import add_new,search_user,search_popover
+from ..components.input_text import EditableText, EditableTextArea
 
-editable_text = OrgEditableText.create
-editable_textarea = OrgEditableTextArea.create
+editable_text = EditableText.create
+editable_textarea = EditableTextArea.create
 all_organization: list[str] = ["Hospital", f"Logistics and Transport",
                                     f"Research and Development","Manufacturer"]
 
@@ -48,16 +48,21 @@ def edit_organization() -> rx.Component:
                         value=org["type"],
                         placeholder="Select type of organization",
                         name="type",
-                        on_change= lambda value: OrgState.update_org("type",value)),
+                        on_change= lambda value: OrgState.update_org("type",value,org["org_id"])),
         ),
         rx.hstack(
             rx.icon("globe"),
-            editable_text(value = org["website"],key = "website"),
+            editable_text(
+                value = org["website"],
+                on_save=lambda text: OrgState.update_org("website", text, org["org_id"]),
+            ),
         ),
         rx.hstack(
             rx.icon("mail"),
-            editable_text(value = org["email"],key = "email"),
-            # rx.text(OrgState.selected_org['email'])
+            editable_text(
+                value = org["email"],
+                on_save=lambda text: OrgState.update_org("email", text, org["org_id"]),
+            ),
         ),
         rx.divider(width='90%'),
         rx.flex(
@@ -73,7 +78,10 @@ def edit_organization() -> rx.Component:
             ),
             rx.vstack(
                 title_section("Description","file_text"),
-                editable_textarea(value = org["description"],key = "description"),
+                editable_textarea(
+                    value = org["description"],
+                    on_save=lambda text: OrgState.update_org("description", text, org["org_id"]),
+                ),
                 width="50%"
             ),
             align='start',
@@ -93,7 +101,10 @@ def edit_organization() -> rx.Component:
             ),
             rx.vstack(
                 rx.heading("Address",size="3"),
-                editable_textarea(value = org["address"],key = "address"),
+                editable_textarea(
+                    value = org["address"],
+                    on_save=lambda text: OrgState.update_org("address", text, org["org_id"]),
+                ),
             ),
             align="center",
             justify="start",

@@ -340,12 +340,14 @@ class OrgState(rx.State):
     
     
     async def update_org(self,key:str,value:str,org_id:str):
-        self.token = await self.set_auth_token()
         try:
+            self.token = await self.set_auth_token()
+            value = value.strip()
             async with httpx.AsyncClient() as client:
                 response = await client.put(
-                    f"{urls.API_URL}/api/orgs/update_org?key={key}&value={value}&org_id={org_id}",
-                    headers = {"Authorization": f"Bearer {self.token}"}
+                    f"{urls.API_URL}/api/orgs/update_org",
+                    params={"key": key, "value": value,"org_id": org_id},  # in the body, no encoding issues
+                    headers={"Authorization": f"Bearer {self.token}"}
                 )
             
             if response.status_code == 200:
@@ -356,8 +358,8 @@ class OrgState(rx.State):
             else:
                 detail = response.json()["detail"]
                 return rx.toast.error(f"Organization update error: {detail}")
-        except:
-            return rx.toast("Unexpected error")
+        except Exception as e:
+            return rx.toast(f"Unexpected error: {str(e)}")
     
     async def update_coordinates(self,form_data: dict):
 
