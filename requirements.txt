@@ -43,7 +43,7 @@ distlib==0.3.9
 docutils==0.21.2
 dulwich==0.22.8
 ecdsa==0.19.0
-fastapi==0.115.6
+fastapi==0.135.1
 fastjsonschema==2.21.1
 filelock==3.17.0
 findpython==0.6.3
@@ -175,7 +175,7 @@ sphinxcontrib-qthelp==2.0.0
 sphinxcontrib-serializinghtml==2.0.0
 SQLAlchemy==2.0.36
 sqlmodel==0.0.37
-starlette==0.41.3
+starlette==0.52.1
 starlette-admin==0.14.1
 storage3==0.12.1
 StrEnum==0.4.15
@@ -192,7 +192,7 @@ typer==0.15.1
 types-Deprecated==1.2.15.20250304
 types-python-dateutil==2.9.0.20250708
 typing==3.7.4.3
-typing-inspection==0.4.1
+typing-inspection==0.4.2
 typing_extensions==4.14.1
 tzdata==2025.2
 urllib3==2.4.0
