@@ -7,6 +7,10 @@ class EditableText(rx.ComponentState):
     original_text: str =""
     editing: bool = False
     key: str = None
+    
+    
+    def set_text(self, value: str): 
+        self.text = value
 
 
     def start_editing(self, original_text: str):
@@ -82,6 +86,10 @@ class EditableTextArea(rx.ComponentState):
     original_text: str
     editing: bool = False
     key: str = None
+    
+    
+    def set_text(self, value: str): 
+        self.text = value
 
 
     def start_editing(self, original_text: str):

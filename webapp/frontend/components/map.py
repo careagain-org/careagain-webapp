@@ -1,17 +1,8 @@
-import plotly.graph_objects as go
 import reflex as rx
 import folium
 from folium import plugins
 from ..states.org_state import OrgState
-from typing import List, Dict,Any
 from ..constants import urls
-import httpx
-import pandas as pd
-import requests
-import clipboard
-import logging
-from folium import Map, CustomIcon, Html, Element, MacroElement
-from jinja2 import Template
 
 
 class MapState(OrgState):
@@ -51,36 +42,37 @@ class MapState(OrgState):
                     org_pop_up = self.pop_up_template(org)
                     if org["type"] == "Research and Development":
                         folium.Marker(
-                            location=[float(org["latitude"]), float(org["longitude"])],
+                            location=[org["latitude"], org["longitude"]],
                             popup=org_pop_up,
                             icon=folium.Icon(color="green",icon="cogs", prefix="fa") #atom
                         ).add_to(g1)
                     elif org["type"] == "Logistics and Transport":
                         folium.Marker(
-                            location=[float(org["latitude"]), float(org["longitude"])],
+                            location=[org["latitude"], org["longitude"]],
                             popup=org_pop_up,
                             icon=folium.Icon(color="blue",icon="truck", prefix="fa") #route
                         ).add_to(g2)
                     elif org["type"] == "Hospital":
                         folium.Marker(
-                            location=[float(org["latitude"]), float(org["longitude"])],
+                            location=[org["latitude"], org["longitude"]],
                             popup=org_pop_up,
                             icon=folium.Icon(color="red",icon="medkit", prefix="fa")
                         ).add_to(g3)
                     elif org["type"] == "Manufacturer":
                         folium.Marker(
-                            location=[float(org["latitude"]), float(org["longitude"])],
+                            location=[org["latitude"], org["longitude"]],
                             popup=org_pop_up,
                             icon=folium.Icon(color="beige",icon="wrench")
                         ).add_to(g4)
                     else:
                         folium.Marker(
-                            location=[float(org["latitude"]), float(org["longitude"])],
+                            location=[org["latitude"], org["longitude"]],
                             popup=org_pop_up,
                             icon=folium.Icon(color="grey",icon="atom")
                         ).add_to(g4)
                 except Exception as err:
-                    print(err)
+                    pass
+                    #print(err)
                     
         folium.LayerControl(collapsed=True).add_to(map_)
         
@@ -94,14 +86,14 @@ class MapState(OrgState):
                                         self.selected_org["longitude"]], zoom_start=7)
             
             folium.Marker(
-                    location=[float(self.selected_org["latitude"]), 
-                            float(self.selected_org["longitude"])],
+                    location=[self.selected_org["latitude"], 
+                            self.selected_org["longitude"]],
                     popup=self.selected_org["name"],
                     icon=folium.Icon(color="red") 
                 ).add_to(map_)
         except Exception as err:
             map_ = folium.Map(location=[40.463667, -3.74922], zoom_start=2)
-            print(err)
+            #print(err)
             
         return map_._repr_html_()
     

@@ -19,7 +19,11 @@ def section_title(section_icon:str,section_title:str, section_link:str): # type:
         color = "accent",
     )
 
-@rx.page(route=urls.PLATFORM_URL, on_load=[AuthState.set_user_cookie,UserState.get_my_details,ProjectState.get_list_projects,UserState.get_users,OrgState.get_orgs])
+@rx.page(route=urls.PLATFORM_URL, on_load=[AuthState.set_user_cookie,
+                                           UserState.get_my_details,
+                                           ProjectState.get_list_projects,
+                                           UserState.get_users,
+                                           OrgState.get_orgs])
 def platform_home() -> rx.Component:
     home = rx.vstack(
                 rx.heading('Most recent', size="5"),

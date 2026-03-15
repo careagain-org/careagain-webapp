@@ -34,7 +34,7 @@ def big_org_card_vertical(org)-> rx.Component:
                 width = "100%",
                 size="3",
             ),
-            on_click=lambda: OrgState.to_org_view(org["org_id"]),
+            href=f"{urls.IND_ORG_URL}/{org['org_id']}",
         ),
         height = 'auto',
         width = "90%",
@@ -70,13 +70,8 @@ def org_card_vertical(org)-> rx.Component:
                     rx.text(org["adress"]),
                     spacing="1",
                 ),
-                rx.cond(org["org_id"] == OrgState.org_id,
-                        rx.button("Select",disabled=True,type="button"),
-                        rx.button("Select",disabled=False,
-                            on_click = lambda: OrgState.select_org(org["org_id"]),
-                            type="button"),
-                        )
             ),
+            href=f"{urls.IND_ORG_URL}/{org['org_id']}",
             width = "100%",
             size="3",
             _hover={"color": "teal"}
@@ -124,7 +119,6 @@ def org_card_horizontal(org)-> rx.Component:
                     align="center"
                 ),
                 href=f"{urls.IND_ORG_URL}/{org['org_id']}",
-                on_click=OrgState.to_org_view(org["org_id"]),
                 align="center"
             ),
             # as_child=True,
