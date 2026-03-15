@@ -1,6 +1,6 @@
-from fastapi import APIRouter,Depends,Response, HTTPException,security
+from fastapi import APIRouter,Depends,Response, HTTPException,security,Request,Cookie
 from fastapi.responses import JSONResponse
-from typing import List
+from typing import List,Annotated
 from ..schemas import user_schema as schema
 # from ..config.db_setup import get_db
 from ..models import model
@@ -12,6 +12,8 @@ from pydantic import BaseModel
 from typing import Optional
 from urllib.parse import unquote
 import json
+import os
+import jwt
 
 
 auth_route = APIRouter(prefix="/api/auth")
@@ -144,6 +146,7 @@ def update_password(input:AuthCredentialsToken):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Reset password error:{str(e)}")
     
+    
 @auth_route.post("/login_without_password",tags = ['auth'])
 def login_without_password(input:AuthCredentials):
     try:
@@ -161,9 +164,12 @@ def login_without_password(input:AuthCredentials):
 def current_user():
     try:
         response = supa.auth.get_user()
-        data = response.json() 
-        parsed_data = json.loads(data)
-        return {"detail": "User details retrieved", "data": parsed_data}
+        if response:
+            data = response.json() 
+            parsed_data = json.loads(data)
+            return {"detail": "User details retrieved", "data": parsed_data}
+        else:
+            raise HTTPException(status_code=401, detail="No user authorized")
     except Exception as e:
         raise HTTPException(status_code=400, detail=f": {str(e)}")
     
@@ -193,3 +199,46 @@ def refresh_session(session = Depends(oauth2schema)):
             return {"detail": "No session open"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=f": {str(e)}")
+    
+
+
+# @auth_route.get("/clerk_token",tags = ['auth'])
+# def check_session(request: Request):
+    
+#     session_token = request.cookies.get("__session")
+#     print(session_token)
+#     if not session_token:
+#         return {"error": "No __session cookie found"}
+
+#     return session_token
+
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials,APIKeyCookie
+cookie_session = APIKeyCookie(name="auth_token")
+
+
+@auth_route.get("auth_token")
+def secure_endpoint(token: str = Depends(cookie_session)):
+    try:
+        return token
+    except Exception as err:
+        return err
+    
+    
+@auth_route.get("auth_user")
+def secure_user(token: str = Depends(cookie_session)):
+    try:
+        data = jwt.decode(token,os.getenv("JWT_KEY"), algorithms=["RS256"])
+        return data['sub']
+    except Exception as err:
+        return err
+
+
+from fastapi import Request, Depends
+from fastapi.security import HTTPBearer
+
+security_token = HTTPBearer()
+
+@auth_route.get("/api/auth/protected")
+def secure_endpoint(token=str,
+    credentials: HTTPAuthorizationCredentials = Depends(security_token)):
+    return token

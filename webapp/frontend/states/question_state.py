@@ -1,10 +1,14 @@
 import reflex as rx
 import httpx
 from ..constants import urls
-from typing import List, Dict 
+from typing import List, Dict , Optional
 
 class QuestionState(rx.State):
     questions: List[Dict[str, str]] = []
+    token:Optional[str]=rx.Cookie(
+                name="__session",
+                max_age =60,
+            ) 
 
     async def get_list_questions(self):
 

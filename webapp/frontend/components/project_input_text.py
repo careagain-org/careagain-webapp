@@ -3,10 +3,14 @@ import typing as Callable
 from ..states.project_state import ProjectState
 
 class ProjectEditableText(rx.ComponentState):
-    text: str = "Click to edit"
+    text: str = ""
     original_text: str
     editing: bool = False
     key: str = None
+    
+    
+    def set_text(self, value: str): 
+        self.text = value
 
 
     def start_editing(self, original_text: str):
@@ -83,6 +87,10 @@ class ProjectEditableTextArea(rx.ComponentState):
     original_text: str
     editing: bool = False
     key: str = None
+    
+    
+    def set_text(self, value: str): 
+        self.text = value
 
 
     def start_editing(self, original_text: str):

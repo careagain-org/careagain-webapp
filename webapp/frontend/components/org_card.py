@@ -34,7 +34,7 @@ def big_org_card_vertical(org)-> rx.Component:
                 width = "100%",
                 size="3",
             ),
-            on_click=lambda: OrgState.to_org_view(org["org_id"]),
+            href=f"{urls.IND_ORG_URL}/{org['org_id']}",
         ),
         height = 'auto',
         width = "90%",
@@ -70,13 +70,8 @@ def org_card_vertical(org)-> rx.Component:
                     rx.text(org["adress"]),
                     spacing="1",
                 ),
-                rx.cond(org["org_id"] == OrgState.org_id,
-                        rx.button("Select",disabled=True,type="button"),
-                        rx.button("Select",disabled=False,
-                            on_click = lambda: OrgState.select_org(org["org_id"]),
-                            type="button"),
-                        )
             ),
+            href=f"{urls.IND_ORG_URL}/{org['org_id']}",
             width = "100%",
             size="3",
             _hover={"color": "teal"}
@@ -109,25 +104,29 @@ def org_card_horizontal(org)-> rx.Component:
         rx.card(
             rx.link(
                 rx.flex(
-                    rx.avatar(src=f"{org["logo"]}",
+                    rx.center(
+                        rx.image(src=f"{org["logo"]}",
                             width="140px",
-                            height="140px"),
+                            max_height="140px",
+                            align="center"),
+                        height="140px",
+                        align="center",
+                    ),
                     rx.heading(org["name"],align="center"),
                     spacing="2",
                     direction="column",
                     padding ="0",
                     align="center"
                 ),
-                href=urls.IND_ORG_URL,
-                on_click=OrgState.to_org_view(org["org_id"]),
-                align="start"
+                href=f"{urls.IND_ORG_URL}/{org['org_id']}",
+                align="center"
             ),
             # as_child=True,
             size="5",
             height='220px',
             width='180px',
-            padding ="5%",
-            align="start",
+            padding ="2%",
+            align="center"
         ),
         height = 'auto',
         align='start',
@@ -143,7 +142,9 @@ def org_scroll_horizontal(orgs)-> rx.Component:
             rx.foreach(orgs, lambda value, i: 
                         org_card_horizontal(value)),
             rx.text("No orgs available")
-        ),   
+        ),  
+        justify= "start",
+        align="start", 
     ),
         spacing="2",
         flex_wrap="wrap",

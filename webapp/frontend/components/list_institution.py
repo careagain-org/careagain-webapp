@@ -13,7 +13,7 @@ def ind_org(image: str, org_name: str, org_link: str, org_type: str)-> rx.Compon
             rx.vstack(
                 rx.cond(org_link is not None,
                         rx.link(rx.heading(org_name,size="5"),
-                               href=org_link),
+                               href=str(org_link)),
                         rx.heading(org_name,size="5")),
                 ),
                 rx.text(org_type),

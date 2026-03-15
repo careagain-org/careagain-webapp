@@ -1,5 +1,5 @@
 import reflex as rx 
-from .platform_base import platform_base
+from ..layout import platform_layout
 from ..constants import urls
 from ..components.forms_popover import add_new_popover
 from ..states.project_state import ProjectState
@@ -22,5 +22,5 @@ def platform_projects() -> rx.Component:
         justify="start",
         width ="100%"
     )
-    return platform_base(my_child)
+    return platform_layout(my_child)
     

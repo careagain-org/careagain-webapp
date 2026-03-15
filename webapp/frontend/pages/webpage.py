@@ -1,6 +1,6 @@
 import reflex as rx 
 
-from .webpage_base import base_page
+from ..layout import base_page
 from ..constants import urls
 from ..components.map import create_map
 from ..states.org_state import OrgState
@@ -111,8 +111,7 @@ def community_section() -> rx.Component:
         padding="1%",
         color_scheme="teal",
         width="100%",
-        id="community_section",
-        on_mount=OrgState.get_location
+        id="community_section"
     )
 
 def support_section(direction:str) -> rx.Component:
@@ -130,16 +129,16 @@ def support_section(direction:str) -> rx.Component:
                 heading_text="Be part of the community",
                 description_text="Add your institution or organization—whether involved in medical device R&D, manufacturing, logistics, or healthcare—to join a unified network and help build a thriving community.",
             ),
-            create_feature_box(
-                icon_tag="atom",
-                heading_text=rx.link("Upload your project",href = urls.PATREON_URL),
-                description_text="If you have developed medical tecnology or you want to start your project, don't hesitate on sharing your knowledge with the community.",
-            ),
             # create_feature_box(
-            #     icon_tag="handshake",
-            #     heading_text=rx.link("Become a patreon",href = urls.PATREON_URL),
-            #     description_text="Your financial support help us to mantain, improve and grow the community. Be in touch with all the new advances",
+            #     icon_tag="atom",
+            #     heading_text=rx.link("Upload your project",href = urls.PATREON_URL),
+            #     description_text="If you have developed medical tecnology or you want to start your project, don't hesitate on sharing your knowledge with the community.",
             # ),
+            create_feature_box(
+                icon_tag="handshake",
+                heading_text=rx.link("Become a patreon",href = urls.PATREON_URL),
+                description_text="Your financial support help us to mantain, improve and grow the community. Be in touch with all the new advances",
+            ),
             columns="3",
             width="90%",
             flow="column",
@@ -262,7 +261,7 @@ def render_menu():
         width="100%",
     )
 
-@rx.page(route=urls.HOME_URL, title = 'Home')
+@rx.page(route=urls.HOME_URL, title = 'Home',on_load=OrgState.get_orgs)
 def home_page() -> rx.Component:
     my_child = rx.box(
     rx.desktop_only(

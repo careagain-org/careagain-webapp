@@ -1,15 +1,12 @@
 import reflex as rx
-import uuid
-from typing import List,Dict
-from .user_input_text import SimpleTextInput
-from .project_upload import upload_logo_project,upload_image_project
+from .upload import ImageUpload
 from ..states.project_state import ProjectState
 from ..states.org_state import OrgState
-from .upload import upload_logo_org
-from .map import interactive_map
 from ..components.project_card import project_grid_vertical
 from ..constants import urls
 
+upload_logo = ImageUpload.create()
+upload_image = ImageUpload.create()
 
 def form_project() -> rx.Component:
         status: list[str] = ["Prototype","Technically tested","Clinically tested",
@@ -59,6 +56,11 @@ def form_project() -> rx.Component:
                         ),
                         width="100%",
                     ),
+                    rx.heading("Organization of the project",size="3"),
+                    rx.select(OrgState.my_org_names,
+                                placeholder="Select your Organization / Institution /group participating in the project",
+                                name="org_name",
+                                width="100%"),
                     rx.heading("Project Device Description",size="3"),
                     rx.text_area(
                         placeholder="Type here...",
@@ -81,22 +83,35 @@ def form_project() -> rx.Component:
                         width="100%",
                     ),
                     rx.hstack(
-                        upload_logo_project(title="Logo",my_image=rx.get_upload_url(ProjectState.logo)),
-                        upload_image_project(title="Representative image",my_image=rx.get_upload_url(ProjectState.image)),
+                        rx.vstack(rx.heading("Project Logo",size="3"),
+                            upload_logo,
+                            rx.input(
+                                name="logo",
+                                value=upload_logo.State.image_name,
+                                type="hidden",
+                            ),),
+                        rx.vstack(rx.heading("Project Image",size="3"),
+                            upload_image,
+                            rx.input(
+                                name="image",
+                                value=upload_image.State.image_name,
+                                type="hidden",
+                            ),),
                         width="100vw",
+                        spacing="2",
                     ),
                     rx.hstack(
                         rx.vstack(
-                            rx.heading("Manual guide (.pdf)",size="3"),
+                            rx.heading("Manual guide url (.pdf)",size="3"),
                             rx.input(placeholder="Enter url link to download",
-                                name= "website",
+                                name= "guide",
                                 width="100%"),
                             width="100%"
                         ),
                         rx.vstack(
-                            rx.heading("Attachment (.zip)",size="3"),
+                            rx.heading("Attachment url (.zip)",size="3"),
                             rx.input(placeholder="Enter url link to download",
-                                name= "repo",
+                                name= "attachment",
                                 width="100%"),
                             width="100%"
                         ),
@@ -125,7 +140,7 @@ def form_project() -> rx.Component:
                     direction = "column",
                     width="100%",
                 ),
-                on_submit=ProjectState.create_new_project,
+                on_submit=[ProjectState.create_new_project,ProjectState.remove_uploaded_files],
                 reset_on_submit=True,
                 )
             )
@@ -134,7 +149,7 @@ def form_project() -> rx.Component:
 def search_project() -> rx.Component:
 
     return rx.dialog.content(
-        rx.dialog.title(f"Search existing organization"),
+        rx.dialog.title(f"Search existing project"),
         rx.form(
             rx.flex(
             rx.input(rx.icon("search"),
@@ -189,4 +204,85 @@ def discover_project():
             width="100%",
             spacing="2"
         ),
+    
+
+def update_logo_form() -> rx.Component:
+    return rx.dialog.root(
+        rx.dialog.trigger(rx.button("Update project logo"), on_click=ProjectState.remove_uploaded_files),
+        rx.dialog.content(
+            rx.form(
+                rx.dialog.title("Update project logo"),
+                upload_logo,
+                rx.spacer(size="5"),
+                rx.flex(
+                    rx.dialog.close(
+                        rx.button(
+                            "Cancel",
+                            color_scheme="gray",
+                            variant="soft",
+                            justify="start",
+                            type ="button",),
+                    ),
+                    rx.dialog.close(
+                        rx.button("Save",
+                            type ="submit",
+                            justify="end",
+                            color_scheme="teal"),
+                    ),
+                    
+                    spacing="5",
+                    margin_top="16px",
+                    justify="end",
+                    width="100%",
+                    min_height="100px",
+                ),
+                spacing="5",
+                align="center",
+                on_submit=ProjectState.supabase_upload_logo(ProjectState.project_id, upload_logo.State.image_name),
+                reset_on_submit=True,
+            ),
+        ),
+        on_open_change=[upload_logo.State.clear_image],
+    ),
+    
+
+def update_image_form() -> rx.Component:
+    return rx.dialog.root(
+        rx.dialog.trigger(rx.button("Update image"), on_click=ProjectState.remove_uploaded_files),
+        rx.dialog.content(
+            rx.form(
+                rx.dialog.title("Update image"),
+                upload_image,
+                rx.spacer(size="5"),
+                rx.flex(
+                    rx.dialog.close(
+                        rx.button(
+                            "Cancel",
+                            color_scheme="gray",
+                            variant="soft",
+                            justify="start",
+                            type ="button",),
+                    ),
+                    rx.dialog.close(
+                        rx.button("Save",
+                            type ="submit",
+                            justify="end",
+                            color_scheme="teal"),
+                    ),
+                    
+                    spacing="5",
+                    margin_top="16px",
+                    justify="end",
+                    width="100%",
+                    min_height="100px",
+                ),
+                spacing="5",
+                align="center",
+                on_submit=ProjectState.supabase_upload_image(ProjectState.project_id,upload_image.State.image_name),
+                reset_on_submit=True,
+            ),
+        ),
+        on_open_change=[upload_image.State.clear_image],
+    )
+
 

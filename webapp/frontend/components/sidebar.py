@@ -1,4 +1,5 @@
 import reflex as rx
+import reflex_clerk_api as reclerk
 from ..constants import urls
 from ..states.user_state import UserState
 from ..states.auth_state import AuthState
@@ -22,7 +23,7 @@ def sidebar_item(
                 "border-radius": "0.5em",
             },
         ),
-        href=href,
+        href=str(href),
         underline="none",
         weight="medium",
         width="100%",
@@ -51,25 +52,23 @@ def profile_button() -> rx.Component:
     return rx.container(
             rx.link(
                 rx.hstack(
-                    rx.cond(AuthState.is_authenticated,
-                            rx.avatar(src=UserState.my_details["profile_image"],
-                                  size="3",
-                                  radius="full",),
-                            rx.icon_button(rx.icon("user"),
-                                       size="3",
-                                       radius="full",),),
+                    rx.icon("file-cog", size=50),
+                    # reclerk.user_button(),
+                        # rx.avatar(src=UserState.my_details["profile_image"],
+                        #           fallback=str(UserState.my_details["first_name"])[0:1],
+                        #     size="3",
+                        #     radius="full",),
                     rx.vstack(
                     rx.box(
                         rx.text(
-                            "My profile",
+                            "Manage account",
+                            # f"{reclerk.ClerkUser.first_name}'s profile",
                             size="3",
                             weight="bold",
-                        ),
-                        rx.text(rx.cond(AuthState.is_authenticated,
-                            f"@{UserState.my_details["username"]}",
-                            f"@undefined"),
-                            size="2",
-                            weight="medium",
+                        ), 
+                        rx.text(f"@{reclerk.ClerkUser.username}",
+                                size="2",
+                                weight="medium",
                         ),
                         width="100%",
                     ),
@@ -114,14 +113,15 @@ def sidebar() -> rx.Component:
     return rx.box(
         rx.desktop_only(
             rx.vstack(
+                
                 brand_header(),
                 sidebar_items(),
                 rx.spacer(),
                 rx.vstack(
-                    # sidebar_item("Settings", "settings", "/#"),
-                    #sidebar_item("Log out", "log-out", "/#"),
                     rx.divider(),
-                    profile_button(),
+                    reclerk.signed_in(
+                        profile_button(),
+                    ),
                     width="100%",
                     spacing="1",
                 ),
@@ -156,10 +156,12 @@ def sidebar() -> rx.Component:
                             sidebar_items(),
                             rx.spacer(),
                             rx.vstack(
-                                sidebar_item("Settings","settings","/#",),
+                                # sidebar_item("Settings","settings","/#",),
                                 #sidebar_item("Log out","log-out","/#",),
                                 rx.divider(margin="0"),
-                                profile_button(),
+                                reclerk.signed_in(
+                                    profile_button(),
+                                ),
                                 width="100%",
                                 spacing="5",
                             ),
@@ -168,7 +170,7 @@ def sidebar() -> rx.Component:
                         ),
                         top="auto",
                         right="auto",
-                        height="100%",
+                        height="100vh",
                         width="20em",
                         padding="1.5em",
                         bg=rx.color("accent", 2),
@@ -178,7 +180,7 @@ def sidebar() -> rx.Component:
                 direction="left",
             ),
             padding="1em",
-            height="100%",
+            height="100vh",
             position="fixed",
         ),
     )

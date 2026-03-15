@@ -1,10 +1,10 @@
 import reflex as rx
+import reflex_clerk_api as reclerk
 from pathlib import Path
-from .platform_base import platform_base
+from ..layout import platform_layout
 from ..constants import urls
 from ..components.forms_popover import add_new_popover,search_popover
-from ..components.user_input_text import EditableText
-from ..components.upload import upload_image_user
+from ..components.user_input_text import EditableText,EditableTextArea
 from ..components.org_table import table_pagination as org_table
 from ..components.project_table import table_pagination as project_table
 from ..components.list_institution import list_org_vertical
@@ -12,8 +12,10 @@ from ..states.user_state import UserState
 from ..states.org_state import OrgState
 from ..states.project_state import ProjectState
 from ..states.auth_state import AuthState
+import logging
 
 editable_text = EditableText.create
+editable_textarea = EditableTextArea.create
 
 class Profile():
     value: str
@@ -51,7 +53,7 @@ def section_title(section_icon:str,section_title:str, go_to_section:str,section_
     return rx.hstack(
         rx.icon(section_icon,color = "teal"),
         rx.heading(section_title,size="5", color = "teal"),
-        rx.link(f"Go to {go_to_section}",href=section_link),
+        rx.link(f"Go to {go_to_section}",href=str(section_link)),
         spacing = "5",
         color = "accent"
     )
@@ -63,20 +65,27 @@ def input_field_edit(title:str,key:str):
             editable_text(value = default_value,key = key),
         ),
 
+def text_field_edit(title:str,key:str):
+    default_value =UserState.my_details[f"{key}"]
+    return rx.vstack(
+            rx.heading(title,size="3", color = "grey"),
+            editable_textarea(value = default_value,key = key),
+        ),
+
 
 def user_section():
 
     return rx.container(
         rx.tablet_and_desktop(
             rx.hstack(
-                upload_image_user("Profile photo",UserState.my_details["profile_image"]), 
+                rx.image(src=f"{reclerk.ClerkUser.image_url}",
+                        border_radius="15px 15px 15px 15px",
+                        width="20%",
+                        heigth="auto"),
                 rx.vstack(
-                    input_field_edit(title= "First name",key = 'first_name'),
-                    input_field_edit("Last name",key='last_name'),
-                    input_field_edit("Country",key='country'),
                     input_field_edit(title= "LinkedIn / Social media",key = 'linkedin'),
-                    input_field_edit(title= "Username (unique id)",key = 'username'),
-                    # input_field_edit("Phone number",UserState.my_details['phone_number']),
+                    input_field_edit("Country",key='country'),
+                    text_field_edit("Bio / Description", key = "description"),
                     spacing="2",
                     padding="3",
                 ),
@@ -119,10 +128,12 @@ def search_existing(text:str):
     )
 
 
-@rx.page(route=urls.PROFILE_URL, on_load= [AuthState.check_session,
-                                           UserState.get_my_details,
-                                           OrgState.get_my_orgs,OrgState.get_orgs,
-                                           ProjectState.get_list_projects,ProjectState.get_my_projects])
+@rx.page(route=urls.PROFILE_URL, on_load= [UserState.get_my_details,
+                                            OrgState.get_my_orgs,
+                                            OrgState.get_orgs,
+                                            ProjectState.get_list_projects,
+                                            ProjectState.get_my_projects
+                                            ])
 def profile() -> rx.Component:
     profile = rx.vstack(
                 rx.heading('My profile', size="9"),
@@ -137,4 +148,4 @@ def profile() -> rx.Component:
                 justify="start",
                 width="100%"
     )
-    return platform_base(profile)
+    return platform_layout(profile)

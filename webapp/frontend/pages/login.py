@@ -1,12 +1,14 @@
 import reflex as rx 
-from .webpage_base import base_page
+import reflex_clerk_api as reclerk
+from ..layout import platform_layout
 from ..constants import urls
 from ..components.login_card import login_multiple_thirdparty
 
 @rx.page(route=urls.LOGIN_URL)
 def login_page() -> rx.Component:
-    my_child = rx.vstack(
-            login_multiple_thirdparty(),
+    my_child = rx.center(
+            reclerk.sign_in(),
+            #login_multiple_thirdparty(),
             spacing="5",
             justify="center",
             align="center",
@@ -14,4 +16,4 @@ def login_page() -> rx.Component:
             id='my-child',
         )
         
-    return base_page(my_child)
+    return platform_layout(my_child)

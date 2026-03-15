@@ -4,6 +4,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    tty: true
     image: careagain/careagain-webapp:latest
     env_file:
       - .env
@@ -11,7 +14,7 @@ services:
       - 3000:3000
     dns:
       - 1.1.1.1
-    command: reflex run --env prod --frontend-only
+    command: reflex run --frontend-only --loglevel debug
     depends_on:
       - app
   app:
@@ -19,6 +22,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    tty: true
     image: careagain/careagain-webapp:latest
     env_file:
       - .env
@@ -26,3 +32,4 @@ services:
       - 8000:8000
     dns:
       - 1.1.1.1
+    command: reflex run --backend-only --loglevel debug

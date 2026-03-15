@@ -1,12 +1,14 @@
 import reflex as rx
-import typing as Callable
 from ..states.org_state import OrgState
 
 class OrgEditableText(rx.ComponentState):
-    text: str = "Click to edit"
+    text: str = ""
     original_text: str
     editing: bool = False
     key: str = None
+    
+    def set_text(self, value: str): 
+        self.text = value
 
 
     def start_editing(self, original_text: str):
@@ -83,6 +85,9 @@ class OrgEditableTextArea(rx.ComponentState):
     original_text: str
     editing: bool = False
     key: str = None
+    
+    def set_text(self, value: str): 
+        self.text = value
 
 
     def start_editing(self, original_text: str):

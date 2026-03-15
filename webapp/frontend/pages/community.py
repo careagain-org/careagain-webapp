@@ -1,6 +1,6 @@
 import reflex as rx 
-
-from .platform_base import platform_base
+import reflex_clerk_api as reclerk
+from ..layout import platform_layout
 from ..constants import urls
 from ..components.map import create_map
 from ..components.org_table import table_pagination
@@ -10,6 +10,7 @@ from ..components.org_forms import discover_org
 from ..components.user_forms import discover_user
 from ..states.org_state import OrgState
 from ..states.user_state import UserState
+from ..states.auth_state import AuthState
 from ..components.forms_popover import add_new_popover
 #from ..components.dropdown import selectors,SelectorsState
 
@@ -38,15 +39,23 @@ def filters_panel():
         ),
 
 
-@rx.page(route=urls.COMMUNITY_PLATFORM,on_load=[OrgState.get_location,OrgState.get_orgs])
+@rx.page(route=urls.COMMUNITY_PLATFORM,on_load=[AuthState.set_user_cookie,OrgState.get_orgs,UserState.get_users])
 def community_page() -> rx.Component:
     my_child = rx.vstack(
                     rx.hstack(
                         rx.heading('Community', size="9"),
                         add_new_popover("organization"),
-                        rx.tooltip(
-                            rx.icon_button("file-cog",size="3",on_click=rx.redirect(urls.PROFILE_ORG_URL)),
-                            content="Manage your organizations.",
+                        rx.fragment(
+                            reclerk.signed_in(
+                                rx.tooltip(
+                                rx.icon_button("file-cog",size="3",on_click=rx.redirect(urls.PROFILE_PROJECT_URL)),
+                                content="Manage your projects.",
+                            ),),
+                            reclerk.signed_out(
+                                rx.tooltip(
+                                rx.icon_button("file-cog",size="3",on_click=rx.redirect(urls.LOGIN_URL)),
+                                content="Log in to Manage your projects.",)
+                            )
                         ),
                         align="end",
                         spacing="5"
@@ -63,7 +72,7 @@ def community_page() -> rx.Component:
                                 create_map(),
                                 spacing="5",
                                 weight="100%",
-                                align="center"
+                                align="center",
                             ),
                             value="tab-map",
                         ),
@@ -100,4 +109,4 @@ def community_page() -> rx.Component:
                     align="start",
                     id='community_page',
                 )
-    return platform_base(my_child)
+    return platform_layout(my_child)

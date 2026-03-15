@@ -115,7 +115,7 @@ def project_card_horizontal(project)-> rx.Component:
                     padding ="0",
                     align="center"
                 ),
-                href=urls.IND_PROJECT_URL,
+                href=f"{urls.IND_PROJECT_URL}/{project['project_id']}",
                 on_click=ProjectState.to_project_view(project["project_id"]),
                 align="start"
             ),

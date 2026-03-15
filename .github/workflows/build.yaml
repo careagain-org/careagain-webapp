@@ -48,10 +48,15 @@ jobs:
           SUPABASE_S3_BUCKET=${{ secrets.SUPABASE_S3_BUCKET}}
           SUPABASE_S3_SECRET_ACCESS_KEY=${{ secrets.SUPABASE_S3_SECRET_ACCESS_KEY}}
           SUPABASE_URL=${{ secrets.SUPABASE_URL}}
-          API_URL=${{ secrets.API_URL}}
-          WEB_URL=${{ secrets.WEB_URL }}
-          FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}
-          BACKEND_PORT=${{ secrets.BACKEND_PORT }}
+          REFLEX_API_URL=${{ secrets.REFLEX_API_URL}}
+          REFLEX_WEB_URL=${{ secrets.REFLEX_WEB_URL }}
+          REFLEX_FRONTEND_PORT=${{ secrets.REFLEX_FRONTEND_PORT }}
+          REFLEX_BACKEND_PORT=${{ secrets.REFLEX_BACKEND_PORT }}
+          CLERK_PUBLIC_KEY=${{ secrets.CLERK_PUBLIC_KEY }}
+          CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}
+          JWT_KEY=${{ secrets.JWT_KEY }}
+          CLERK_WEBHOOK_SECRET=${{ secrets.CLERK_WEBHOOK_SECRET }}
+          SUPABASE_API_SECRET_KEY=${{ secrets.SUPABASE_API_SECRET_KEY }}
           EOF
 
       - name: Build and push Docker image for linux/arm64

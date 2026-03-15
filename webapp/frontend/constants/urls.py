@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 vm = os.getenv("VIRTUAL_MACHINE_IP")
-BACKEND_PORT = os.getenv("BACKEND_PORT")
-FRONTEND_PORT= os.getenv("FRONTEND_PORT")
-API_URL = os.getenv("API_URL")
-WEB_URL = os.getenv("WEB_URL")
+BACKEND_PORT = os.getenv("REFLEX_BACKEND_PORT")
+FRONTEND_PORT= os.getenv("REFLEX_FRONTEND_PORT")
+API_URL = os.getenv("REFLEX_API_URL")
+WEB_URL = os.getenv("REFLEX_WEB_URL")
 
 HOME_URL = '/'
 ABOUT_URL = '/#home_logo'
@@ -28,7 +28,7 @@ EMAIL = 'hello@careagain.org'
 PLATFORM_URL = '/platform'
 PROJECTS_URL = '/projects'
 IND_PROJECT_URL = '/project_view'
-IND_ORG_URL = '/org_view'
+IND_ORG_URL = '/organization_view'
 IND_USER_URL = '/user_view'
 IND_EDIT_PROJECT_URL = '/project_edit'
 IND_EDIT_ORG_URL = '/org_edit'

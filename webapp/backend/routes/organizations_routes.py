@@ -4,8 +4,9 @@ from ..schemas import organization_schema as org_schema
 from ..schemas import user_schema as schema
 from ..models import model
 from sqlalchemy.orm import Session
+from sqlalchemy import desc,asc
 #from ..config.db_setup import get_db
-from ..config.supabase_config import get_db,supa_client,bucket_s3,url_s3_object
+from ..config.supabase_config import get_db,bucket_s3,url_s3_object,supa_client
 from ..services import user_functions
 import numpy as np
 import datetime as dt
@@ -16,41 +17,51 @@ organization_route = APIRouter(prefix="/api/orgs")
 @organization_route.post("/upload_image",tags = ['organizations'])
 async def upload_image(org_id: str,
                        file: UploadFile= File(...),
-                        user: schema.User = Depends(user_functions.get_current_user),
+                        token: schema.User = Depends(user_functions.get_token),
                         db: Session = Depends(get_db)):
     try:
         if not file:
             raise HTTPException(status_code=400, detail="No file uploaded")
         url_photo = f"orgs/{org_id}/images/{file.filename}"
         contents = await file.read()
+        
+        # supa_client.storage._client.headers["Authorization"] = f"Bearer {token}"
 
         # Upload with auth headers
-        response = supa_client.storage.from_(f"{bucket_s3}").upload(
+        supa_client.storage.from_(f"{bucket_s3}").upload(
             file=contents,
             path=url_photo,
             file_options={"content-type": file.content_type,
                         "cache-control": "3600", "upsert": "true",},
         )
-        
-        return {"filename":f"{url_s3_object}/{url_photo}", "detail": "Image uploaded","org_id":org_id}
+
+        return {"filename":f"{url_s3_object}{url_photo}", "detail": "Image uploaded","org_id":org_id}
     
     except Exception as err:
         raise HTTPException(status_code=500, detail=str(err))
 
-
+def validate_float(my_string:str):
+    try:
+        if my_string is None or my_string=="":
+            return None
+        else:
+            return float(my_string)
+    except:
+        print("Invalid float value")
+        return None
 
 @organization_route.post("/create_org",tags = ['organizations'])
 async def create_org(input:org_schema.CreateOrganization,
                      db:Session=Depends(get_db),
                      user:schema.User = Depends(user_functions.get_current_user)):
-
+    
     org_obj = model.Organization(org_id=input.org_id,
                                  name = input.name,
                                  type = input.type,
                                  address = input.address,
                                  description= input.description,
-                                 latitude = input.latitude,
-                                 longitude = input.longitude,
+                                 latitude = validate_float(input.latitude),
+                                 longitude = validate_float(input.longitude),
                                  logo = f"{url_s3_object}orgs/{input.org_id}/images/{input.logo}" if input.logo else "",
                                  website = input.website,
                                  email = input.email,
@@ -65,6 +76,15 @@ async def create_org(input:org_schema.CreateOrganization,
                                       member_type = "admin")
     db.add(rel_obj)
     db.commit()
+    
+    action_obj = model.Action(performed_by = user.user_id,
+                              received_by = org_obj.org_id,
+                              action_type = "creation",
+                              receiver_type = "organization",
+                              description = f"{org_obj.name} - has been created")
+    
+    db.add(action_obj)
+    db.commit()
 
     db.refresh(org_obj)
 
@@ -73,18 +93,29 @@ async def create_org(input:org_schema.CreateOrganization,
 
 @organization_route.get("/organizations",tags = ['organizations'])
 async def show_organizations(db:Session=Depends(get_db)):
-    orgs = db.query(model.Organization).all()
+    orgs = db.query(model.Organization).order_by(desc(model.Organization.creation_date)).all()
     return orgs 
 
 
 @organization_route.delete("/delete_org",tags = ['organizations'])
 async def delete_organization(org_id:str,
-                            db:Session=Depends(get_db)):
+                            db:Session=Depends(get_db),
+                            user: schema.User = Depends(user_functions.get_current_user)):
+    org_obj = db.query(model.Organization).filter(model.Organization.org_id == org_id).first()
+    (db.query(model.Project_Organization).filter(model.Project_Organization.org_id == org_id).delete(synchronize_session='fetch'))
     (db.query(model.User_Organization).filter(model.User_Organization.org_id == org_id).delete(synchronize_session='fetch'))
     (db.query(model.Organization).filter(model.Organization.org_id == org_id).delete())
-
+    
+    action_obj = model.Action(performed_by = user.user_id,
+                              received_by = org_obj.org_id,
+                              action_type = "delete",
+                              receiver_type = "organization",
+                              description = f"{org_obj.name} - has been deleted")
+    
+    db.add(action_obj)
     db.commit()
-
+    
+    
     return {"detail": "Organization deleted"} 
 
 @organization_route.delete("/leave_org",tags = ['organizations'])
@@ -102,6 +133,7 @@ async def leave_organization(org_id:str,
 async def join_organization(org_id:str,
                             user:schema.User = Depends(user_functions.get_current_user),
                             db:Session=Depends(get_db)):
+    org = db.query(model.Organization).filter(model.Organization.org_id == org_id).first()
     admin_roles = db.query(model.User_Organization).filter(model.User_Organization.org_id == org_id,
                                               model.User_Organization.member_type == "admin").all()
     
@@ -114,11 +146,29 @@ async def join_organization(org_id:str,
                                         member_type = "admin")
             db.add(rel_obj)
             db.commit()
+            
+            action_obj = model.Action(performed_by = user.user_id,
+                                    received_by = org_id,
+                                    action_type = "modification",
+                                    receiver_type = "organization",
+                                    description = f"{org.name} - has a new admin")
+            
+            db.add(action_obj)
+            db.commit()
         else:
             rel_obj = model.User_Organization(user_id = user.user_id,
                                         org_id = org_id,
                                         member_type = "user")
             db.add(rel_obj)
+            db.commit()
+            
+            action_obj = model.Action(performed_by = user.user_id,
+                                    received_by = org_id,
+                                    action_type = "modification",
+                                    receiver_type = "organization",
+                                    description = f"{org.name} - has a new member")
+            
+            db.add(action_obj)
             db.commit()
         
         return {"detail": "Organization attached"} 
@@ -150,6 +200,18 @@ async def get_members(org_id:str,
             merged_list.append(merged_dict)
         
     return merged_list
+
+
+@organization_route.get("/projects",tags = ['organizations'])
+async def get_projects(org_id:str,
+                            db:Session=Depends(get_db)):
+    projects = db.query(model.Project).join(
+            model.Project_Organization,
+            model.Project_Organization.project_id == model.Project.project_id
+        ).filter(model.Project_Organization.org_id == org_id).all()
+        
+    return projects
+
     
 @organization_route.get("/locations",tags = ['organizations'])
 async def show_organizations(db:Session=Depends(get_db)):
@@ -204,7 +266,8 @@ async def show_organizations(
 async def update_org(key: str, 
                       value: str, 
                       org_id: str,
-                      db: Session = Depends(get_db)):
+                      db: Session = Depends(get_db),
+                      user: schema.User = Depends(user_functions.get_current_user)):
     
     org= (db.query(model.Organization).filter(model.Organization.org_id == org_id)).first()
 
@@ -217,11 +280,21 @@ async def update_org(key: str,
 
     # Set the attribute dynamically
     setattr(org, key, value)
+    setattr(org, "modification_date", dt.date.today())
 
     # Commit the changes to the database
     db.add(org)
     db.commit()
     db.refresh(org)
+    
+    action_obj = model.Action(performed_by = user.user_id,
+                              received_by = org.org_id,
+                              action_type = "modification",
+                              receiver_type = "organization",
+                              description = f"{org.name} - has been modified")
+    
+    db.add(action_obj)
+    db.commit()
 
     return org
 
@@ -230,6 +303,7 @@ async def update_org(key: str,
 async def join_org(org_id:str,
                        user_id:str,
                        db:Session=Depends(get_db)):
+    org = db.query(model.Organization).filter(model.Organization.org_id == org_id).first()
     admin_roles = db.query(model.User_Organization).filter(model.User_Organization.org_id == org_id,
                                               model.User_Organization.member_type == "admin").all()
     
@@ -242,17 +316,65 @@ async def join_org(org_id:str,
                                         member_type = "admin")
             db.add(rel_obj)
             db.commit()
+            
+            action_obj = model.Action(performed_by = user_id,
+                                    received_by = org_id,
+                                    action_type = "modification",
+                                    receiver_type = "organization",
+                                    description = f"{org.name} - has a new admin")
+            
+            db.add(action_obj)
+            db.commit()
         else:
             rel_obj = model.User_Organization(user_id = user_id,
                                         org_id = org_id,
                                         member_type = "user")
             db.add(rel_obj)
             db.commit()
+            
+            action_obj = model.Action(performed_by = user_id,
+                                    received_by = org_id,
+                                    action_type = "modification",
+                                    receiver_type = "organization",
+                                    description = f"{org.name} - has a new member")
+            
+            db.add(action_obj)
+            db.commit()
         
         return {"detail": "User joined the organization"} 
     else:
         raise HTTPException(status_code=422, detail="User is already a member of this organization")
     
+
+@organization_route.put("/user_follow_org",tags = ['organizations'])
+async def follow_org(org_id:str,
+                       user_id:str,
+                       db:Session=Depends(get_db)):
+    
+    try:
+        rel_obj = model.User_Organization(user_id = user_id,
+                                            org_id = org_id,
+                                            member_type = "follower")
+        db.add(rel_obj)
+        db.commit()
+    
+        return {"detail": "You are now following the organization"} 
+    except Exception as err:
+        raise HTTPException(status_code=422, detail=str(err))
+    
+
+@organization_route.put("/user_unfollow_org",tags = ['organizations'])
+async def dettach_org(org_id:str,
+                       user_id:str,
+                       db:Session=Depends(get_db)):
+    (db.query(model.User_Organization).filter(model.User_Organization.org_id == org_id,
+                                              model.User_Organization.user_id == user_id,
+                                              model.User_Organization.member_type == "follower").delete(synchronize_session='fetch'))
+
+    db.commit()
+
+    return {"detail": "Unfollowing organization"}
+
 
 @organization_route.put("/user_dettached_org",tags = ['organizations'])
 async def dettach_org(org_id:str,
@@ -263,7 +385,7 @@ async def dettach_org(org_id:str,
 
     db.commit()
 
-    return {"detail": "User removedfrom organization"} 
+    return {"detail": "User removed from organization"}
 
 
 @organization_route.put("/change_member_type",tags = ['organizations'])

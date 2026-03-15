@@ -1,22 +1,14 @@
-import plotly.graph_objects as go
 import reflex as rx
 import folium
 from folium import plugins
 from ..states.org_state import OrgState
-from typing import List, Dict,Any
 from ..constants import urls
-import httpx
-import pandas as pd
-import requests
-import clipboard
-import logging
-from folium import Map, CustomIcon, Html, Element, MacroElement
-from jinja2 import Template
 
 
 class MapState(OrgState):
     lat= ""
-    lng= ""
+    lon= ""
+    map_html = ""
     
     @rx.var
     def folium_map_html(self) -> str:
@@ -45,35 +37,44 @@ class MapState(OrgState):
         # Only add markers if orgs is a non-empty list
         if orgs:
             for org in orgs:
+                
                 try:
-                    if org["type"] == "Research & Development":
+                    org_pop_up = self.pop_up_template(org)
+                    if org["type"] == "Research and Development":
                         folium.Marker(
-                            location=[float(org["latitude"]), float(org["longitude"])],
-                            popup=org["name"],
+                            location=[org["latitude"], org["longitude"]],
+                            popup=org_pop_up,
                             icon=folium.Icon(color="green",icon="cogs", prefix="fa") #atom
                         ).add_to(g1)
-                    elif org["type"] == "Logistics & transport":
+                    elif org["type"] == "Logistics and Transport":
                         folium.Marker(
-                            location=[float(org["latitude"]), float(org["longitude"])],
-                            popup=org["name"],
+                            location=[org["latitude"], org["longitude"]],
+                            popup=org_pop_up,
                             icon=folium.Icon(color="blue",icon="truck", prefix="fa") #route
                         ).add_to(g2)
                     elif org["type"] == "Hospital":
                         folium.Marker(
-                            location=[float(org["latitude"]), float(org["longitude"])],
-                            popup=org["name"],
+                            location=[org["latitude"], org["longitude"]],
+                            popup=org_pop_up,
                             icon=folium.Icon(color="red",icon="medkit", prefix="fa")
                         ).add_to(g3)
                     elif org["type"] == "Manufacturer":
                         folium.Marker(
-                            location=[float(org["latitude"]), float(org["longitude"])],
-                            popup=org["name"],
+                            location=[org["latitude"], org["longitude"]],
+                            popup=org_pop_up,
                             icon=folium.Icon(color="beige",icon="wrench")
                         ).add_to(g4)
+                    else:
+                        folium.Marker(
+                            location=[org["latitude"], org["longitude"]],
+                            popup=org_pop_up,
+                            icon=folium.Icon(color="grey",icon="atom")
+                        ).add_to(g4)
                 except Exception as err:
-                    print(err)
+                    pass
+                    #print(err)
                     
-        folium.LayerControl(collapsed=False).add_to(map_)
+        folium.LayerControl(collapsed=True).add_to(map_)
         
         return map_._repr_html_()
     
@@ -85,36 +86,137 @@ class MapState(OrgState):
                                         self.selected_org["longitude"]], zoom_start=7)
             
             folium.Marker(
-                    location=[float(self.selected_org["latitude"]), 
-                            float(self.selected_org["longitude"])],
+                    location=[self.selected_org["latitude"], 
+                            self.selected_org["longitude"]],
                     popup=self.selected_org["name"],
                     icon=folium.Icon(color="red") 
                 ).add_to(map_)
         except Exception as err:
             map_ = folium.Map(location=[40.463667, -3.74922], zoom_start=2)
-            print(err)
+            #print(err)
             
         return map_._repr_html_()
+    
+    # def inject_code:
+    #     """// Store marker data
+    #         markers.push({ lat: parseFloat(lat), lng: parseFloat(lng) });
+
+    #         // Save updated JSON file
+    #         saveMarkersToJSON();
+    #     }"""
     
     @rx.var
     def interactive_map_html(self)-> str:
         map_ = folium.Map(location=[40.463667, -3.74922], zoom_start=2)
         folium.ClickForMarker(popup="<b>Lat:</b> ${lat}<br /><b>Lon:</b> ${lng}").add_to(map_)
-        folium.ClickForLatLng(format_str='lat + "," + lng', alert=True).add_to(map_)
+        folium.ClickForLatLng(format_str='lat + "," + lng', alert=False).add_to(map_)
+        # map_.get_root().html.add_child(textarea)
+        # folium.ClickForMarker(popup="<b>Lat:</b> ${lat}<br /><b>Lon:</b> ${lng}").add_to(map_)
+        # folium.ClickForLatLng(format_str='lat + "," + lng', alert=False).add_to(map_)
+        # self.map_html = map_._repr_html_()
         return map_._repr_html_()
+    
+    @rx.event
+    def find_popup_variable_name(self):
+        pattern = "var lat_lng"
+        # if self.map_html:
+        # Find the starting index of the variable name
+        # and the ending index of the variable name
+        starting_index = self.map_html.find(pattern) + 4
+        tmp_html = self.map_html[starting_index:]
+        ending_index = tmp_html.find(" =") + starting_index
+        self.lat = self.map_html[starting_index:ending_index]
+        self.lon = self.map_html[starting_index:ending_index]
+        print(self.map_html)
+        # return self.map_html[starting_index:ending_index]
+    
+    rx.event
+    def hola(self):
+        print("Hola")
+        
+    def pop_up_template(self, org) -> str:
+        """Create a pop-up template for the organization."""
+        
+        html = """
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>Tarjeta Empresa</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                }}
+                .card {{
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    gap: 20px;
+                    border: 1px solid #ccc;
+                    padding: 20px;
+                    max-width: 600px;
+                    min-width: 300px;
+                }}
+                .icon {{
+                    font-size: 60px;
+                }}
+                .content {{
+                    display: flex;
+                    flex-direction: column;
+                }}
+                .title a {{
+                    font-weight: bold;
+                    font-size: 24px;
+                    color: black;
+                    text-decoration: none;
+                }}
+                .title a:hover {{
+                    text-decoration: underline;
+                }}
+                .subtitle {{
+                    font-size: 18px;
+                    margin-top: 5px;
+                }}
+                .link {{
+                    font-size: 16px;
+                    color: #555;
+                    margin-top: 5px;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <div class="icon">
+                    <img src={image} style="width: 100px;" alt="Logo" />
+                </div>
+                <div class="content">
+                    <div class="title">
+                        <a href={org_link} target="_top">{org_name}</a>
+                    </div>
+                    <div class="subtitle">{type}</div>
+                </div>
+            </div>
+        </body>
+        </html>
+        """.format(
+            image=org["logo"],
+            org_name=org["name"],
+            org_link=f"{urls.WEB_URL}{urls.IND_ORG_URL}/{org['org_id']}",
+            type=org["type"],
+            link=org["website"]
+        )
+        return html
 
 
 def create_map() -> rx.Component:
     """Create a map component using Folium."""
-    return rx.el.div(
-        rx.el.iframe(
-            src_doc=MapState.folium_map_html,
-            class_name="w-full h-[calc(100vh-200px)] border-none rounded-lg shadow-md",
-            width = "100%",
-        ),
-        class_name="p-1 bg-gray-50 rounded-lg shadow-inner",
-        width = "80%",
-    )
+    return  rx.el.iframe(
+                src_doc=MapState.folium_map_html,
+                class_name="w-full h-screen",
+                width = "90vw",
+                height ="90vh"
+            )
+
 
 
 def find_popup_variable_name(html):
@@ -130,17 +232,18 @@ def find_popup_variable_name(html):
 def interactive_map():
     # MapState.lat = find_popup_variable_name(MapState.interactive_map_html)
     # MapState.interactive_map_html
-    return rx.el.div(
+    return rx.box(
             # rx.text(MapState.lat),
             rx.el.iframe(
                 src_doc=MapState.interactive_map_html,
-                class_name="w-full h-full border-none rounded-lg shadow-md",
+                class_name="w-full aspect-[5/3] border-none rounded-lg shadow-md",
                 width = "100%",
                 heigth = "100%",
             ),
             # class_name="p-1 bg-gray-50 rounded-lg shadow-inner",
             width = "100%",
             height = "100%",
+            on_click=MapState.find_popup_variable_name,
         )
 
 def map_org()-> rx.Component:
@@ -148,11 +251,10 @@ def map_org()-> rx.Component:
     return rx.el.div(
         rx.el.iframe(
             src_doc=MapState.individual_folium_map_html,
-            class_name="w-full h-[calc(40vh-50px)] border-none rounded-lg shadow-md",
+            class_name="w-full aspect-[5/3] border-none rounded-lg shadow-md",
             width = "100%",
-            heigth = "100%",
         ),
-        class_name="p-1 bg-gray-50 rounded-lg shadow-inner",
+        # class_name="p-1 bg-gray-50 rounded-lg shadow-inner",
         width = "100%",
     )
 

@@ -5,36 +5,43 @@ from ..models import model
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 # from ..config.db_setup import get_db
+from supabase import create_client, Client
 from ..config.supabase_config import get_db,url_s3_object,supa_client,bucket_s3
 from ..services import user_functions
 import passlib.hash as hash
 from urllib.parse import unquote
 import uuid
 import json
+from gotrue.errors import AuthApiError
+from ..services import utils
 
 user_route = APIRouter(prefix="/api/users")
 
 
 @user_route.get("/",response_model=List[schema.User],tags = ['users'])
 def show_users(db:Session=Depends(get_db)):
-    users = db.query(model.User).all()
-    return users
+    try:
+        users = db.query(model.User).order_by(desc(model.User.creation_date)).all()
+        return users
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching users: {str(e)}")
 
 @user_route.get("/me",tags = ['users'])
 async def get_user(user:schema.User = Depends(user_functions.get_current_user)):
     return user
 
-
 @user_route.post("/upload_image",tags = ['users'])
-async def upload_image(file: UploadFile= File(...),
-                       user: schema.User = Depends(user_functions.get_current_user),
-                       db: Session = Depends(get_db)):
+async def upload_image(user_id: str,
+                        file: UploadFile= File(...),
+                        db: Session = Depends(get_db)):
     try:
         if not file:
             raise HTTPException(status_code=400, detail="No file uploaded")
-        user_id = user.user_id
+        # user_id = user.user_id
         url_photo = f"users/{user_id}/images/{uuid.uuid4()}.png"
         contents = await file.read()
+        user = (db.query(model.User)
+            .filter(model.User.user_id == str(user_id))).all()
 
         # Upload with auth headers
         response = supa_client.storage.from_(f"{bucket_s3}").upload(
@@ -78,12 +85,6 @@ async def update_user(key: str,
     db.refresh(user)
 
     return user
-
-
-@user_route.get("/",response_model=List[schema.User],tags = ['users'])
-def show_projects(db:Session=Depends(get_db)):
-    users = db.query(model.User).order_by(desc(model.User.user_id)).all()
-    return users
 
 
 @user_route.post("/invite_user",tags = ['users']) 

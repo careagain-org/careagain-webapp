@@ -10,13 +10,14 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     gnupg \
     unzip \
+    xclip \
+    libxkbcommon-x11-0 \
     && curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION} | bash - \
     && apt-get install -y nodejs \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
-    apt-get install -y xclip && \
     rm -rf /var/lib/apt/lists/*
 
 # Install CA certs and dependencies
@@ -65,4 +66,4 @@ ENV REFLEX_DB_URL="sqlite:///reflex.db"
 STOPSIGNAL SIGKILL
 
 # Always apply migrations before starting the backend.
-CMD ["sh", "-c", "reflex db migrate && reflex run --env prod --backend-only"]
+CMD ["sh", "-c", "reflex db makemigrations && reflex db migrate && reflex run --env prod --backend-only --loglevel debug"]

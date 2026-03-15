@@ -17,7 +17,7 @@ class SpeedDialMenu(rx.ComponentState):
                         rx.icon(icon, padding="2px"),
                         rx.text(text, weight="medium"),
                     ),
-                    href=link,
+                    href=str(link),
                     align="center",
                     opacity="0.75",
                     cursor="pointer",

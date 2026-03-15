@@ -4,13 +4,15 @@
 import reflex as rx
 from webapp.frontend.pages import (ind_org_view, ind_org_edit, 
                                    ind_project_view, ind_project_edit, 
-                                   ind_user_view,
-                                   webpage,login, projects, signup,
+                                   ind_user_view,login,signup,
+                                   webpage, projects, 
                                    platform, projects, profile,
-                                   videos,community, questions,
-                                   reset_password) #contact,community,
+                                   videos,community, questions) #contact,community,
 from webapp.frontend.constants import urls
 from rxconfig import config
+
+#clerk sdk
+from clerk_backend_api import Clerk
 
 # backend imports
 # import fastAPI modules
@@ -25,6 +27,8 @@ from webapp.backend.routes.video_routes import video_route
 from webapp.backend.routes.organizations_routes import organization_route
 from webapp.backend.routes.question_routes import question_route
 from webapp.backend.routes.auth_routes import auth_route
+from webapp.backend.routes.clerk_routes import clerk_route
+from webapp.backend.routes.action_routes import action_route
 
 # import model and db
 from webapp.backend.models import model
@@ -43,8 +47,44 @@ load_dotenv(find_dotenv())
 #     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 # )
 
+## ---------------- ADD BACKEND --------------------------- ##
+api_app = FastAPI()
+
+# create table in the database
+model.Base.metadata.create_all(bind=engine)
+model.automap_base()
+
+# add all routes
+api_app.include_router(default)
+api_app.include_router(user_route)
+api_app.include_router(project_route)
+api_app.include_router(video_route)
+api_app.include_router(organization_route)
+api_app.include_router(question_route)
+api_app.include_router(auth_route)
+api_app.include_router(clerk_route)
+api_app.include_router(action_route)
+
+# CORS middleware to allow communication between frontend and backend
+origins = [urls.WEB_URL,
+           urls.API_URL,
+           "https://www.careagain.org/",
+           "https://www.opencareagain.org/",
+           "http://localhost:8000",
+           "http://localhost:3000"] # specify the http where the api is going to run
+
+api_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Change this in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 ## ---------------- RUN FRONTEND APP ---------------------- ##
 app = rx.App(
+    api_transformer=api_app,
     theme=rx.theme(
         appearance="light", 
         has_background=True, 
@@ -53,33 +93,4 @@ app = rx.App(
         radius="medium", 
         accent_color="teal"
     )
-)
-
-## ---------------- ADD BACKEND --------------------------- ##
-
-# create table in the database
-model.Base.metadata.create_all(bind=engine)
-model.automap_base()
-
-# add all routes
-app.api.include_router(default)
-app.api.include_router(user_route)
-app.api.include_router(project_route)
-app.api.include_router(video_route)
-app.api.include_router(organization_route)
-app.api.include_router(question_route)
-app.api.include_router(auth_route)
-
-# CORS middleware to allow communication between frontend and backend
-origins = [urls.WEB_URL,
-           urls.API_URL,
-           "http://localhost:8000",
-           "http://localhost:3000"] # specify the http where the api is going to run
-
-app.api.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,  # Change this in production
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
 )

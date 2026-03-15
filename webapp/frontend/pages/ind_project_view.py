@@ -1,28 +1,68 @@
 import reflex as rx 
-from .platform_base import platform_base
+import reflex_clerk_api as reclerk
+from ..layout import platform_layout
 from ..constants import urls
 from ..states.project_state import ProjectState
+from ..states.user_state import UserState
 from ..states.auth_state import AuthState
 from typing import Dict
+from ..components.org_table import table_pagination as org_table
 from ..components.user_card import users_grid_horizontal
 
 
-@rx.page(route=urls.IND_PROJECT_URL,on_load=ProjectState.find_members_project)
+@rx.page(route=f"{urls.IND_PROJECT_URL}/[pr_id]",on_load=[AuthState.set_user_cookie,
+                                                          ProjectState.load_project_page,
+                                                        ProjectState.find_members_project])
 def view_project() -> rx.Component:
     my_child = rx.vstack(
-        rx.link(rx.icon('arrow_left'),href=urls.PROJECTS_URL),
-        rx.hstack(
-            rx.heading(ProjectState.selected_project['name'], size="9"),
-            rx.avatar(src=f"{ProjectState.selected_project['logo']}", heigh="50px",justify="end"),
+        # rx.link(rx.icon('arrow_left'),href=urls.PROJECTS_URL),
+        rx.flex(
+            rx.vstack(
+                rx.hstack(
+                    rx.heading(ProjectState.selected_project['name'], size="9"),
+                    reclerk.signed_in(
+                        rx.cond(ProjectState.is_project_member,
+                                rx.button("Unfollow",variant="outline",type="button",
+                                          on_mount=[ProjectState.get_my_projects,UserState.get_my_details],
+                                        on_click = lambda: ProjectState.user_unfollow_project(UserState.my_details["user_id"]),
+                                        ),
+                                rx.button("Follow",variant="solid",
+                                    on_click = lambda: ProjectState.user_follow_project(UserState.my_details["user_id"]),
+                                    on_mount=[ProjectState.get_my_projects,UserState.get_my_details],
+                                    type="button"),
+                    ),),
+                    align="center",
+                    padding="5",),
+                rx.hstack(
+                    rx.text("Status: ",color="accent"),
+                    rx.cond(ProjectState.selected_project['verified'],
+                            rx.badge("Verified",variant="surface",color_scheme="teal"),
+                            rx.badge("Non-Verified",variant="surface",color_scheme="amber")),
+                    rx.match(ProjectState.selected_project["status"],
+                     ("Regulatory body approval",rx.badge("RB Approved",variant="surface",color_scheme="grass")),
+                     ("Clinically tested",rx.badge("Clinically tested",variant="surface",color_scheme="violet")),
+                     ("Technically tested",rx.badge("Technically tested",variant="surface",color_scheme="cyan")),
+                     ("Prototype",rx.badge("Prototype",variant="surface",color_scheme="bronze")),
+                     rx.badge("Not defined",variant="surface",color_scheme="gray")),
+                    align="center",
+                ),
+                rx.hstack(
+                    rx.icon("globe"),
+                    rx.link(f"{ProjectState.selected_project['website']}",href=str({ProjectState.selected_project['website']}),is_external=True)
+                ),
+                rx.hstack(
+                    rx.icon("github"),
+                    rx.link(f"{ProjectState.selected_project['repo']}",href=str({ProjectState.selected_project['repo']}),is_external=True)
+                ),
+                justify="start",
+            ),
+            rx.image(src=f"{ProjectState.selected_project['logo']}", 
+                     border_radius="15px 15px 15px 15px",
+                     height="100px",align="end"),
             justify="between",
-        ),
-        rx.hstack(
-            rx.icon("globe"),
-            rx.link(ProjectState.selected_project['website'],href=ProjectState.selected_project['website'])
-        ),
-        rx.hstack(
-            rx.icon("github"),
-            rx.link(ProjectState.selected_project['repo'])#,href=ProjectState.selected_project['repo'])
+            direction="row",
+            align="center",
+            width="90%",
         ),
         rx.divider(width='90%'),
         rx.hstack(
@@ -48,18 +88,46 @@ def view_project() -> rx.Component:
             rx.icon("download"),
             rx.heading("Downloads",size="5"),
         ),
-        rx.button("Download",
-                on_click=rx.download(
-                    url={ProjectState.selected_project['image']},
-                    filename="test",
+        rx.hstack(
+            rx.text("Manual guide (.pdf): "),
+            rx.cond(ProjectState.selected_project['guide']=="",
+                rx.button("Not available yet",
+                            disabled=True,
+                        id="download_button_guide",
+                    ),
+                rx.button("Download",
+                    on_click=rx.download(
+                                url={ProjectState.selected_project['guide']},
+                                filename=f"{ProjectState.selected_project['guide']}_guide",
+                            ),
+                    id="download_button_guide",
+                ),),
+            rx.text("Attachment - Project files (.zip): "),
+            rx.cond(ProjectState.selected_project['attachment']=="",
+                rx.button("Not available yet",
+                    disabled=True,
+                    id="download_button_attachment",
                 ),
-                id="download_button",
-            ),
+                rx.button("Download",
+                    on_click=rx.download(
+                        url={ProjectState.selected_project['attachment']},
+                        filename=f"{ProjectState.selected_project['guide']}_attachment",
+                    ),
+                    id="download_button_attachment",
+                ),
+            )
+        ),
+        # rx.divider(width='90%'),
+        # rx.hstack(
+        #     rx.icon("newspaper"),
+        #     rx.heading("News and Publications",size="5"),
+        # ),
         rx.divider(width='90%'),
         rx.hstack(
-            rx.icon("newspaper"),
-            rx.heading("News and Publications",size="5"),
+            rx.icon("building-2"),
+            rx.heading("Organizations involved",size="5"),
         ),
+        org_table(ProjectState.project_orgs),
         rx.divider(width='90%'),
         rx.hstack(
             rx.icon("circle-user-round"),
@@ -67,7 +135,8 @@ def view_project() -> rx.Component:
         ),
         users_grid_horizontal(ProjectState.project_members),
         width ="100%",
-        spacing="3"
+        spacing="3",
+            
     )
 
-    return platform_base(my_child)
+    return platform_layout(my_child)
