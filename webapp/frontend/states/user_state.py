@@ -26,7 +26,7 @@ class UserState(rx.State):
     my_details: Dict[str, Any] = {}
     
     selected_user_id:str
-    selected_user: Dict[str, str]
+    selected_user: Dict[str, Any]={}
     users: List[Dict[str, str]]=[]
     filtered_users: List[Dict[str, str]]=[]
     searched_users: List[Dict[str, str]]=[]
@@ -79,9 +79,9 @@ class UserState(rx.State):
 
 
     async def load_user_page(self):
-        current_page_route = self.router.page.raw_path
-        user_id =current_page_route.split("/")[-2]
-        # print(f"User ID: {user_id}")
+        current_page_route = self.router.url.path
+        user_id =current_page_route.split("/")[-1]
+        print(f"User ID: {user_id}")
         self.selected_user_id = user_id
         self.selected_user = [d for d in self.users if d['user_id']==(user_id)][0]
     
@@ -189,6 +189,7 @@ class UserState(rx.State):
     
     
     def select_user(self,user_id:str):
+        print(f"Attempting to select user with ID: {user_id}")
         self.selected_user_id = user_id
         self.selected_user = [d for d in self.users if d['user_id']==(user_id)][0]
         

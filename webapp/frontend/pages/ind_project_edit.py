@@ -9,7 +9,6 @@ from ..components.user_card import users_grid_horizontal
 from ..components.user_table import table_pagination
 from ..components.org_table import table_pagination as org_table
 from ..components.project_input_text import ProjectEditableText,ProjectEditableTextArea
-from ..components.project_upload import upload_logo_project,upload_image_project
 from ..components.forms_popover import add_new,search_user
 from ..components.project_forms import update_logo_form,update_image_form
 

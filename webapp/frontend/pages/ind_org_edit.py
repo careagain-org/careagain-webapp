@@ -11,7 +11,6 @@ from ..components.user_table import table_pagination
 from ..components.project_table import table_pagination as project_table_pagination
 from ..components.org_input_text import OrgEditableText,OrgEditableTextArea
 from ..components.org_forms import update_coordinates_form,update_image_form
-from ..components.upload import upload_logo_org
 from ..components.forms_popover import add_new,search_user,search_popover
 
 editable_text = OrgEditableText.create

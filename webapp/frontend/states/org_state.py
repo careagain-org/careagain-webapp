@@ -29,7 +29,7 @@ class OrgState(rx.State):
     org_members:List[Dict[str, Any]] = []
     org_projects:List[Dict[str, Any]] =[]
     org_id:str=""
-    logo: str =""
+    logo_data: str =""
     is_org_member: bool=False
     token:Optional[str]=rx.Cookie(
                 name="auth_token", max_age=30,
@@ -38,6 +38,8 @@ class OrgState(rx.State):
                 secure=True,
             ) 
     
+    def set_logo(self, image_data: str):
+        self.logo_data = image_data
     
     async def set_auth_token(self) -> Optional[str]:
         clerk_state = await self.get_state(reclerk.ClerkState)
@@ -84,11 +86,11 @@ class OrgState(rx.State):
             files: The uploaded files.
         """
         try:
-
+            upload_data = self.logo_data
             file=my_files[0]
             upload_data = await file.read()
-            self.logo = f"{uuid.uuid4()}.png"
-            outfile = rx.get_upload_dir() / self.logo
+            logo_filename = f"{uuid.uuid4()}.png"
+            outfile = rx.get_upload_dir() / logo_filename
 
             # Save the file.
             with outfile.open("wb") as file_object:
@@ -99,39 +101,40 @@ class OrgState(rx.State):
     
     
     async def remove_uploaded_files(self):
-        self.logo =""
+        self.logo_data =""
         files = glob.glob(f"{rx.get_upload_dir()}/*")
         for f in files:
             os.remove(f)
-            
+                       
 
-    async def supabase_upload(self,org_id):
+    async def supabase_upload(self,org_id, logo_name):
         """Upload the logo to Supabase storage and update the organization details."""
         self.token = await self.set_auth_token()
         try:
-            outfile = rx.get_upload_dir() / self.logo 
-
+            logo_filename = f"{uuid.uuid4()}.png"
+            outfile = rx.get_upload_dir() / logo_name
+            print(outfile)
             with open(outfile, "rb") as image_file:
-                files = {"file": (self.logo, image_file, "image/png")}
+                files = {"file": (logo_filename, image_file, "image/png")}
                 data = {"org_id": org_id}
                 headers = {"Authorization": f"Bearer {self.token}"}
 
                 async with httpx.AsyncClient() as client:
                     response = await client.post(f"{urls.API_URL}/api/orgs/upload_image?org_id={org_id}", 
                                                 files=files, data=data, headers=headers)
-
-                if response.status_code == 200:
-                    try:
-                        logo  = f"{os.environ.get("SUPABASE_URL")}storage/v1/object/public/{os.environ.get("SUPABASE_S3_BUCKET")}/orgs/{org_id}/images/{self.logo}"
-                        await self.update_org("logo",logo)
-                    except:
-                        print("org doesn't exist")
-                    await self.remove_uploaded_files()
-                    return rx.toast(f"File uploaded")
-                else:
-                    detail = response.json()["detail"]
-                    await self.remove_uploaded_files()
-                    return rx.toast(f"User update error: {response.status_code}, {detail}")
+            print(response.status_code)
+            if response.status_code == 200:
+                try:
+                    logo  = f"{os.environ.get("SUPABASE_URL")}storage/v1/object/public/{os.environ.get("SUPABASE_S3_BUCKET")}/orgs/{org_id}/images/{logo_filename}"
+                    await self.update_org("logo",logo,org_id)
+                except:
+                    print("org doesn't exist")
+                await self.remove_uploaded_files()
+                return rx.toast(f"File uploaded")
+            else:
+                detail = response.json()["detail"]
+                await self.remove_uploaded_files()
+                return rx.toast(f"User update error: {response.status_code}, {detail}")
         except Exception as e:
             await self.remove_uploaded_files()
             return rx.toast(f"File upload error: {str(e)}")
@@ -142,8 +145,12 @@ class OrgState(rx.State):
 
     def validate_float(self,my_string:str):
         try:
-            return float(my_string)
+            if my_string is None or my_string=="":
+                return None
+            else:
+                return float(my_string)
         except:
+            print("Invalid float value")
             return None
 
     async def create_new_org(self, form_data: dict):
@@ -160,7 +167,7 @@ class OrgState(rx.State):
                 "latitude": self.validate_float(form_data["latitude"]),
                 "longitude": self.validate_float(form_data["longitude"]),
                 "address": form_data["address"],
-                "logo": f"{self.logo}" if self.logo else "",
+                "logo": "",
                 "website": form_data["website"],
                 "email":form_data["email"],
                 "visible": True
@@ -171,9 +178,9 @@ class OrgState(rx.State):
             async with httpx.AsyncClient() as client:
                 response = await client.post(f"{urls.API_URL}/api/orgs/create_org", 
                                             json=input_data, headers=headers)
-                
-            if self.logo:
-                await self.supabase_upload(org_id)
+            print(form_data["logo"])
+            if form_data["logo"] != "":
+                await self.supabase_upload(org_id=org_id, logo_name=form_data["logo"])
 
             if response.status_code == 200:
                 self.org_details = response.json()["org_details"]
@@ -308,8 +315,8 @@ class OrgState(rx.State):
             
     async def load_org_page(self):
         await self.get_orgs()
-        current_page_route = self.router.page.raw_path
-        org_id =current_page_route.split("/")[-2]
+        current_page_route = self.router.url.path
+        org_id =current_page_route.split("/")[-1]
         self.select_org(org_id)
         await self.find_projects_org()
         await self.find_members_org()
@@ -323,21 +330,21 @@ class OrgState(rx.State):
     def to_org_view(self,org_id:str):
         self.org_id = org_id
         self.selected_org = [d for d in self.orgs if d['org_id']==org_id][0]
-        return rx.redirect(f"/{urls.IND_ORG_URL}/{org_id}")
+        return rx.redirect(f"{urls.IND_ORG_URL}/{org_id}")
     
     
     def to_org_edit(self,org_id:str):
         self.org_id = org_id
         self.selected_org = [d for d in self.orgs if d['org_id']==org_id][0]
-        return rx.redirect(f"/{urls.IND_EDIT_ORG_URL}/{org_id}")
+        return rx.redirect(f"{urls.IND_EDIT_ORG_URL}/{org_id}")
     
     
-    async def update_org(self,key:str,value:str):
+    async def update_org(self,key:str,value:str,org_id:str):
         self.token = await self.set_auth_token()
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.put(
-                    f"{urls.API_URL}/api/orgs/update_org?key={key}&value={value}&org_id={self.org_id}",
+                    f"{urls.API_URL}/api/orgs/update_org?key={key}&value={value}&org_id={org_id}",
                     headers = {"Authorization": f"Bearer {self.token}"}
                 )
             
@@ -358,13 +365,13 @@ class OrgState(rx.State):
         lat = form_data["latitude"]
         lon = form_data["longitude"]
         
-        await self.update_org(key="latitude",value=lat)
-        await self.update_org(key="longitude",value=lon)
+        await self.update_org(key="latitude",value=lat,org_id=self.org_id)
+        await self.update_org(key="longitude",value=lon,org_id=self.org_id)
     
-    async def get_coordinates_from_map(self):
-        lat = float(pyperclip.paste().split(",")[0])
-        lon = float(pyperclip.paste().split(",")[-1])
-        return lat, lon
+    # async def get_coordinates_from_map(self):
+    #     lat = float(pyperclip.paste().split(",")[0])
+    #     lon = float(pyperclip.paste().split(",")[-1])
+    #     return lat, lon
         
         
         

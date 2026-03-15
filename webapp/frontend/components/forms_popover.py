@@ -2,8 +2,8 @@ import reflex as rx
 import reflex_clerk_api as reclerk
 from .user_input_text import SimpleTextInput
 from .forms import ProjectForm,InstitutionForm, VideoForm
-from .org_forms  import form_org,search_org
-from .project_forms  import form_project,search_project
+from .org_forms  import form_org,search_org,upload_logo_org
+from .project_forms  import form_project,search_project,upload_image,upload_logo
 from .user_forms import form_user,search_user_org,search_user_project
 from ..states.auth_state import AuthState
 from ..constants import urls
@@ -49,6 +49,9 @@ def add_new_popover(my_title:str):
             ("user", form_user()),
             form_org(),
             ),
+        on_open_change=[upload_logo_org.State.clear_image,
+                    upload_image.State.clear_image,
+                    upload_logo.State.clear_image,]
     )
 
 def search_popover(my_title:str):

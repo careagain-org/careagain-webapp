@@ -1,15 +1,12 @@
 import reflex as rx
-import uuid
-from typing import List,Dict
-from .user_input_text import SimpleTextInput
-from .project_upload import upload_logo_project,upload_image_project
+from .upload import ImageUpload
 from ..states.project_state import ProjectState
 from ..states.org_state import OrgState
-from .upload import upload_logo_org
-from .map import interactive_map
 from ..components.project_card import project_grid_vertical
 from ..constants import urls
 
+upload_logo = ImageUpload.create()
+upload_image = ImageUpload.create()
 
 def form_project() -> rx.Component:
         status: list[str] = ["Prototype","Technically tested","Clinically tested",
@@ -86,9 +83,22 @@ def form_project() -> rx.Component:
                         width="100%",
                     ),
                     rx.hstack(
-                        upload_logo_project(title="Logo",my_image=rx.get_upload_url(ProjectState.logo)),
-                        upload_image_project(title="Representative image",my_image=rx.get_upload_url(ProjectState.image)),
+                        rx.vstack(rx.heading("Project Logo",size="3"),
+                            upload_logo,
+                            rx.input(
+                                name="logo",
+                                value=upload_logo.State.image_name,
+                                type="hidden",
+                            ),),
+                        rx.vstack(rx.heading("Project Image",size="3"),
+                            upload_image,
+                            rx.input(
+                                name="image",
+                                value=upload_image.State.image_name,
+                                type="hidden",
+                            ),),
                         width="100vw",
+                        spacing="2",
                     ),
                     rx.hstack(
                         rx.vstack(
@@ -130,7 +140,7 @@ def form_project() -> rx.Component:
                     direction = "column",
                     width="100%",
                 ),
-                on_submit=ProjectState.create_new_project,
+                on_submit=[ProjectState.create_new_project,ProjectState.remove_uploaded_files],
                 reset_on_submit=True,
                 )
             )
@@ -198,11 +208,11 @@ def discover_project():
 
 def update_logo_form() -> rx.Component:
     return rx.dialog.root(
-        rx.dialog.trigger(rx.button("Update project logo")),
+        rx.dialog.trigger(rx.button("Update project logo"), on_click=ProjectState.remove_uploaded_files),
         rx.dialog.content(
             rx.form(
-                rx.dialog.title("Update location"),
-                upload_logo_project(title="Logo",my_image=rx.get_upload_url(ProjectState.logo)),
+                rx.dialog.title("Update project logo"),
+                upload_logo,
                 rx.spacer(size="5"),
                 rx.flex(
                     rx.dialog.close(
@@ -228,20 +238,21 @@ def update_logo_form() -> rx.Component:
                 ),
                 spacing="5",
                 align="center",
-                on_submit=ProjectState.supabase_upload_logo(ProjectState.project_id),
+                on_submit=ProjectState.supabase_upload_logo(ProjectState.project_id, upload_logo.State.image_name),
                 reset_on_submit=True,
             ),
-        )
+        ),
+        on_open_change=[upload_logo.State.clear_image],
     ),
     
 
 def update_image_form() -> rx.Component:
     return rx.dialog.root(
-        rx.dialog.trigger(rx.button("Update image")),
+        rx.dialog.trigger(rx.button("Update image"), on_click=ProjectState.remove_uploaded_files),
         rx.dialog.content(
             rx.form(
-                rx.dialog.title("Update location"),
-                upload_image_project(title="Logo",my_image=rx.get_upload_url(ProjectState.image)),
+                rx.dialog.title("Update image"),
+                upload_image,
                 rx.spacer(size="5"),
                 rx.flex(
                     rx.dialog.close(
@@ -267,10 +278,11 @@ def update_image_form() -> rx.Component:
                 ),
                 spacing="5",
                 align="center",
-                on_submit=ProjectState.supabase_upload_image(ProjectState.project_id),
+                on_submit=ProjectState.supabase_upload_image(ProjectState.project_id,upload_image.State.image_name),
                 reset_on_submit=True,
             ),
-        )
-    ),
+        ),
+        on_open_change=[upload_image.State.clear_image],
+    )
 
 

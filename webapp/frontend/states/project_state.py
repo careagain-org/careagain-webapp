@@ -37,6 +37,12 @@ class ProjectState(rx.State):
                 secure=True,
             ) 
     
+    def set_logo(self, image_data: str):
+        self.logo_data = image_data
+        
+    def set_image(self, image_data: str):
+        self.image_data = image_data
+    
     
     async def set_auth_token(self) -> Optional[str]:
         clerk_state = await self.get_state(reclerk.ClerkState)
@@ -61,12 +67,12 @@ class ProjectState(rx.State):
             return None
     
     def reset_project(self):
-        self.logo =None
-        self.image =None
+        self.logo = None
+        self.image = None
         
     async def load_project_page(self):
-        current_page_url = self.router.page.raw_path
-        project_id =current_page_url.split("/")[-2]
+        current_page_url = self.router.url.path
+        project_id =current_page_url.split("/")[-1]
         await self.get_list_projects()
         self.select_project(project_id)
         await self.find_members_project()
@@ -89,87 +95,22 @@ class ProjectState(rx.State):
     def select_project(self,project_id:str):
         self.project_id = project_id
         self.selected_project = [d for d in self.projects if d['project_id']==(project_id)][0]
-    
-    
-    @rx.event
-    async def handle_upload_image(self, my_files: list[rx.UploadFile]):
-        """Handle the upload of file(s).
-
-        Args:
-            files: The uploaded files.
-        """
-        try:
-            self.token = await self.set_auth_token()
-
-            file=my_files[0]
-            upload_data = await file.read()
-            self.image = f"{uuid.uuid4()}.png"
-            outfile = rx.get_upload_dir() / self.image
-
-            # Save the file.
-            with outfile.open("wb") as file_object:
-                file_object.write(upload_data)
-
-        except Exception as err:
-            return rx.toast(err)
         
-        
-    @rx.event
-    async def handle_upload_logo(self, my_files: list[rx.UploadFile]):
-        """Handle the upload of file(s).
-
-        Args:
-            files: The uploaded files.
-        """
-        try:
-            self.token = await self.set_auth_token()
-
-            file=my_files[0]
-            upload_data = await file.read()
-            self.logo = f"{uuid.uuid4()}.png"
-            outfile = rx.get_upload_dir() / self.logo
-
-            # Save the file.
-            with outfile.open("wb") as file_object:
-                file_object.write(upload_data)
-
-        except Exception as err:
-            return rx.toast(err)
-        
-        
-    @rx.event
-    async def upload_project(self, my_files: list[rx.UploadFile]):
-        """Handle the upload of file(s).
-
-        Args:
-            files: The uploaded files.
-        """
-        try:
-            self.token = await self.set_auth_token()
-            file=my_files[0]
-            upload_data = await file.read()
-            self.image = f"{uuid.uuid4()}.png"
-            outfile = rx.get_upload_dir() / self.image
-
-            # Save the file.
-            with outfile.open("wb") as file_object:
-                file_object.write(upload_data)
-
-        except Exception as err:
-            return rx.toast(err)
     
     async def remove_uploaded_files(self):
         files = glob.glob(f"{rx.get_upload_dir()}/*")
         for f in files:
             os.remove(f)
+    
         
-    async def supabase_upload_logo(self,project_id):
+    async def supabase_upload_logo(self,project_id,logo_name):
         try:
+            filename = f"{uuid.uuid4()}.png"
             self.token = await self.set_auth_token()
-            outfile = rx.get_upload_dir() / self.logo
+            outfile = rx.get_upload_dir() / logo_name
 
             with open(outfile, "rb") as image_file:
-                files = {"file": (self.logo, image_file, "image/png")}
+                files = {"file": (filename, image_file, "image/png")}
                 data = {"project_id": project_id}
                 headers = {"Authorization": f"Bearer {self.token}"}
 
@@ -179,30 +120,29 @@ class ProjectState(rx.State):
 
                 if response.status_code == 200:
                     try:
-                        logo  = f"{os.environ.get('SUPABASE_URL')}storage/v1/object/public/{os.environ.get('SUPABASE_S3_BUCKET')}/projects/{self.project_id}/images/{self.logo}"
-                        await self.update_project("logo",logo)
-                        await self.remove_uploaded_files()
+                        self.logo  = f"{os.environ.get('SUPABASE_URL')}storage/v1/object/public/{os.environ.get('SUPABASE_S3_BUCKET')}/projects/{project_id}/images/{filename}"
+                        await self.update_project("logo",self.logo,project_id=project_id)
+                        self.logo = None
                     except Exception as e:
-                        await self.remove_uploaded_files()
+                        self.logo = None
                         return rx.toast(f"Logo upload error: {str(e)}")
-                    self.logo = None
-                    self.project_details = response.json()["project_id"]
                 else:
-                    detail = response.json()["detail"]
                     self.logo = None
+                    detail = response.json()["detail"]
                     return rx.toast(f"Project update error: {response.status_code}, {detail}")
         except Exception as e:
             self.logo = None
             return rx.toast(f"File upload error: {str(e)}")
         
         
-    async def supabase_upload_image(self,project_id):
+    async def supabase_upload_image(self,project_id,image_name):
         try:
             self.token = await self.set_auth_token()
-            outfile = rx.get_upload_dir() / self.image
+            filename = f"{uuid.uuid4()}.png"
+            outfile = rx.get_upload_dir() / image_name
 
             with open(outfile, "rb") as image_file:
-                files = {"file": (self.image, image_file, "image/png")}
+                files = {"file": (filename, image_file, "image/png")}
                 data = {"project_id": project_id}
                 headers = {"Authorization": f"Bearer {self.token}"}
 
@@ -212,23 +152,18 @@ class ProjectState(rx.State):
 
                 if response.status_code == 200:
                     try:
-                        image  = f"{os.environ.get('SUPABASE_URL')}storage/v1/object/public/{os.environ.get('SUPABASE_S3_BUCKET')}/projects/{self.project_id}/images/{self.image}"
-                        await self.update_project("image",image)
-                        await self.remove_uploaded_files()
+                        self.image  = f"{os.environ.get('SUPABASE_URL')}storage/v1/object/public/{os.environ.get('SUPABASE_S3_BUCKET')}/projects/{project_id}/images/{filename}"
+                        await self.update_project("image",self.image,project_id=project_id)
                         self.image = None
-                        self.project_details = response.json()["project_id"]
                     except Exception as e:
                         self.image = None
-                        await self.remove_uploaded_files()
                         return rx.toast(f"Image upload error: {str(e)}")
                 else:
-                    detail = response.json()["detail"]
                     self.image = None
-                    await self.remove_uploaded_files()
+                    detail = response.json()["detail"]
                     return rx.toast(f"Project update error: {response.status_code}, {detail}")
         except Exception as e:
             self.image = None
-            await self.remove_uploaded_files()
             return rx.toast(f"File upload error: {str(e)}")
         
         
@@ -236,12 +171,7 @@ class ProjectState(rx.State):
         try:
             self.token = await self.set_auth_token()
             project_id = str(uuid.uuid4())
-
-            if self.logo:
-                await self.supabase_upload_logo(project_id)
-            if self.image:
-                await self.supabase_upload_image(project_id)
-
+            
             input_data = {
                 "project_id": project_id, 
                 "name": form_data["name"],
@@ -256,7 +186,7 @@ class ProjectState(rx.State):
                 "repo": form_data["repo"] if form_data["repo"] else "",
                 "org_name": form_data["org_name"] if form_data["org_name"] else "",
             }
-
+            
             headers = {"Authorization": f"Bearer {self.token}"}
 
             async with httpx.AsyncClient() as client:
@@ -264,12 +194,17 @@ class ProjectState(rx.State):
                                             json=input_data, headers=headers)
 
             if response.status_code == 200:
-                self.project_details = response.json()["project_details"]
+                if form_data["logo"] != "":
+                    await self.supabase_upload_logo(project_id,form_data["logo"])
+                if form_data["image"] != "":
+                    await self.supabase_upload_image(project_id,form_data["image"])
+                await self.remove_uploaded_files()
                 self.reset_project()
                 await self.get_my_projects()
                 await self.get_list_projects()
                 return rx.toast("New project uploaded")
             else:
+                await self.remove_uploaded_files()
                 detail = response.json()["detail"]
                 return rx.toast(f"Project update error: {response.status_code}, {detail}")
         except Exception as err:
@@ -474,12 +409,12 @@ class ProjectState(rx.State):
             return rx.toast.error(f"Change member type: {response.status_code}, {response.text}")
         
     
-    async def update_project(self,key:str,value:str):
+    async def update_project(self,key:str,value:str,project_id:str):
         try:
             self.token = await self.set_auth_token()
             async with httpx.AsyncClient() as client:
                 response = await client.put(
-                    f"{urls.API_URL}/api/projects/update_project?key={key}&value={value}&project_id={self.project_id}",
+                    f"{urls.API_URL}/api/projects/update_project?key={key}&value={value}&project_id={project_id}",
                     headers = {"Authorization": f"Bearer {self.token}"}
                 )
             

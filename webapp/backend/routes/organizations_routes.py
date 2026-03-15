@@ -34,16 +34,20 @@ async def upload_image(org_id: str,
             file_options={"content-type": file.content_type,
                         "cache-control": "3600", "upsert": "true",},
         )
-        
-        return {"filename":f"{url_s3_object}/{url_photo}", "detail": "Image uploaded","org_id":org_id}
+
+        return {"filename":f"{url_s3_object}{url_photo}", "detail": "Image uploaded","org_id":org_id}
     
     except Exception as err:
         raise HTTPException(status_code=500, detail=str(err))
 
 def validate_float(my_string:str):
     try:
-        return float(my_string)
+        if my_string is None or my_string=="":
+            return None
+        else:
+            return float(my_string)
     except:
+        print("Invalid float value")
         return None
 
 @organization_route.post("/create_org",tags = ['organizations'])

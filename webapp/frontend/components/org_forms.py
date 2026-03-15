@@ -1,22 +1,21 @@
 import reflex as rx
-import uuid
-from typing import List,Dict
-from .user_input_text import SimpleTextInput
-from .upload import upload_logo_org
-from ..states.project_state import ProjectState
+from .upload import ImageUpload
 from ..states.org_state import OrgState
-from .upload import upload_logo_org
+# from .upload import upload_logo_org, upload_image
 from .map import interactive_map
 import clipboard
 import os
 from ..components.org_card import org_grid_vertical
 
+upload_logo_org = ImageUpload.create()
 
 def form_org() -> rx.Component:
     all_organization: list[str] = ["Hospital", "Logistics and Transport",
                                     "Research and Development","Manufacturer"]
+    
 
-    return rx.dialog.content(
+    return rx.fragment(
+        rx.dialog.content(
         rx.dialog.title(f"Add new organization"),
         rx.dialog.description(
                 f"Add new organization details, required fields marked with *",
@@ -67,7 +66,14 @@ def form_org() -> rx.Component:
                         width="100%",
                     ),
                     rx.hstack(
-                            upload_logo_org(title="Logo",my_image=rx.get_upload_url(OrgState.logo)),
+                        rx.vstack(rx.heading("Organization Logo",size="3"),
+                            upload_logo_org,
+                            rx.input(
+                                name="logo",
+                                value=upload_logo_org.State.image_name,
+                                type="hidden",
+                            ),),
+#                            upload_logo_org(title="Logo",my_image=rx.get_upload_url(OrgState.logo)),
                             rx.vstack(
                                 rx.hstack(rx.heading("Locate in the map",color="grey",size="3")),
                                 interactive_map(),
@@ -95,7 +101,7 @@ def form_org() -> rx.Component:
                                 "Cancel",
                                 color_scheme="gray",
                                 variant="soft",
-                                justify="start",),
+                                justify="start"),
                         ),
                         rx.dialog.close(
                             rx.button("Save",
@@ -115,8 +121,8 @@ def form_org() -> rx.Component:
                 on_submit=OrgState.create_new_org,
                 reset_on_submit=True,
             )
-        )
-
+        ),
+    )
 
 
 def search_org() -> rx.Component:
@@ -162,6 +168,7 @@ def search_org() -> rx.Component:
         on_submit=OrgState.join_org,
         reset_on_submit=True,
     )
+        
 )
     
 def discover_org():
@@ -238,8 +245,11 @@ def update_image_form():
         rx.dialog.trigger(rx.button("Update image"), on_click=OrgState.remove_uploaded_files),
         rx.dialog.content(
             rx.form(
-                rx.dialog.title("Update location"),
-                upload_logo_org(title="Logo",my_image=rx.get_upload_url(OrgState.logo)),
+                rx.dialog.title("Update image"),
+                rx.box(
+                    upload_logo_org,
+                ),
+                #upload_logo_org(title="Logo",my_image=OrgState.logo),
                 rx.spacer(size="5"),
                 rx.flex(
                     rx.dialog.close(
@@ -265,10 +275,11 @@ def update_image_form():
                 ),
                 spacing="5",
                 align="center",
-                on_submit=OrgState.supabase_upload(OrgState.org_id),
+                on_submit=OrgState.supabase_upload(OrgState.org_id,upload_logo_org.State.image_name),
                 reset_on_submit=True,
             ),
-        )
+        ),
+        on_open_change=[upload_logo_org.State.clear_image],
     ),
 
 # class OrganizationForm(rx.ComponentState):

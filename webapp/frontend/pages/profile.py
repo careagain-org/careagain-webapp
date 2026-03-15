@@ -5,7 +5,6 @@ from ..layout import platform_layout
 from ..constants import urls
 from ..components.forms_popover import add_new_popover,search_popover
 from ..components.user_input_text import EditableText,EditableTextArea
-from ..components.upload import upload_image_user
 from ..components.org_table import table_pagination as org_table
 from ..components.project_table import table_pagination as project_table
 from ..components.list_institution import list_org_vertical
