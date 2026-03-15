@@ -54,6 +54,7 @@ furo==2024.8.6
 geographiclib==2.0
 geopy==2.4.1
 ghp-import==2.1.0
+git-filter-repo==2.47.0
 gotrue==2.12.3
 granian==2.7.2
 griffe==1.7.3
@@ -174,7 +175,7 @@ sphinxcontrib-qthelp==2.0.0
 sphinxcontrib-serializinghtml==2.0.0
 SQLAlchemy==2.0.36
 sqlmodel==0.0.37
-starlette==0.52.1
+starlette==0.41.3
 starlette-admin==0.14.1
 storage3==0.12.1
 StrEnum==0.4.15
