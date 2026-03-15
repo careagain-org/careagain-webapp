@@ -21,7 +21,7 @@ def view_project() -> rx.Component:
                 rx.hstack(
                     rx.heading(ProjectState.selected_project['name'], size="9"),
                     reclerk.signed_in(
-                        rx.cond(ProjectState.is_project_member,
+                        rx.cond(ProjectState.is_project_follower,
                                 rx.button("Unfollow",variant="outline",type="button",
                                           on_mount=[ProjectState.get_my_projects,UserState.get_my_details],
                                         on_click = lambda: ProjectState.user_unfollow_project(UserState.my_details["user_id"]),
@@ -29,8 +29,13 @@ def view_project() -> rx.Component:
                                 rx.button("Follow",variant="solid",
                                     on_click = lambda: ProjectState.user_follow_project(UserState.my_details["user_id"]),
                                     on_mount=[ProjectState.get_my_projects,UserState.get_my_details],
-                                    type="button"),
-                    ),),
+                                    type="button"),),
+                        reclerk.signed_in(
+                            rx.cond(ProjectState.is_project_admin,
+                                        rx.icon_button("pencil",variant="solid",type="button",
+                                                on_click = lambda: ProjectState.to_project_edit(ProjectState.selected_project['project_id']),
+                                                ),),),
+                    ),
                     align="center",
                     padding="5",),
                 rx.hstack(

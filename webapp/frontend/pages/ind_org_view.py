@@ -23,7 +23,7 @@ def view_organization() -> rx.Component:
         rx.flex(
             rx.heading(OrgState.selected_org['name'], size="9"),
             reclerk.signed_in(
-                rx.cond(OrgState.is_org_member,
+                rx.cond(OrgState.is_org_follower,
                             rx.button("Unfollow",variant="outline",type="button",
                                     on_click = lambda: OrgState.user_unfollow_org(UserState.my_details["user_id"]),
                                     ),
@@ -31,6 +31,12 @@ def view_organization() -> rx.Component:
                                 on_click = lambda: OrgState.user_follow_org(UserState.my_details["user_id"]),
                                 type="button"),
                             ),
+            ),
+            reclerk.signed_in(
+                rx.cond(OrgState.is_org_admin,
+                            rx.icon_button("pencil",variant="solid",type="button",
+                                    on_click = lambda: OrgState.to_org_edit(OrgState.selected_org['org_id']),
+                                    ),),
             ),
             justify="start",
             direction="row",

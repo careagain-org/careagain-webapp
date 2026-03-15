@@ -31,6 +31,8 @@ class OrgState(rx.State):
     org_id:str=""
     logo_data: str =""
     is_org_member: bool=False
+    is_org_follower: bool=False
+    is_org_admin: bool=False
     token:Optional[str]=rx.Cookie(
                 name="auth_token", max_age=30,
                 path="/",
@@ -205,6 +207,7 @@ class OrgState(rx.State):
         if response.status_code == 200:
             self.my_orgs = response.json()
             self.is_org_member = any(d['org_id'] == self.selected_org.get("org_id") for d in self.my_orgs)
+            self.is_org_admin = any((d['org_id'] == self.selected_org.get("org_id") and d['member_type'] == "admin") for d in self.my_orgs)
         
         else:
             print(f"Failed to get orgs: {response.status_code}, {response.text}")
@@ -290,6 +293,7 @@ class OrgState(rx.State):
             if response.status_code == 200:
                 self.org_members = response.json()
                 self.is_org_member = any(d['org_id'] == self.selected_org.get("org_id") for d in self.my_orgs)
+                self.is_org_admin = any((d['org_id'] == self.selected_org.get("org_id") and d['member_type'] == "admin") for d in self.my_orgs)
         
             else:
                 print(f"Failed to get orgs: {response.status_code}, {response.text}")
@@ -418,7 +422,7 @@ class OrgState(rx.State):
             detail = response.json()["detail"]
             await self.get_my_orgs()
             await self.find_members_org()
-            self.is_org_member = any(d['org_id'] == self.selected_org.get("org_id") for d in self.my_orgs)
+            self.is_org_follower = any((d['org_id'] == self.selected_org.get("org_id") and d['member_type'] == "follower") for d in self.my_orgs)
             return rx.toast.success(detail)
         else:
             return rx.toast.error(f"Failed to follow org: {response.status_code}, {response.text}")
@@ -435,7 +439,7 @@ class OrgState(rx.State):
             detail = response.json()["detail"]
             await self.get_my_orgs()
             await self.find_members_org()
-            self.is_org_member = any(d['org_id'] == self.selected_org.get("org_id") for d in self.my_orgs)
+            self.is_org_follower = any(d['org_id'] == self.selected_org.get("org_id") and d['member_type'] == "follower" for d in self.my_orgs)
             return rx.toast.success(detail)
         else:
             return rx.toast.error(f"Failed to unfollow org: {response.status_code}, {response.text}")

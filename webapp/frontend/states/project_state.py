@@ -30,6 +30,8 @@ class ProjectState(rx.State):
     logo: str = None
     image: str = None
     is_project_member: bool = False
+    is_project_admin: bool = False
+    is_project_follower: bool = False
     token:Optional[str]=rx.Cookie(
                 name="auth_token", max_age=30,
                 path="/",
@@ -283,6 +285,8 @@ class ProjectState(rx.State):
         if response.status_code == 200:
             self.my_projects = response.json()
             self.is_project_member = any(d['project_id'] == self.selected_project.get("project_id") for d in self.my_projects)
+            self.is_project_admin = any(d['project_id'] == self.selected_project.get("project_id") and d['member_type'] == "admin" for d in self.my_projects)
+            self.is_project_follower = any(d['project_id'] == self.selected_project.get("project_id") and d['member_type'] == "follower" for d in self.my_projects)
         
         else:
             print(f"Failed to get projects: {response.status_code}, {response.text}")
@@ -374,7 +378,7 @@ class ProjectState(rx.State):
         if response.status_code == 200:
             detail = response.json()["detail"]
             await self.get_my_projects()
-            self.is_project_member = any(d['project_id'] == self.project_id for d in self.my_projects)
+            self.is_project_follower = any(d['project_id'] == self.project_id and d['member_type'] == "follower" for d in self.my_projects)
             return rx.toast.success(detail)
         else:
             return rx.toast.error(f"Failed to unfollow project: {response.status_code}, {response.text}")
@@ -389,7 +393,7 @@ class ProjectState(rx.State):
         if response.status_code == 200:
             detail = response.json()["detail"]
             await self.get_my_projects()
-            self.is_project_member = any(d['project_id'] == self.project_id for d in self.my_projects)
+            self.is_project_follower = any(d['project_id'] == self.project_id and d['member_type'] == "follower" for d in self.my_projects)
             return rx.toast.success(detail)
         else:
             return rx.toast.error(f"Failed to follow project: {response.status_code}, {response.text}")

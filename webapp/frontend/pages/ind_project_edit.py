@@ -1,4 +1,5 @@
 import reflex as rx 
+import reflex_clerk_api as reclerk
 from ..layout import platform_layout
 from ..constants import urls
 from ..states.project_state import ProjectState
@@ -33,7 +34,8 @@ def title_section(title:str, icon:str, text:str = "") -> rx.Component:
                                                             ProjectState.find_orgs_project])
 def edit_project() -> rx.Component:
     project=ProjectState.selected_project
-    my_child = rx.vstack(
+    my_child = rx.cond(ProjectState.is_project_admin,
+        rx.vstack(
         rx.link(rx.icon('arrow_left'),href=urls.PROFILE_URL),
         rx.flex(
             rx.vstack(
@@ -157,6 +159,11 @@ def edit_project() -> rx.Component:
             spacing="4",
         ),
         table_pagination(ProjectState.project_members,"project"),
+    ),
+        rx.callout(
+            "You need admin privileges to edit the project information.",
+            icon="info",
+        )
     )
 
     return platform_layout(my_child)

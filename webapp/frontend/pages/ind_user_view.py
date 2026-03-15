@@ -33,7 +33,7 @@ def view_user() -> rx.Component:
                 ),
                 rx.hstack(
                     rx.icon("globe"),
-                    # rx.link(f"{UserState.selected_user['linkedin']}",href=f"{UserState.selected_user['web_link']}",is_external=True)
+                    rx.link(f"{UserState.selected_user['linkedin']}",href=f"{UserState.selected_user['linkedin']}",is_external=True)
                 ),
                 rx.divider(width='90%'),
                 rx.vstack(

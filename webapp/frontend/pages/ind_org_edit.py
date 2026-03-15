@@ -32,7 +32,8 @@ def title_section(title:str, icon:str):
                                                             OrgState.find_projects_org])
 def edit_organization() -> rx.Component:
     org=OrgState.selected_org
-    my_child = rx.vstack(
+    my_child = rx.cond(OrgState.is_org_admin,
+        rx.vstack(
         rx.link(rx.icon('arrow_left'),href=urls.PROFILE_URL),
         rx.hstack(
             rx.heading(org['name'], size="9"),
@@ -146,6 +147,10 @@ def edit_organization() -> rx.Component:
         project_table_pagination(OrgState.org_projects),
         with_="100%",
         id="organization-edit",
+        ),
+        rx.callout(
+            "You need admin privileges to edit the organization information.",
+            icon="info",
+        )
     )
-
     return platform_layout(my_child)
