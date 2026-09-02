@@ -293,4 +293,4 @@ def home_page() -> rx.Component:
     ),
     render_menu(),
     )
-    return base_page(my_child)
+    return rx.redirect(urls.PLATFORM_URL)

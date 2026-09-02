@@ -4,8 +4,8 @@
 import reflex as rx
 from webapp.frontend.pages import (ind_org_view, ind_org_edit, 
                                    ind_project_view, ind_project_edit, 
-                                   ind_user_view,login,signup,
-                                   webpage, projects, 
+                                   ind_user_view,login,signup,webpage, 
+                                   projects, 
                                    platform, projects, profile,
                                    videos,community, questions) #contact,community,
 from webapp.frontend.constants import urls
@@ -68,8 +68,7 @@ api_app.include_router(action_route)
 # CORS middleware to allow communication between frontend and backend
 origins = [urls.WEB_URL,
            urls.API_URL,
-           "https://www.careagain.org/",
-           "https://www.opencareagain.org/",
+           "https://platform.careagain.org/",
            "http://localhost:8000",
            "http://localhost:3000"] # specify the http where the api is going to run
 
